@@ -1730,22 +1730,193 @@ function fillVehicleFromAPI(result, prefix) {
 }
 
 async function lookupPlateStep2() {
-    const plaque = document.getElementById('cvPlaque').value.trim().toUpperCase();
+    const plaque = document.getElementById('cvPlaque').value.trim().toUpperCase().replace(/[-\s]/g,'');
     if (!plaque) return toast('Entrez une plaque', 'error');
-    try {
-        toast('Recherche en cours...', 'info');
-        const resp = await fetch(PROXY_URL + '?plaque=' + encodeURIComponent(plaque));
-        const result = await resp.json();
-        console.log('API BRUT:', JSON.stringify(result, null, 2));
-        if (result && Object.keys(result).length > 1) {
-            fillVehicleFromAPI(result, 'cv');
-            toast('Véhicule trouvé !', 'success');
-        } else {
-            toast('Véhicule non trouvé', 'error');
+    openAutodocPaste('cv');
+}
+
+function openAutodocPaste(prefix) {
+    const html = `
+        <div id="autodocPasteOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.remove()">
+            <div style="background:#fff;border-radius:12px;max-width:550px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+                <div style="padding:16px 20px;background:var(--blue);color:#fff;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center">
+                    <strong>📋 Coller les infos Autodoc</strong>
+                    <button onclick="document.getElementById('autodocPasteOverlay').remove()" style="background:none;border:none;color:#fff;font-size:1.3em;cursor:pointer">&times;</button>
+                </div>
+                <div style="padding:20px">
+                    <p style="margin-bottom:10px;font-size:0.85em;color:var(--text-light)">
+                        1. Va sur <a href="https://www.autodoc.fr/" target="_blank" style="color:var(--blue);font-weight:600">Autodoc.fr</a>, cherche ton véhicule par plaque<br>
+                        2. Clique sur <strong>Informations véhicule</strong><br>
+                        3. Sélectionne tout le texte (Ctrl+A) et copie (Ctrl+C)<br>
+                        4. Colle ici (Ctrl+V) et clique <strong>Remplir</strong>
+                    </p>
+                    <textarea id="autodocPasteArea" placeholder="Colle ici le texte copié depuis Autodoc..." style="width:100%;height:200px;border:2px solid var(--border);border-radius:8px;padding:12px;font-size:0.85em;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>
+                    <button onclick="parseAutodocPaste('${prefix}')" class="btn btn-primary" style="width:100%;margin-top:10px;padding:12px;font-size:1em">🚗 Remplir le formulaire</button>
+                </div>
+            </div>
+        </div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+    document.getElementById('autodocPasteArea').focus();
+}
+
+function parseAutodocPaste(prefix) {
+    const raw = document.getElementById('autodocPasteArea').value;
+    if (!raw.trim()) return toast('Colle du texte d\'abord !', 'error');
+
+    const text = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+
+    // Extraire marque depuis la première ligne "VOLKSWAGEN Passat..." ou header
+    let marque = '', modele = '', motorisation = '', carrosserie = '', energie = '';
+    let puissanceCH = '', puissanceKW = '', cylindree = '', cylindres = '';
+    let codeMoteur = '', boite = '', annee = '', transmission = '';
+
+    // Parser ligne par ligne
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const lower = line.toLowerCase();
+        const nextLine = (i + 1 < lines.length) ? lines[i + 1].trim() : '';
+
+        // Format "Label:Valeur" ou "Label :Valeur"
+        const colonMatch = line.match(/^([^:]+):\s*(.+)$/);
+        if (colonMatch) {
+            const label = colonMatch[1].toLowerCase().trim();
+            const val = colonMatch[2].trim();
+
+            if (label.includes('puissance') && label.includes('cv')) puissanceCH = val.replace(/[^0-9]/g, '');
+            else if (label.includes('puissance') && label.includes('kw')) puissanceKW = val.replace(/[^0-9]/g, '');
+            else if (label.includes('cylindr') && label.includes('cc')) cylindree = val.replace(/[^0-9]/g, '');
+            else if (label === 'cylindres' || label === 'cylindre') cylindres = val.replace(/[^0-9]/g, '');
+            else if (label === 'motorisation' || label === 'carburant') energie = val.toUpperCase();
+            else if (label.includes('code moteur')) codeMoteur = val;
+            else if (label.includes('transmission')) transmission = val;
+            else if (label.includes('carrosserie') || (label === 'type' && (val.toLowerCase().includes('break') || val.toLowerCase().includes('berline') || val.toLowerCase().includes('cabriolet') || val.toLowerCase().includes('suv') || val.toLowerCase().includes('monospace') || val.toLowerCase().includes('coup')))) carrosserie = val;
+            else if (label === 'type' && !carrosserie) motorisation = val;
+            else if (label.includes('construction') || label.includes('production')) {
+                const ym = val.match(/(\d{2})\.(\d{4})/);
+                if (ym) annee = ym[2];
+            }
+            else if (label.includes('bo') && label.includes('vitesse')) boite = val;
+            continue;
         }
-    } catch(e) {
-        toast('Erreur : ' + e.message, 'error');
     }
+
+    // Extraire marque/modèle depuis le header "VOLKSWAGEN Passat B5 GP Break (3BG, 3B6) 1.9 TDI..."
+    const headerLine = lines.find(l => /^[A-Z]{2,}/.test(l) && l.length > 5) || '';
+    if (headerLine) {
+        const parts = headerLine.split(/\s+/);
+        if (parts.length >= 2) {
+            marque = parts[0].toUpperCase();
+            // Modèle = deuxième mot (avant les parenthèses ou chiffres de motorisation)
+            let modelParts = [];
+            for (let j = 1; j < parts.length; j++) {
+                if (parts[j].startsWith('(') || /^\d+\.\d+$/.test(parts[j])) break;
+                modelParts.push(parts[j]);
+            }
+            modele = modelParts.join(' ');
+            // Motorisation = ce qui reste après le modèle
+            const afterModel = headerLine.substring(headerLine.indexOf(modele) + modele.length).replace(/\([^)]*\)/g, '').trim();
+            if (afterModel && !motorisation) motorisation = afterModel.split(' fiche')[0].trim();
+        }
+    }
+
+    // Remplir les champs du formulaire
+    const fields = {
+        'Marque': marque,
+        'Modele': modele,
+        'Motorisation': motorisation || codeMoteur,
+        'Carrosserie': carrosserie,
+        'Energie': energie,
+        'Puissance': puissanceCH || puissanceKW,
+        'PuissanceFisc': '',
+        'Cylindree': cylindree,
+        'Annee': annee,
+        'Vin': '',
+        'TypeMine': '',
+        'Couleur': ''
+    };
+
+    // Sélectionner la marque dans le dropdown
+    const marqueSelect = document.getElementById(prefix + 'Marque');
+    if (marqueSelect && marque) {
+        for (let opt of marqueSelect.options) {
+            if (opt.value.toUpperCase() === marque || opt.text.toUpperCase() === marque) {
+                marqueSelect.value = opt.value;
+                marqueSelect.dispatchEvent(new Event('change'));
+                break;
+            }
+        }
+        // Après changement de marque, sélectionner le modèle
+        setTimeout(() => {
+            const modeleSelect = document.getElementById(prefix + 'Modele');
+            if (modeleSelect && modele) {
+                const cleanModel = modele.split(' ')[0].toUpperCase();
+                for (let opt of modeleSelect.options) {
+                    if (opt.value.toUpperCase().includes(cleanModel) || opt.text.toUpperCase().includes(cleanModel)) {
+                        modeleSelect.value = opt.value;
+                        break;
+                    }
+                }
+            }
+        }, 200);
+    }
+
+    // Remplir les champs texte
+    const setVal = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+    setVal(prefix + 'Motorisation', motorisation || codeMoteur);
+    setVal(prefix + 'Annee', annee);
+    setVal(prefix + 'Cylindree', cylindree);
+    setVal(prefix + 'Puissance', puissanceCH || puissanceKW);
+
+    // Carrosserie dropdown
+    const carroSelect = document.getElementById(prefix + 'Carrosserie');
+    if (carroSelect && carrosserie) {
+        const cc = carrosserie.toUpperCase();
+        for (let opt of carroSelect.options) {
+            if (opt.value.toUpperCase().includes(cc) || cc.includes(opt.value.toUpperCase())) {
+                carroSelect.value = opt.value;
+                break;
+            }
+        }
+    }
+
+    // Énergie dropdown
+    const energieSelect = document.getElementById(prefix + 'Energie');
+    if (energieSelect && energie) {
+        const ee = energie.toUpperCase();
+        for (let opt of energieSelect.options) {
+            if (opt.value.toUpperCase().includes('DIESEL') && ee.includes('DIESEL')) { energieSelect.value = opt.value; break; }
+            if (opt.value.toUpperCase().includes('ESSENCE') && ee.includes('ESSENCE')) { energieSelect.value = opt.value; break; }
+            if (opt.text.toUpperCase().includes(ee)) { energieSelect.value = opt.value; break; }
+        }
+    }
+
+    // Boîte
+    const boiteSelect = document.getElementById(prefix + 'Boite');
+    if (boiteSelect && boite) {
+        const bb = boite.toUpperCase();
+        for (let opt of boiteSelect.options) {
+            if (bb.includes('AUTO') && opt.value.toUpperCase().includes('AUTO')) { boiteSelect.value = opt.value; break; }
+            if (bb.includes('MANU') && opt.value.toUpperCase().includes('MANU')) { boiteSelect.value = opt.value; break; }
+        }
+    }
+
+    // Observations — mettre les infos supplémentaires
+    const obs = document.getElementById(prefix + 'Observations');
+    if (obs) {
+        let extras = [];
+        if (transmission) extras.push('Transmission: ' + transmission);
+        if (cylindres) extras.push('Cylindres: ' + cylindres);
+        if (codeMoteur) extras.push('Code moteur: ' + codeMoteur);
+        if (puissanceKW && puissanceCH) extras.push(puissanceKW + ' KW / ' + puissanceCH + ' CV');
+        if (extras.length) obs.value = extras.join(' | ');
+    }
+
+    // Fermer le popup
+    document.getElementById('autodocPasteOverlay')?.remove();
+
+    const nbFilled = Object.values(fields).filter(v => v).length;
+    toast('✅ ' + nbFilled + ' champs remplis depuis Autodoc !', 'success');
 }
 
 function deleteClient(id) {
@@ -1892,24 +2063,11 @@ function deleteVehicle(id) {
     toast('Véhicule supprimé', 'info');
 }
 
-// Plate lookup via proxy
+// Plate lookup — ouvre le panneau copier-coller Autodoc
 async function lookupPlate() {
-    const plaque = document.getElementById('vPlaque').value.trim().toUpperCase();
+    const plaque = document.getElementById('vPlaque').value.trim().toUpperCase().replace(/[-\s]/g,'');
     if (!plaque) return toast('Entrez une plaque', 'error');
-    try {
-        toast('Recherche en cours...', 'info');
-        const resp = await fetch(PROXY_URL + '?plaque=' + encodeURIComponent(plaque));
-        const result = await resp.json();
-        console.log('API BRUT:', JSON.stringify(result, null, 2));
-        if (result && Object.keys(result).length > 1) {
-            fillVehicleFromAPI(result, 'v');
-            toast('Véhicule trouvé !', 'success');
-        } else {
-            toast('Véhicule non trouvé', 'error');
-        }
-    } catch(e) {
-        toast('Erreur de recherche : ' + e.message, 'error');
-    }
+    openAutodocPaste('v');
 }
 
 // ============================================================
