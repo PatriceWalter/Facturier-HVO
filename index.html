@@ -1180,6 +1180,115 @@ function updateModelsStep2() {
     }
 }
 
+// Generic plate lookup - fills all fields for either modal
+function fillVehicleFromAPI(result, prefix) {
+    // prefix = 'cv' pour step2 client, 'v' pour modal véhicule standalone
+    const marqueId = prefix + (prefix === 'cv' ? 'Marque' : 'Marque');
+    const modeleId = prefix + (prefix === 'cv' ? 'Modele' : 'Modele');
+    const updateFn = prefix === 'cv' ? updateModelsStep2 : updateModels;
+
+    // === MARQUE ===
+    if (result.marque) {
+        const marqueUpper = result.marque.toUpperCase().trim();
+        const sel = document.getElementById(marqueId);
+        // Try exact match first
+        let matched = false;
+        for (let opt of sel.options) {
+            if (opt.value === marqueUpper) { sel.value = marqueUpper; matched = true; break; }
+        }
+        // Try partial match
+        if (!matched) {
+            for (let opt of sel.options) {
+                if (opt.value && (marqueUpper.includes(opt.value) || opt.value.includes(marqueUpper))) {
+                    sel.value = opt.value; matched = true; break;
+                }
+            }
+        }
+        // If still not matched, add it
+        if (!matched && marqueUpper) {
+            const newOpt = document.createElement('option');
+            newOpt.value = marqueUpper; newOpt.textContent = marqueUpper;
+            sel.appendChild(newOpt);
+            sel.value = marqueUpper;
+        }
+        updateFn();
+    }
+
+    // === MODELE ===
+    const modele = result.modele || result.model || result.modeleCommercial || '';
+    if (modele) {
+        const selM = document.getElementById(modeleId);
+        const modelClean = modele.trim();
+        // Try exact match
+        let mMatched = false;
+        for (let opt of selM.options) {
+            if (opt.value && opt.value.toLowerCase() === modelClean.toLowerCase()) { selM.value = opt.value; mMatched = true; break; }
+        }
+        // Try partial match
+        if (!mMatched) {
+            for (let opt of selM.options) {
+                if (opt.value && (modelClean.toLowerCase().includes(opt.value.toLowerCase()) || opt.value.toLowerCase().includes(modelClean.toLowerCase()))) {
+                    selM.value = opt.value; mMatched = true; break;
+                }
+            }
+        }
+        // If not matched, add it as option
+        if (!mMatched && modelClean) {
+            const newOpt = document.createElement('option');
+            newOpt.value = modelClean; newOpt.textContent = modelClean + ' (API)';
+            selM.appendChild(newOpt);
+            selM.value = modelClean;
+        }
+    }
+
+    // === ALL OTHER FIELDS ===
+    const fields = {
+        'Annee': result.annee || result.anneeMEC || result.year || '',
+        'DateMEC': result.dateMEC || result.date1erMEC || result.dateCirculation || '',
+        'Km': result.km || result.kilometrage || '',
+        'Cylindree': result.cylindree || result.cylindreeMoteur || '',
+        'Puissance': result.puissance || result.puissanceCV || result.puissanceKW || '',
+        'PuissanceFisc': result.puissanceFisc || result.puissanceFiscale || result.cvFiscaux || '',
+        'Vin': result.vin || result.VIN || result.codifVin || '',
+        'TypeMine': result.typeMine || result.CNIT || result.typeVehicule || '',
+        'Couleur': result.couleur || result.color || ''
+    };
+
+    for (const [suffix, val] of Object.entries(fields)) {
+        if (val) {
+            const el = document.getElementById(prefix + suffix);
+            if (el) el.value = String(val).trim();
+        }
+    }
+
+    // === ENERGIE (select) ===
+    const energie = (result.energie || result.carburant || result.typeCarburant || '').toUpperCase();
+    if (energie) {
+        const enSel = document.getElementById(prefix + 'Energie');
+        if (enSel) {
+            const enMap = {'DIESEL':'Diesel','GO':'Diesel','GAZOLE':'Diesel','GASOIL':'Diesel',
+                'ESSENCE':'Essence','ES':'Essence','SUPER':'Essence',
+                'HYBRIDE':'Hybride','HY':'Hybride','HYBRID':'Hybride',
+                'ELECTRIQUE':'Électrique','EL':'Électrique','ELECTRIC':'Électrique',
+                'GPL':'GPL','GP':'GPL','GAZ':'GPL'};
+            for (const [key, val] of Object.entries(enMap)) {
+                if (energie.includes(key)) { enSel.value = val; break; }
+            }
+        }
+    }
+
+    // === BOITE (select) ===
+    const boite = (result.boite || result.boiteVitesse || result.transmission || '').toUpperCase();
+    if (boite) {
+        const bSel = document.getElementById(prefix + 'Boite');
+        if (bSel) {
+            if (boite.includes('AUTO') || boite.includes('BVA') || boite.includes('DSG')) bSel.value = 'Automatique';
+            else if (boite.includes('ROBOT')) bSel.value = 'Robotisée';
+            else bSel.value = 'Manuelle';
+        }
+    }
+}
+
 async function lookupPlateStep2() {
     const plaque = document.getElementById('cvPlaque').value.trim().toUpperCase();
     if (!plaque) return toast('Entrez une plaque', 'error');
@@ -1189,13 +1298,9 @@ async function lookupPlateStep2() {
         toast('Recherche en cours...', 'info');
         const resp = await fetch(proxyUrl + '?plaque=' + encodeURIComponent(plaque));
         const result = await resp.json();
-        if (result && result.marque) {
-            document.getElementById('cvMarque').value = result.marque.toUpperCase();
-            updateModelsStep2();
-            if (result.modele) document.getElementById('cvModele').value = result.modele;
-            if (result.annee) document.getElementById('cvAnnee').value = result.annee;
-            if (result.energie) document.getElementById('cvEnergie').value = result.energie;
-            if (result.vin) document.getElementById('cvVin').value = result.vin;
+        console.log('API result step2:', result);
+        if (result && (result.marque || result.modele)) {
+            fillVehicleFromAPI(result, 'cv');
             toast('Véhicule trouvé !', 'success');
         } else {
             toast('Véhicule non trouvé', 'error');
@@ -1355,13 +1460,9 @@ async function lookupPlate() {
         toast('Recherche en cours...', 'info');
         const resp = await fetch(proxyUrl + '?plaque=' + encodeURIComponent(plaque));
         const result = await resp.json();
-        if (result && result.marque) {
-            document.getElementById('vMarque').value = result.marque.toUpperCase();
-            updateModels();
-            if (result.modele) document.getElementById('vModele').value = result.modele;
-            if (result.annee) document.getElementById('vAnnee').value = result.annee;
-            if (result.energie) document.getElementById('vEnergie').value = result.energie;
-            if (result.vin) document.getElementById('vVin').value = result.vin;
+        console.log('API result:', result);
+        if (result && (result.marque || result.modele)) {
+            fillVehicleFromAPI(result, 'v');
             toast('Véhicule trouvé !', 'success');
         } else {
             toast('Véhicule non trouvé', 'error');
