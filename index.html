@@ -396,7 +396,7 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                 <div class="search-bar">
                     <input type="text" id="vehicleSearch" placeholder="Rechercher par plaque, marque, modèle..." oninput="renderVehicles()">
                 </div>
-                <div class="table-wrap"><table><thead><tr><th>Plaque</th><th>Marque</th><th>Modèle</th><th>Énergie</th><th>Client</th><th>Km</th><th>Année</th><th>Actions</th></tr></thead><tbody id="vehiclesTable"></tbody></table></div>
+                <div class="table-wrap"><table><thead><tr><th>Plaque</th><th>Marque</th><th>Modèle</th><th>Motorisation</th><th>Énergie</th><th>Client</th><th>Km</th><th>Actions</th></tr></thead><tbody id="vehiclesTable"></tbody></table></div>
             </div>
         </div>
 
@@ -588,6 +588,10 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                     </div>
                 </div>
                 <div class="form-row">
+                    <div class="form-group"><label>Motorisation</label><input id="cvMotorisation" placeholder="ex: TDI 130, 1.6 HDI 110, 2.0 TSI 190..."></div>
+                    <div class="form-group"><label>Carrosserie</label><select id="cvCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>SUV / Crossover</option><option>Coupé</option><option>Cabriolet</option><option>Monospace</option><option>Utilitaire</option><option>Pick-up</option><option>Citadine</option><option>Compact</option></select></div>
+                </div>
+                <div class="form-row">
                     <div class="form-group"><label>Année de mise en circulation</label><input id="cvAnnee" type="number" min="1950" max="2030"></div>
                     <div class="form-group"><label>Date 1ère mise en circulation</label><input id="cvDateMEC" type="date"></div>
                 </div>
@@ -645,6 +649,10 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                     <label>Modèle *</label>
                     <select id="vModele"><option value="">-- Sélectionner marque --</option></select>
                 </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Motorisation</label><input id="vMotorisation" placeholder="ex: TDI 130, 1.6 HDI 110, 2.0 TSI 190..."></div>
+                <div class="form-group"><label>Carrosserie</label><select id="vCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>SUV / Crossover</option><option>Coupé</option><option>Cabriolet</option><option>Monospace</option><option>Utilitaire</option><option>Pick-up</option><option>Citadine</option><option>Compact</option></select></div>
             </div>
             <div class="form-row">
                 <div class="form-group"><label>Année de mise en circulation</label><input id="vAnnee" type="number" min="1950" max="2030"></div>
@@ -1385,9 +1393,10 @@ function openClientModal(id) {
             <button class="btn btn-primary" onclick="saveClientOnly()">💾 Enregistrer</button>`;
     } else {
         ['cNom','cPrenom','cTel','cEmail','cAdresse','cCp','cVille','cNotes'].forEach(id => document.getElementById(id).value = '');
-        ['cvPlaque','cvAnnee','cvDateMEC','cvKm','cvCylindree','cvPuissance','cvPuissanceFisc','cvVin','cvTypeMine','cvCouleur','cvNotes'].forEach(id => document.getElementById(id).value = '');
+        ['cvPlaque','cvAnnee','cvDateMEC','cvKm','cvCylindree','cvPuissance','cvPuissanceFisc','cvVin','cvTypeMine','cvCouleur','cvNotes','cvMotorisation'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('cvEnergie').value = 'Diesel';
         document.getElementById('cvBoite').value = 'Manuelle';
+        document.getElementById('cvCarrosserie').value = '';
         // Populate brand selector for step 2
         const sel = document.getElementById('cvMarque');
         sel.innerHTML = '<option value="">-- Sélectionner --</option>' +
@@ -1496,6 +1505,8 @@ function saveClientWithVehicle() {
         typeMine: document.getElementById('cvTypeMine').value.trim().toUpperCase(),
         couleur: document.getElementById('cvCouleur').value.trim(),
         boite: document.getElementById('cvBoite').value,
+        motorisation: document.getElementById('cvMotorisation').value.trim(),
+        carrosserie: document.getElementById('cvCarrosserie').value,
         notesVeh: document.getElementById('cvNotes').value.trim()
     };
     data.vehicles.push(vehicleData);
@@ -1524,21 +1535,17 @@ function updateModelsStep2() {
 
 // Generic plate lookup - fills all fields for either modal
 function fillVehicleFromAPI(result, prefix) {
-    // prefix = 'cv' pour step2 client, 'v' pour modal véhicule standalone
-    const marqueId = prefix + (prefix === 'cv' ? 'Marque' : 'Marque');
-    const modeleId = prefix + (prefix === 'cv' ? 'Modele' : 'Modele');
     const updateFn = prefix === 'cv' ? updateModelsStep2 : updateModels;
+    console.log('API brut:', JSON.stringify(result));
 
     // === MARQUE ===
     if (result.marque) {
         const marqueUpper = result.marque.toUpperCase().trim();
-        const sel = document.getElementById(marqueId);
-        // Try exact match first
+        const sel = document.getElementById(prefix + 'Marque');
         let matched = false;
         for (let opt of sel.options) {
             if (opt.value === marqueUpper) { sel.value = marqueUpper; matched = true; break; }
         }
-        // Try partial match
         if (!matched) {
             for (let opt of sel.options) {
                 if (opt.value && (marqueUpper.includes(opt.value) || opt.value.includes(marqueUpper))) {
@@ -1546,7 +1553,6 @@ function fillVehicleFromAPI(result, prefix) {
                 }
             }
         }
-        // If still not matched, add it
         if (!matched && marqueUpper) {
             const newOpt = document.createElement('option');
             newOpt.value = marqueUpper; newOpt.textContent = marqueUpper;
@@ -1556,43 +1562,119 @@ function fillVehicleFromAPI(result, prefix) {
         updateFn();
     }
 
-    // === MODELE ===
-    const modele = result.modele || result.model || result.modeleCommercial || '';
-    if (modele) {
-        const selM = document.getElementById(modeleId);
-        const modelClean = modele.trim();
-        // Try exact match
-        let mMatched = false;
-        for (let opt of selM.options) {
-            if (opt.value && opt.value.toLowerCase() === modelClean.toLowerCase()) { selM.value = opt.value; mMatched = true; break; }
-        }
-        // Try partial match
-        if (!mMatched) {
-            for (let opt of selM.options) {
-                if (opt.value && (modelClean.toLowerCase().includes(opt.value.toLowerCase()) || opt.value.toLowerCase().includes(modelClean.toLowerCase()))) {
-                    selM.value = opt.value; mMatched = true; break;
-                }
-            }
-        }
-        // If not matched, add it as option
-        if (!mMatched && modelClean) {
-            const newOpt = document.createElement('option');
-            newOpt.value = modelClean; newOpt.textContent = modelClean + ' (API)';
-            selM.appendChild(newOpt);
-            selM.value = modelClean;
+    // === MODELE + MOTORISATION + CARROSSERIE ===
+    // L'API renvoie souvent le modèle commercial complet ex: "BREAK TDI 130 4MOTION"
+    // Il faut extraire: modèle=Passat, motorisation=TDI 130 4MOTION, carrosserie=Break
+    const rawModele = (result.modele || result.model || result.modeleCommercial || result.designation || '').trim();
+    const marqueVal = document.getElementById(prefix + 'Marque').value;
+
+    // Carrosseries connues
+    const carrosseries = {'BREAK':'Break','BERLINE':'Berline','SW':'Break','TOURING':'Break','AVANT':'Break','ESTATE':'Break','SPORTBACK':'Berline',
+        'SUV':'SUV / Crossover','CROSSOVER':'SUV / Crossover','4X4':'SUV / Crossover',
+        'COUPE':'Coupé','CABRIOLET':'Cabriolet','SPIDER':'Cabriolet','ROADSTER':'Cabriolet',
+        'MONOSPACE':'Monospace','VAN':'Monospace','LUDOSPACE':'Monospace',
+        'UTILITAIRE':'Utilitaire','FOURGON':'Utilitaire','COMBI':'Utilitaire',
+        'PICK-UP':'Pick-up','PICKUP':'Pick-up',
+        'CITADINE':'Citadine','COMPACT':'Compact'};
+
+    // Motorisation patterns (ce qui reste après avoir retiré carrosserie et modèle)
+    let detectedCarrosserie = '';
+    let cleanStr = rawModele.toUpperCase();
+
+    // Extraire carrosserie
+    for (const [key, val] of Object.entries(carrosseries)) {
+        if (cleanStr.includes(key)) {
+            detectedCarrosserie = val;
+            cleanStr = cleanStr.replace(new RegExp('\\b'+key+'\\b','g'), '').trim();
+            break;
         }
     }
 
-    // === ALL OTHER FIELDS ===
+    // Essayer de trouver le modèle dans la base BRANDS_MODELS
+    let foundModel = '';
+    let motorisation = '';
+    const models = BRANDS_MODELS[marqueVal] || [];
+
+    // Trier par longueur décroissante pour matcher les plus longs d'abord (ex: "Yaris Cross" avant "Yaris")
+    const sortedModels = [...models].sort((a,b) => b.length - a.length);
+    for (const m of sortedModels) {
+        if (cleanStr.includes(m.toUpperCase())) {
+            foundModel = m;
+            cleanStr = cleanStr.replace(new RegExp(m.toUpperCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '').trim();
+            break;
+        }
+    }
+
+    // Si pas de match dans la base, essayer le 1er mot du modèle API
+    if (!foundModel && rawModele) {
+        // Essayer partial match avec les modèles connus
+        const words = rawModele.toUpperCase().split(/[\s-]+/);
+        for (const m of sortedModels) {
+            for (const w of words) {
+                if (w.length >= 3 && m.toUpperCase().includes(w)) {
+                    foundModel = m;
+                    break;
+                }
+            }
+            if (foundModel) break;
+        }
+    }
+
+    // Ce qui reste = motorisation
+    motorisation = cleanStr.replace(/\s+/g, ' ').trim();
+    // Nettoyer les tirets en trop
+    motorisation = motorisation.replace(/^[\s\-]+|[\s\-]+$/g, '').trim();
+
+    // Appliquer le modèle
+    if (foundModel) {
+        const selM = document.getElementById(prefix + 'Modele');
+        let mMatched = false;
+        for (let opt of selM.options) {
+            if (opt.value === foundModel) { selM.value = foundModel; mMatched = true; break; }
+        }
+        if (!mMatched) {
+            const newOpt = document.createElement('option');
+            newOpt.value = foundModel; newOpt.textContent = foundModel;
+            selM.appendChild(newOpt);
+            selM.value = foundModel;
+        }
+    } else if (rawModele) {
+        // Fallback: mettre le modèle brut
+        const selM = document.getElementById(prefix + 'Modele');
+        const newOpt = document.createElement('option');
+        newOpt.value = rawModele; newOpt.textContent = rawModele + ' (API)';
+        selM.appendChild(newOpt);
+        selM.value = rawModele;
+    }
+
+    // Appliquer motorisation
+    const motorEl = document.getElementById(prefix + 'Motorisation');
+    if (motorEl && motorisation) motorEl.value = motorisation;
+    // Si l'API a un champ dédié motorisation, l'utiliser en priorité
+    if (motorEl && (result.motorisation || result.version)) {
+        motorEl.value = (result.motorisation || result.version).trim();
+    }
+
+    // Appliquer carrosserie
+    const carEl = document.getElementById(prefix + 'Carrosserie');
+    if (carEl && detectedCarrosserie) carEl.value = detectedCarrosserie;
+    if (carEl && (result.carrosserie || result.genre)) {
+        const rawCar = (result.carrosserie || result.genre).toUpperCase();
+        for (const [key, val] of Object.entries(carrosseries)) {
+            if (rawCar.includes(key)) { carEl.value = val; break; }
+        }
+    }
+
+    // === AUTRES CHAMPS ===
     const fields = {
-        'Annee': result.annee || result.anneeMEC || result.year || '',
-        'DateMEC': result.dateMEC || result.date1erMEC || result.dateCirculation || '',
+        'Annee': result.annee || result.anneeMEC || result.year || result.date1erMEC?.substring(0,4) || '',
+        'DateMEC': result.dateMEC || result.date1erMEC || result.date1ereMEC || result.dateCirculation || '',
         'Km': result.km || result.kilometrage || '',
-        'Cylindree': result.cylindree || result.cylindreeMoteur || '',
-        'Puissance': result.puissance || result.puissanceCV || result.puissanceKW || '',
-        'PuissanceFisc': result.puissanceFisc || result.puissanceFiscale || result.cvFiscaux || '',
+        'Cylindree': result.cylindree || result.cylindreeMoteur || result.cm3 || '',
+        'Puissance': result.puissance || result.puissanceCV || result.puissanceDin || result.cv || '',
+        'PuissanceFisc': result.puissanceFisc || result.puissanceFiscale || result.cvFiscaux || result.chevaux_fiscaux || '',
         'Vin': result.vin || result.VIN || result.codifVin || '',
-        'TypeMine': result.typeMine || result.CNIT || result.typeVehicule || '',
+        'TypeMine': result.typeMine || result.CNIT || result.cnit || result.typeVehicule || '',
         'Couleur': result.couleur || result.color || ''
     };
 
@@ -1603,7 +1685,15 @@ function fillVehicleFromAPI(result, prefix) {
         }
     }
 
-    // === ENERGIE (select) ===
+    // Si l'année est vide mais dateMEC remplie, extraire l'année
+    const anneeEl = document.getElementById(prefix + 'Annee');
+    const dateEl = document.getElementById(prefix + 'DateMEC');
+    if (anneeEl && !anneeEl.value && dateEl && dateEl.value) {
+        const y = dateEl.value.substring(0, 4);
+        if (y && parseInt(y) > 1950) anneeEl.value = y;
+    }
+
+    // === ENERGIE ===
     const energie = (result.energie || result.carburant || result.typeCarburant || '').toUpperCase();
     if (energie) {
         const enSel = document.getElementById(prefix + 'Energie');
@@ -1619,7 +1709,7 @@ function fillVehicleFromAPI(result, prefix) {
         }
     }
 
-    // === BOITE (select) ===
+    // === BOITE ===
     const boite = (result.boite || result.boiteVitesse || result.transmission || '').toUpperCase();
     if (boite) {
         const bSel = document.getElementById(prefix + 'Boite');
@@ -1695,10 +1785,10 @@ function renderVehicles() {
             <td><strong style="font-size:1.05em;letter-spacing:1px">${v.plaque}</strong></td>
             <td>${v.marque}</td>
             <td>${v.modele}</td>
+            <td>${v.motorisation || '-'}</td>
             <td>${v.energie || '-'}</td>
             <td>${cl ? cl.nom + ' ' + cl.prenom : '-'}</td>
             <td>${v.km ? v.km.toLocaleString('fr-FR') + ' km' : '-'}</td>
-            <td>${v.annee || '-'}</td>
             <td>
                 <button class="btn btn-sm btn-outline" onclick="editVehicle('${v.id}')">✏️</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteVehicle('${v.id}')">🗑️</button>
@@ -1734,14 +1824,17 @@ function openVehicleModal(id) {
             document.getElementById('vCouleur').value = v.couleur || '';
             document.getElementById('vBoite').value = v.boite || 'Manuelle';
             document.getElementById('vNotesVeh').value = v.notesVeh || '';
+            document.getElementById('vMotorisation').value = v.motorisation || '';
+            document.getElementById('vCarrosserie').value = v.carrosserie || '';
         }
     } else {
-        ['vPlaque','vAnnee','vDateMEC','vKm','vCylindree','vPuissance','vPuissanceFisc','vVin','vTypeMine','vCouleur','vNotesVeh'].forEach(id => document.getElementById(id).value = '');
+        ['vPlaque','vAnnee','vDateMEC','vKm','vCylindree','vPuissance','vPuissanceFisc','vVin','vTypeMine','vCouleur','vNotesVeh','vMotorisation'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('vClient').value = '';
         document.getElementById('vMarque').value = '';
         updateModels();
         document.getElementById('vEnergie').value = 'Diesel';
         document.getElementById('vBoite').value = 'Manuelle';
+        document.getElementById('vCarrosserie').value = '';
     }
     openModal('vehicleModal');
 }
@@ -1767,6 +1860,8 @@ function saveVehicle() {
         typeMine: document.getElementById('vTypeMine').value.trim().toUpperCase(),
         couleur: document.getElementById('vCouleur').value.trim(),
         boite: document.getElementById('vBoite').value,
+        motorisation: document.getElementById('vMotorisation').value.trim(),
+        carrosserie: document.getElementById('vCarrosserie').value,
         notesVeh: document.getElementById('vNotesVeh').value.trim()
     };
 
@@ -2032,7 +2127,12 @@ function printInvoice(id) {
         const prix = l.priceTTC || l.priceHT || 0;
         const rem = l.remise || 0;
         const lineTotal = (l.qty||1) * prix * (1 - rem/100);
-        return '<tr><td>'+escHtml(l.description)+'</td><td style="text-align:center">'+(l.qty||1)+'</td><td style="text-align:right">'+prix.toFixed(2)+' €</td>'
+        // Clean emojis for print
+        let desc = (l.description || '').replace(/🔧\s*/g,'').replace(/⚙️\s*/g,'').trim();
+        const isPart = l.lineType === 'part';
+        const indent = isPart ? 'padding-left:24px;font-size:9px;color:#555' : 'font-weight:600';
+        const prefix = isPart ? '↳ ' : '';
+        return '<tr><td style="'+indent+'">'+prefix+escHtml(desc)+'</td><td style="text-align:center">'+(l.qty||1)+'</td><td style="text-align:right">'+prix.toFixed(2)+' €</td>'
             + (rem > 0 ? '<td style="text-align:center;color:#c41e1e">-'+rem+'%</td>' : '<td style="text-align:center">-</td>')
             + '<td style="text-align:right;font-weight:600">'+lineTotal.toFixed(2)+' €</td></tr>';
     }).join('');
@@ -2079,7 +2179,7 @@ function printInvoice(id) {
     </div>
     <div class="row">
         <div class="col"><div class="box"><h3>CLIENT</h3>${cl ? escHtml(cl.nom) + ' ' + escHtml(cl.prenom) + '<br>' + escHtml(cl.adresse||'') + '<br>' + escHtml(cl.cp||'') + ' ' + escHtml(cl.ville||'') + (cl.tel ? '<br>Tél: '+escHtml(cl.tel) : '') : '-'}</div></div>
-        <div class="col"><div class="box"><h3>VÉHICULE</h3><div class="vehicle-info">${vh ? '<div>Plaque: <strong>'+escHtml(vh.plaque)+'</strong></div><div>'+escHtml(vh.marque)+' '+escHtml(vh.modele)+'</div><div>Énergie: '+escHtml(vh.energie||'')+'</div><div>VIN: '+escHtml(vh.vin||'-')+'</div>' + (inv.kmIn ? '<div>Km entrée: '+inv.kmIn.toLocaleString('fr-FR')+'</div>' : '') + (inv.kmOut ? '<div>Km sortie: '+inv.kmOut.toLocaleString('fr-FR')+'</div>' : '') : '-'}</div></div></div>
+        <div class="col"><div class="box"><h3>VÉHICULE</h3><div class="vehicle-info">${vh ? '<div>Plaque: <strong>'+escHtml(vh.plaque)+'</strong></div><div>'+escHtml(vh.marque)+' '+escHtml(vh.modele)+'</div>'+(vh.motorisation?'<div>Motorisation: '+escHtml(vh.motorisation)+'</div>':'')+(vh.carrosserie?'<div>Carrosserie: '+escHtml(vh.carrosserie)+'</div>':'')+'<div>Énergie: '+escHtml(vh.energie||'')+'</div><div>VIN: '+escHtml(vh.vin||'-')+'</div>' + (inv.kmIn ? '<div>Km entrée: '+inv.kmIn.toLocaleString('fr-FR')+'</div>' : '') + (inv.kmOut ? '<div>Km sortie: '+inv.kmOut.toLocaleString('fr-FR')+'</div>' : '') : '-'}</div></div></div>
     </div>
     <table>
         <thead><tr><th>Désignation</th><th style="width:50px">Qté</th><th style="width:80px">${colPrix}</th><th style="width:60px">Remise</th><th style="width:80px">Total</th></tr></thead>
