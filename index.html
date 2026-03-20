@@ -1745,7 +1745,7 @@ function openAutodocPaste(prefix) {
                 </div>
                 <div style="padding:20px">
                     <p style="margin-bottom:10px;font-size:0.85em;color:var(--text-light)">
-                        1. Va sur <a href="https://www.autodoc.fr/" target="_blank" style="color:var(--blue);font-weight:600">Autodoc.fr</a>, cherche ton véhicule par plaque<br>
+                        1. Va sur <a href="https://www.auto-doc.fr/" target="_blank" style="color:var(--blue);font-weight:600">Auto-Doc.fr</a>, cherche ton véhicule par plaque<br>
                         2. Clique sur <strong>Informations véhicule</strong><br>
                         3. Sélectionne tout le texte (Ctrl+A) et copie (Ctrl+C)<br>
                         4. Colle ici (Ctrl+V) et clique <strong>Remplir</strong>
@@ -1763,160 +1763,148 @@ function parseAutodocPaste(prefix) {
     const raw = document.getElementById('autodocPasteArea').value;
     if (!raw.trim()) return toast('Colle du texte d\'abord !', 'error');
 
-    const text = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    const lines = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').map(l => l.trim()).filter(l => l);
 
-    // Extraire marque depuis la première ligne "VOLKSWAGEN Passat..." ou header
     let marque = '', modele = '', motorisation = '', carrosserie = '', energie = '';
     let puissanceCH = '', puissanceKW = '', cylindree = '', cylindres = '';
-    let codeMoteur = '', boite = '', annee = '', transmission = '';
+    let codeMoteur = '', boite = '', annee = '', transmission = '', soupapes = '';
 
-    // Parser ligne par ligne
+    // Parser chaque ligne
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
-        const lower = line.toLowerCase();
-        const nextLine = (i + 1 < lines.length) ? lines[i + 1].trim() : '';
+        // Format "Label :Valeur" ou "Label:Valeur"
+        const m = line.match(/^(.+?)\s*:\s*(.+)$/);
+        if (!m) continue;
+        const label = m[1].toLowerCase().replace(/[\[\]()]/g, '').trim();
+        const val = m[2].trim();
+        if (val === '---' || val === '-' || !val) continue;
 
-        // Format "Label:Valeur" ou "Label :Valeur"
-        const colonMatch = line.match(/^([^:]+):\s*(.+)$/);
-        if (colonMatch) {
-            const label = colonMatch[1].toLowerCase().trim();
-            const val = colonMatch[2].trim();
-
-            if (label.includes('puissance') && label.includes('cv')) puissanceCH = val.replace(/[^0-9]/g, '');
-            else if (label.includes('puissance') && label.includes('kw')) puissanceKW = val.replace(/[^0-9]/g, '');
-            else if (label.includes('cylindr') && label.includes('cc')) cylindree = val.replace(/[^0-9]/g, '');
-            else if (label === 'cylindres' || label === 'cylindre') cylindres = val.replace(/[^0-9]/g, '');
-            else if (label === 'motorisation' || label === 'carburant') energie = val.toUpperCase();
-            else if (label.includes('code moteur')) codeMoteur = val;
-            else if (label.includes('transmission')) transmission = val;
-            else if (label.includes('carrosserie') || (label === 'type' && (val.toLowerCase().includes('break') || val.toLowerCase().includes('berline') || val.toLowerCase().includes('cabriolet') || val.toLowerCase().includes('suv') || val.toLowerCase().includes('monospace') || val.toLowerCase().includes('coup')))) carrosserie = val;
-            else if (label === 'type' && !carrosserie) motorisation = val;
-            else if (label.includes('construction') || label.includes('production')) {
-                const ym = val.match(/(\d{2})\.(\d{4})/);
-                if (ym) annee = ym[2];
-            }
-            else if (label.includes('bo') && label.includes('vitesse')) boite = val;
-            continue;
+        if (label.includes('puissance') && label.includes('cv')) puissanceCH = val.replace(/[^0-9]/g, '');
+        else if (label.includes('puissance') && label.includes('kw')) puissanceKW = val.replace(/[^0-9]/g, '');
+        else if (label.includes('cylindr') && label.includes('cc')) cylindree = val.replace(/[^0-9]/g, '');
+        else if (label === 'cylindres') cylindres = val;
+        else if (label === 'soupapes par chambre de combustion') soupapes = val;
+        else if (label === 'motorisation' || label === 'carburant') energie = val;
+        else if (label === 'code moteur') codeMoteur = val;
+        else if (label === 'transmission') transmission = val;
+        else if (label === 'type' && /break|berline|cabriolet|suv|crossover|monospace|coup|utilitaire|pick|citadine|compact/i.test(val)) carrosserie = val;
+        else if (label === 'type' && !motorisation) motorisation = val;
+        else if (label.includes('construction') || label.includes('production')) {
+            const ym = val.match(/(\d{2})\.(\d{4})/);
+            if (ym) annee = ym[2];
         }
+        else if (label.includes('bo') && label.includes('vitesse') && !label.includes('code')) boite = val;
     }
 
     // Extraire marque/modèle depuis le header "VOLKSWAGEN Passat B5 GP Break (3BG, 3B6) 1.9 TDI..."
-    const headerLine = lines.find(l => /^[A-Z]{2,}/.test(l) && l.length > 5) || '';
+    const headerLine = lines.find(l => /^[A-Z]{2,}\s/.test(l) && l.length > 5) || '';
     if (headerLine) {
         const parts = headerLine.split(/\s+/);
-        if (parts.length >= 2) {
-            marque = parts[0].toUpperCase();
-            // Modèle = deuxième mot (avant les parenthèses ou chiffres de motorisation)
-            let modelParts = [];
-            for (let j = 1; j < parts.length; j++) {
-                if (parts[j].startsWith('(') || /^\d+\.\d+$/.test(parts[j])) break;
-                modelParts.push(parts[j]);
-            }
-            modele = modelParts.join(' ');
-            // Motorisation = ce qui reste après le modèle
+        marque = parts[0].toUpperCase();
+        let modelParts = [];
+        for (let j = 1; j < parts.length; j++) {
+            if (parts[j].startsWith('(') || /^\d+\.\d+$/.test(parts[j])) break;
+            modelParts.push(parts[j]);
+        }
+        modele = modelParts.join(' ');
+        if (!motorisation) {
             const afterModel = headerLine.substring(headerLine.indexOf(modele) + modele.length).replace(/\([^)]*\)/g, '').trim();
-            if (afterModel && !motorisation) motorisation = afterModel.split(' fiche')[0].trim();
+            if (afterModel) motorisation = afterModel.split(' fiche')[0].trim();
         }
     }
 
-    // Remplir les champs du formulaire
-    const fields = {
-        'Marque': marque,
-        'Modele': modele,
-        'Motorisation': motorisation || codeMoteur,
-        'Carrosserie': carrosserie,
-        'Energie': energie,
-        'Puissance': puissanceCH || puissanceKW,
-        'PuissanceFisc': '',
-        'Cylindree': cylindree,
-        'Annee': annee,
-        'Vin': '',
-        'TypeMine': '',
-        'Couleur': ''
-    };
+    // Si motorisation contient le code moteur, combiner
+    if (codeMoteur && motorisation && !motorisation.includes(codeMoteur)) {
+        motorisation = motorisation + ' (' + codeMoteur + ')';
+    }
 
-    // Sélectionner la marque dans le dropdown
-    const marqueSelect = document.getElementById(prefix + 'Marque');
-    if (marqueSelect && marque) {
-        for (let opt of marqueSelect.options) {
+    // === REMPLIR LES VRAIS CHAMPS DU FORMULAIRE ===
+    const set = (id, val) => { const el = document.getElementById(id); if (el && val) { el.value = val; } };
+
+    // Marque dropdown
+    const marqueEl = document.getElementById(prefix + 'Marque');
+    if (marqueEl && marque) {
+        for (const opt of marqueEl.options) {
             if (opt.value.toUpperCase() === marque || opt.text.toUpperCase() === marque) {
-                marqueSelect.value = opt.value;
-                marqueSelect.dispatchEvent(new Event('change'));
+                marqueEl.value = opt.value;
+                marqueEl.dispatchEvent(new Event('change'));
                 break;
             }
         }
-        // Après changement de marque, sélectionner le modèle
+        // Modèle après que le dropdown se peuple
         setTimeout(() => {
-            const modeleSelect = document.getElementById(prefix + 'Modele');
-            if (modeleSelect && modele) {
-                const cleanModel = modele.split(' ')[0].toUpperCase();
-                for (let opt of modeleSelect.options) {
-                    if (opt.value.toUpperCase().includes(cleanModel) || opt.text.toUpperCase().includes(cleanModel)) {
-                        modeleSelect.value = opt.value;
+            const modeleEl = document.getElementById(prefix + 'Modele');
+            if (modeleEl && modele) {
+                const m1 = modele.split(' ')[0].toUpperCase();
+                for (const opt of modeleEl.options) {
+                    if (opt.value.toUpperCase().includes(m1) || opt.text.toUpperCase().includes(m1)) {
+                        modeleEl.value = opt.value;
                         break;
                     }
                 }
             }
-        }, 200);
+        }, 300);
     }
 
-    // Remplir les champs texte
-    const setVal = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
-    setVal(prefix + 'Motorisation', motorisation || codeMoteur);
-    setVal(prefix + 'Annee', annee);
-    setVal(prefix + 'Cylindree', cylindree);
-    setVal(prefix + 'Puissance', puissanceCH || puissanceKW);
+    // Champs texte
+    set(prefix + 'Motorisation', motorisation);
+    set(prefix + 'Annee', annee);
+    set(prefix + 'Cylindree', cylindree);
+    set(prefix + 'Puissance', puissanceCH || puissanceKW);
 
     // Carrosserie dropdown
-    const carroSelect = document.getElementById(prefix + 'Carrosserie');
-    if (carroSelect && carrosserie) {
-        const cc = carrosserie.toUpperCase();
-        for (let opt of carroSelect.options) {
-            if (opt.value.toUpperCase().includes(cc) || cc.includes(opt.value.toUpperCase())) {
-                carroSelect.value = opt.value;
+    const carroEl = document.getElementById(prefix + 'Carrosserie');
+    if (carroEl && carrosserie) {
+        for (const opt of carroEl.options) {
+            if (opt.value.toLowerCase() === carrosserie.toLowerCase() || opt.text.toLowerCase() === carrosserie.toLowerCase()) {
+                carroEl.value = opt.value;
                 break;
             }
         }
     }
 
     // Énergie dropdown
-    const energieSelect = document.getElementById(prefix + 'Energie');
-    if (energieSelect && energie) {
+    const energieEl = document.getElementById(prefix + 'Energie');
+    if (energieEl && energie) {
         const ee = energie.toUpperCase();
-        for (let opt of energieSelect.options) {
-            if (opt.value.toUpperCase().includes('DIESEL') && ee.includes('DIESEL')) { energieSelect.value = opt.value; break; }
-            if (opt.value.toUpperCase().includes('ESSENCE') && ee.includes('ESSENCE')) { energieSelect.value = opt.value; break; }
-            if (opt.text.toUpperCase().includes(ee)) { energieSelect.value = opt.value; break; }
+        for (const opt of energieEl.options) {
+            if (ee.includes('DIESEL') && opt.value.includes('Diesel')) { energieEl.value = opt.value; break; }
+            if ((ee.includes('ESSENCE') || ee.includes('SUPER')) && opt.value.includes('Essence')) { energieEl.value = opt.value; break; }
+            if (ee.includes('HYBRI') && opt.value.includes('Hybride')) { energieEl.value = opt.value; break; }
+            if (ee.includes('ELEC') && opt.value.includes('Électrique')) { energieEl.value = opt.value; break; }
         }
     }
 
-    // Boîte
-    const boiteSelect = document.getElementById(prefix + 'Boite');
-    if (boiteSelect && boite) {
-        const bb = boite.toUpperCase();
-        for (let opt of boiteSelect.options) {
-            if (bb.includes('AUTO') && opt.value.toUpperCase().includes('AUTO')) { boiteSelect.value = opt.value; break; }
-            if (bb.includes('MANU') && opt.value.toUpperCase().includes('MANU')) { boiteSelect.value = opt.value; break; }
-        }
+    // Boîte dropdown
+    const boiteEl = document.getElementById(prefix + 'Boite');
+    if (boiteEl && boite) {
+        if (/auto/i.test(boite)) boiteEl.value = 'Automatique';
+        else if (/robot/i.test(boite)) boiteEl.value = 'Robotisée';
+        else boiteEl.value = 'Manuelle';
     }
 
-    // Observations — mettre les infos supplémentaires
-    const obs = document.getElementById(prefix + 'Observations');
-    if (obs) {
+    // Observations — infos supplémentaires (bon ID selon le préfixe)
+    const obsId = prefix === 'cv' ? 'cvNotes' : 'vNotesVeh';
+    const obsEl = document.getElementById(obsId);
+    if (obsEl) {
         let extras = [];
-        if (transmission) extras.push('Transmission: ' + transmission);
-        if (cylindres) extras.push('Cylindres: ' + cylindres);
-        if (codeMoteur) extras.push('Code moteur: ' + codeMoteur);
-        if (puissanceKW && puissanceCH) extras.push(puissanceKW + ' KW / ' + puissanceCH + ' CV');
-        if (extras.length) obs.value = extras.join(' | ');
+        if (puissanceKW) extras.push(puissanceKW + ' KW');
+        if (puissanceCH) extras.push(puissanceCH + ' CV');
+        if (cylindres) extras.push(cylindres + ' cylindres');
+        if (soupapes) extras.push(soupapes + ' soupapes/cyl');
+        if (codeMoteur) extras.push('Moteur: ' + codeMoteur);
+        if (transmission) extras.push(transmission);
+        if (extras.length) obsEl.value = extras.join(' | ');
     }
 
     // Fermer le popup
     document.getElementById('autodocPasteOverlay')?.remove();
 
-    const nbFilled = Object.values(fields).filter(v => v).length;
-    toast('✅ ' + nbFilled + ' champs remplis depuis Autodoc !', 'success');
+    let count = 0;
+    if (marque) count++; if (modele) count++; if (motorisation) count++;
+    if (carrosserie) count++; if (annee) count++; if (cylindree) count++;
+    if (puissanceCH || puissanceKW) count++; if (energie) count++;
+    toast('✅ ' + count + ' champs remplis !', 'success');
 }
 
 function deleteClient(id) {
@@ -2174,17 +2162,72 @@ function renderInvoiceLines() {
         const isPart = line.lineType === 'part';
         const isMO = line.lineType === 'mo';
         const bgStyle = isMO ? 'background:#e8f0fe;border-left:3px solid var(--blue)' : isPart ? 'background:#fff8e1;border-left:3px solid #f59e0b' : 'background:#fafafa';
+        
+        // Détecter si c'est une ligne huile moteur
+        const isOil = /huile\s+moteur/i.test(line.description);
+        const oilVisco = line.oilVisco || '';
+        const oilSize = line.oilSize || '';
+        
+        let oilSelectors = '';
+        if (isOil) {
+            oilSelectors = `<div style="display:flex;gap:6px;margin-top:4px">
+                <select onchange="currentInvoiceLines[${i}].oilVisco=this.value;updateOilDesc(${i})" style="flex:1;padding:4px 6px;font-size:0.8em;border:1px solid var(--border);border-radius:4px">
+                    <option value="">Viscosité...</option>
+                    <option ${oilVisco==='0W20'?'selected':''}>0W20</option>
+                    <option ${oilVisco==='0W30'?'selected':''}>0W30</option>
+                    <option ${oilVisco==='5W30'?'selected':''}>5W30</option>
+                    <option ${oilVisco==='5W40'?'selected':''}>5W40</option>
+                    <option ${oilVisco==='10W40'?'selected':''}>10W40</option>
+                    <option ${oilVisco==='15W40'?'selected':''}>15W40</option>
+                    <option ${oilVisco==='5W20'?'selected':''}>5W20</option>
+                    <option ${oilVisco==='0W40'?'selected':''}>0W40</option>
+                </select>
+                <select onchange="currentInvoiceLines[${i}].oilSize=this.value;updateOilDesc(${i})" style="flex:1;padding:4px 6px;font-size:0.8em;border:1px solid var(--border);border-radius:4px">
+                    <option value="">Contenance...</option>
+                    <option ${oilSize==='1L'?'selected':''}>1L</option>
+                    <option ${oilSize==='2L'?'selected':''}>2L</option>
+                    <option ${oilSize==='4L'?'selected':''}>4L</option>
+                    <option ${oilSize==='5L'?'selected':''}>5L</option>
+                    <option ${oilSize==='6L'?'selected':''}>6L</option>
+                    <option ${oilSize==='10L'?'selected':''}>10L</option>
+                </select>
+            </div>`;
+        }
+        
+        // Champ référence pour les pièces
+        const ref = line.ref || '';
+        let refField = '';
+        if (isPart) {
+            refField = `<input value="${escHtml(ref)}" placeholder="Réf. pièce" onchange="currentInvoiceLines[${i}].ref=this.value" style="width:100%;font-size:0.78em;margin-top:4px;padding:4px 8px;color:#666;border:1px dashed var(--border);border-radius:4px">`;
+        }
+        
         return `
         <div class="line-item" style="${bgStyle}">
-            <input value="${escHtml(line.description)}" placeholder="${isPart ? 'Pièce / fourniture' : 'Description'}" onchange="currentInvoiceLines[${i}].description=this.value" style="${isPart?'font-size:0.85em':'font-weight:600'}">
-            <input type="number" value="${line.qty}" min="1" onchange="currentInvoiceLines[${i}].qty=parseFloat(this.value)||1;calcInvoice()">
-            <input type="number" value="${prix}" step="0.01" min="0" onchange="currentInvoiceLines[${i}].priceTTC=parseFloat(this.value)||0;calcInvoice()" style="${isPart && prix===0 ? 'border-color:#f59e0b;background:#fffbeb' : ''}">
-            <input type="number" value="${remise}" step="1" min="0" max="100" onchange="currentInvoiceLines[${i}].remise=parseFloat(this.value)||0;calcInvoice()" placeholder="0">
-            <div style="text-align:right;font-weight:600;font-size:0.9em">${total.toFixed(2)} €</div>
+            <div style="flex:1;min-width:0">
+                <input value="${escHtml(line.description)}" placeholder="${isPart ? 'Pièce / fourniture' : 'Description'}" onchange="currentInvoiceLines[${i}].description=this.value" style="${isPart?'font-size:0.85em':'font-weight:600'};width:100%">
+                ${oilSelectors}
+                ${refField}
+            </div>
+            <input type="number" value="${line.qty}" min="1" onchange="currentInvoiceLines[${i}].qty=parseFloat(this.value)||1;renderInvoiceLines()">
+            <input type="number" value="${prix}" step="0.01" min="0" onchange="currentInvoiceLines[${i}].priceTTC=parseFloat(this.value)||0;renderInvoiceLines()" style="${isPart && prix===0 ? 'border-color:#f59e0b;background:#fffbeb' : ''}">
+            <input type="number" value="${remise}" step="1" min="0" max="100" onchange="currentInvoiceLines[${i}].remise=parseFloat(this.value)||0;renderInvoiceLines()" placeholder="0">
+            <div style="text-align:right;font-weight:600;font-size:0.9em;min-width:70px">${total.toFixed(2)} €</div>
             <button class="btn-remove" onclick="currentInvoiceLines.splice(${i},1);renderInvoiceLines()">×</button>
         </div>`;
     }).join('');
     calcInvoice();
+}
+
+function updateOilDesc(idx) {
+    const line = currentInvoiceLines[idx];
+    if (!line) return;
+    const visco = line.oilVisco || '';
+    const size = line.oilSize || '';
+    let desc = 'Huile moteur';
+    if (visco) desc += ' ' + visco;
+    if (size) desc += ' (' + size + ')';
+    line.description = '    ⚙️ ' + desc;
+    renderInvoiceLines();
 }
 
 function calcInvoice() {
@@ -2293,7 +2336,8 @@ function printInvoice(id) {
         const isPart = l.lineType === 'part';
         const indent = isPart ? 'padding-left:24px;font-size:9px;color:#555' : 'font-weight:600';
         const prefix = isPart ? '↳ ' : '';
-        return '<tr><td style="'+indent+'">'+prefix+escHtml(desc)+'</td><td style="text-align:center">'+(l.qty||1)+'</td><td style="text-align:right">'+prix.toFixed(2)+' €</td>'
+        const refText = (isPart && l.ref) ? ' <span style="color:#888;font-size:8px">(Réf: '+escHtml(l.ref)+')</span>' : '';
+        return '<tr><td style="'+indent+'">'+prefix+escHtml(desc)+refText+'</td><td style="text-align:center">'+(l.qty||1)+'</td><td style="text-align:right">'+prix.toFixed(2)+' €</td>'
             + (rem > 0 ? '<td style="text-align:center;color:#c41e1e">-'+rem+'%</td>' : '<td style="text-align:center">-</td>')
             + '<td style="text-align:right;font-weight:600">'+lineTotal.toFixed(2)+' €</td></tr>';
     }).join('');
