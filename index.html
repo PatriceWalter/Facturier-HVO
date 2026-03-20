@@ -1150,59 +1150,51 @@ const DEFAULT_OPERATIONS = [
 // ============================================================
 function init() {
     populateBrands();
+
+    // TOUJOURS charger le localStorage d'abord pour affichage immédiat
+    loadFromLocalStorage();
+    applyMigrations();
+    updateUI();
+
+    // Puis sync Firebase en arrière-plan
     if (firebaseReady && dbRef) {
-        // === FIREBASE = SOURCE PRINCIPALE ===
-        document.getElementById('firebaseStatus').textContent = '⏳ Chargement...';
+        document.getElementById('firebaseStatus').textContent = '⏳ Sync...';
+        
+        // Timeout de sécurité — si Firebase ne répond pas en 5s, on continue sans
+        var fbTimeout = setTimeout(function() {
+            document.getElementById('firebaseStatus').textContent = '⚠️ Lent';
+            document.getElementById('firebaseStatus').style.background = 'rgba(255,200,50,0.3)';
+        }, 5000);
+
         dbRef.once('value').then(snapshot => {
+            clearTimeout(fbTimeout);
             const fbData = snapshot.val();
             if (fbData) {
+                // Garder les opérations locales si elles ont des parts et Firebase non
+                const localOps = data.operations;
                 data = {...data, ...fbData};
                 data.settings = {...data.settings, ...(fbData.settings || {})};
-                console.log('🔥 Données chargées depuis Firebase');
-            } else {
-                // Firebase vide — tenter de récupérer le localStorage pour migration initiale
-                loadFromLocalStorage();
-                if (data.clients.length > 0 || data.invoices.length > 0) {
-                    dbRef.set(data);
-                    console.log('📤 Migration localStorage → Firebase');
+                const fbHasParts = (fbData.operations || []).some(o => o.parts && o.parts.length > 0);
+                if (!fbHasParts && localOps.some(o => o.parts && o.parts.length > 0)) {
+                    data.operations = localOps;
                 }
+                applyMigrations();
+                updateUI();
+                console.log('🔥 Firebase sync OK');
+            } else {
+                // Firebase vide — on pousse tout
+                saveData();
+                console.log('📤 Push initial vers Firebase');
             }
-            applyMigrations();
-            saveData(); // Push les operations avec parts vers Firebase
-            updateUI();
             document.getElementById('firebaseStatus').textContent = '🔥 Connecté';
             document.getElementById('firebaseStatus').style.background = 'rgba(80,255,80,0.3)';
-
-            // Listener temps réel — toute modif Firebase se reflète ici
-            // MAIS on ne laisse PAS Firebase écraser les operations si elles ont perdu les parts
-            dbRef.on('value', snapshot => {
-                const live = snapshot.val();
-                if (live) {
-                    // Sauvegarder les operations courantes (avec parts)
-                    const currentOps = data.operations;
-                    data = {...data, ...live};
-                    data.settings = {...data.settings, ...(live.settings || {})};
-                    // Si Firebase n'a pas les parts, garder les opérations locales
-                    const fbHasParts = (live.operations || []).some(o => o.parts && o.parts.length > 0);
-                    if (!fbHasParts && currentOps.some(o => o.parts && o.parts.length > 0)) {
-                        data.operations = currentOps;
-                    }
-                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
-                }
-            });
         }).catch(e => {
-            console.warn('Firebase load error, fallback localStorage:', e);
-            loadFromLocalStorage();
-            applyMigrations();
-            updateUI();
+            clearTimeout(fbTimeout);
+            console.warn('Firebase error:', e);
             document.getElementById('firebaseStatus').textContent = '❌ Hors ligne';
             document.getElementById('firebaseStatus').style.background = 'rgba(255,80,80,0.3)';
         });
     } else {
-        // Pas de Firebase — mode dégradé localStorage
-        loadFromLocalStorage();
-        applyMigrations();
-        updateUI();
         document.getElementById('firebaseStatus').textContent = '❌ Hors ligne';
         document.getElementById('firebaseStatus').style.background = 'rgba(255,80,80,0.3)';
     }
@@ -1675,13 +1667,20 @@ function fillVehicleFromAPI(result, prefix) {
     }
 
     // === AUTRES CHAMPS ===
+    // Convertir date FR (18-04-2009) en format ISO (2009-04-18) pour input type=date
+    let dateMEC = result.dateMEC || result.date1erMEC || result.date1ereMEC || result.dateCirculation || '';
+    if (dateMEC && dateMEC.includes('-') && dateMEC.length === 10) {
+        const parts = dateMEC.split('-');
+        if (parts[0].length === 2) dateMEC = parts[2] + '-' + parts[1] + '-' + parts[0]; // DD-MM-YYYY → YYYY-MM-DD
+    }
+
     const fields = {
-        'Annee': result.annee || result.anneeMEC || result.year || result.date1erMEC?.substring(0,4) || '',
-        'DateMEC': result.dateMEC || result.date1erMEC || result.date1ereMEC || result.dateCirculation || '',
+        'Annee': result.annee || (dateMEC ? dateMEC.substring(0,4) : '') || '',
+        'DateMEC': dateMEC,
         'Km': result.km || result.kilometrage || '',
         'Cylindree': result.cylindree || result.cylindreeMoteur || result.cm3 || '',
-        'Puissance': result.puissance || result.puissanceCV || result.puissanceDin || result.cv || '',
-        'PuissanceFisc': result.puissanceFisc || result.puissanceFiscale || result.cvFiscaux || result.chevaux_fiscaux || '',
+        'Puissance': result.puissanceCH || result.puissance || result.puissanceCV || result.puissanceDin || result.cv || '',
+        'PuissanceFisc': result.puissanceFisc || result.puissanceFiscale || result.cvFiscaux || '',
         'Vin': result.vin || result.VIN || result.codifVin || '',
         'TypeMine': result.typeMine || result.CNIT || result.cnit || result.typeVehicule || '',
         'Couleur': result.couleur || result.color || ''
@@ -1738,7 +1737,6 @@ async function lookupPlateStep2() {
         const resp = await fetch(PROXY_URL + '?plaque=' + encodeURIComponent(plaque));
         const result = await resp.json();
         console.log('API BRUT:', JSON.stringify(result, null, 2));
-        showAPIDebug(result);
         if (result && Object.keys(result).length > 1) {
             fillVehicleFromAPI(result, 'cv');
             toast('Véhicule trouvé !', 'success');
@@ -1903,7 +1901,6 @@ async function lookupPlate() {
         const resp = await fetch(PROXY_URL + '?plaque=' + encodeURIComponent(plaque));
         const result = await resp.json();
         console.log('API BRUT:', JSON.stringify(result, null, 2));
-        showAPIDebug(result);
         if (result && Object.keys(result).length > 1) {
             fillVehicleFromAPI(result, 'v');
             toast('Véhicule trouvé !', 'success');
