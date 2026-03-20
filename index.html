@@ -525,6 +525,7 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                     <input type="file" id="importFile" accept=".json" onchange="importData(event)" style="display:none">
                     <button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📤 Importer (JSON)</button>
                     <button class="btn btn-danger" onclick="resetAllData()">🗑️ Réinitialiser tout</button>
+                    <button class="btn btn-outline" onclick="resetOperations()">🔄 Recharger catalogue opérations</button>
                 </div>
             </div>
         </div>
@@ -1167,17 +1168,25 @@ function init() {
                 }
             }
             applyMigrations();
+            saveData(); // Push les operations avec parts vers Firebase
             updateUI();
             document.getElementById('firebaseStatus').textContent = '🔥 Connecté';
             document.getElementById('firebaseStatus').style.background = 'rgba(80,255,80,0.3)';
 
             // Listener temps réel — toute modif Firebase se reflète ici
+            // MAIS on ne laisse PAS Firebase écraser les operations si elles ont perdu les parts
             dbRef.on('value', snapshot => {
                 const live = snapshot.val();
                 if (live) {
+                    // Sauvegarder les operations courantes (avec parts)
+                    const currentOps = data.operations;
                     data = {...data, ...live};
                     data.settings = {...data.settings, ...(live.settings || {})};
-                    // Cache local (secours uniquement)
+                    // Si Firebase n'a pas les parts, garder les opérations locales
+                    const fbHasParts = (live.operations || []).some(o => o.parts && o.parts.length > 0);
+                    if (!fbHasParts && currentOps.some(o => o.parts && o.parts.length > 0)) {
+                        data.operations = currentOps;
+                    }
                     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
                 }
             });
@@ -2285,7 +2294,8 @@ function renderOpPicker() {
     if (search) ops = ops.filter(o => o.name.toLowerCase().includes(search));
 
     document.getElementById('opPickerGrid').innerHTML = ops.map(o => {
-        const nbParts = (o.parts && o.parts.length) || 0;
+        const defOp = DEFAULT_OPERATIONS.find(d => d.id === o.id);
+        const nbParts = (o.parts && o.parts.length) || (defOp && defOp.parts ? defOp.parts.length : 0);
         return `
         <div class="op-card ${selectedPickerOps.has(o.id)?'selected':''}" onclick="togglePickerOp('${o.id}')">
             <span class="op-type ${o.type.toLowerCase()}">${o.type}</span>
@@ -2304,11 +2314,16 @@ function togglePickerOp(id) {
 
 function addSelectedOps() {
     selectedPickerOps.forEach(opId => {
-        const op = data.operations.find(o => o.id === opId);
+        let op = data.operations.find(o => o.id === opId);
+        // Si pas de parts dans la version data, chercher dans DEFAULT
+        if (op && (!op.parts || op.parts.length === 0)) {
+            const defOp = DEFAULT_OPERATIONS.find(o => o.id === opId);
+            if (defOp && defOp.parts) op = {...op, parts: defOp.parts};
+        }
         if (op) {
-            // Add MO line
+            // Ligne MO
             currentInvoiceLines.push({ description: '🔧 ' + op.name, qty: 1, priceTTC: op.price, remise: 0, lineType: 'mo' });
-            // Add parts lines
+            // Lignes pièces
             if (op.parts && op.parts.length > 0) {
                 op.parts.forEach(p => {
                     currentInvoiceLines.push({ description: '    ⚙️ ' + p.desc, qty: 1, priceTTC: p.price || 0, remise: 0, lineType: 'part' });
@@ -2532,6 +2547,14 @@ function resetAllData() {
     localStorage.removeItem(STORAGE_KEY);
     if (firebaseReady && dbRef) dbRef.remove();
     location.reload();
+}
+
+function resetOperations() {
+    if (!confirm('Recharger le catalogue complet des opérations avec toutes les pièces ? Vos opérations personnalisées seront perdues.')) return;
+    data.operations = DEFAULT_OPERATIONS.map(o => ({...o, parts: o.parts ? o.parts.map(p => ({...p})) : []}));
+    saveData();
+    renderOperations();
+    toast('Catalogue rechargé avec ' + data.operations.length + ' opérations + pièces', 'success');
 }
 
 // ============================================================
