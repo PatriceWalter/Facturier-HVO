@@ -1673,14 +1673,12 @@ function fillVehicleFromAPI(result, prefix) {
 
     const fields = {
         'Annee': result.annee || (dateMEC ? dateMEC.substring(0,4) : '') || '',
-        'DateMEC': dateMEC,
         'Km': result.km || result.kilometrage || '',
         'Cylindree': result.cylindree || result.cylindreeMoteur || result.cm3 || '',
         'Puissance': result.puissanceCH || result.puissance || result.puissanceCV || result.puissanceDin || result.cv || '',
-        'PuissanceFisc': result.puissanceFisc || result.puissanceFiscale || result.cvFiscaux || '',
-        'Vin': result.vin || result.VIN || result.codifVin || '',
-        'TypeMine': result.typeMine || result.CNIT || result.cnit || result.typeVehicule || '',
-        'Couleur': result.couleur || result.color || ''
+        'PuissanceKW': result.puissanceKW || '',
+        'Cylindres': result.cylindres || result.nbCylindres || '',
+        'CodeMoteur': result.codeMoteur || ''
     };
 
     for (const [suffix, val] of Object.entries(fields)) {
@@ -1690,12 +1688,16 @@ function fillVehicleFromAPI(result, prefix) {
         }
     }
 
-    // Si l'année est vide mais dateMEC remplie, extraire l'année
-    const anneeEl = document.getElementById(prefix + 'Annee');
-    const dateEl = document.getElementById(prefix + 'DateMEC');
-    if (anneeEl && !anneeEl.value && dateEl && dateEl.value) {
-        const y = dateEl.value.substring(0, 4);
-        if (y && parseInt(y) > 1950) anneeEl.value = y;
+    // Transmission
+    const transVal = result.transmission || '';
+    if (transVal) {
+        const tEl = document.getElementById(prefix + 'Transmission');
+        if (tEl) {
+            const tt = transVal.toLowerCase();
+            if (tt.includes('intégral') || tt.includes('4motion') || tt.includes('4x4') || tt.includes('awd')) tEl.value = 'Traction intégrale';
+            else if (tt.includes('propulsion') || tt.includes('rwd')) tEl.value = 'Propulsion';
+            else tEl.value = 'Traction avant';
+        }
     }
 
     // === ENERGIE ===
@@ -2815,27 +2817,6 @@ function closeModal(id) { document.getElementById(id).classList.remove('active')
 function formatDate(d) { if (!d) return '-'; const p = d.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
 function escHtml(s) { if (!s) return ''; const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
-function showAPIDebug(result) {
-    const rows = Object.entries(result).map(([key, val]) => {
-        const v = (val === null || val === undefined) ? '<em style="color:#999">vide</em>' : escHtml(String(val));
-        return `<tr><td style="padding:6px 12px;font-weight:700;color:var(--blue);white-space:nowrap;border-bottom:1px solid #eee">${escHtml(key)}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;word-break:break-all">${v}</td></tr>`;
-    }).join('');
-    const html = `<div style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.remove()">
-        <div style="background:#fff;border-radius:12px;max-width:600px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
-            <div style="padding:16px 20px;background:var(--blue);color:#fff;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center">
-                <strong>🔍 Données brutes de l'API (${Object.keys(result).length} champs)</strong>
-                <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;color:#fff;font-size:1.3em;cursor:pointer">&times;</button>
-            </div>
-            <div style="padding:16px">
-                <div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.8em;color:#92400e">
-                    📸 Fais un screenshot de ce popup et envoie-le moi pour que je mappe correctement tous les champs !
-                </div>
-                <table style="width:100%;border-collapse:collapse;font-size:0.85em">${rows}</table>
-            </div>
-        </div>
-    </div>`;
-    document.body.insertAdjacentHTML('beforeend', html);
-}
 function toast(msg, type) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.className = 'toast ' + (type||'info') + ' show';
