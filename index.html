@@ -589,28 +589,27 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Motorisation</label><input id="cvMotorisation" placeholder="ex: TDI 130, 1.6 HDI 110, 2.0 TSI 190..."></div>
+                    <div class="form-group"><label>Motorisation</label><input id="cvMotorisation" placeholder="ex: 1.9 TDI 4motion, 1.6 HDI 110..."></div>
                     <div class="form-group"><label>Carrosserie</label><select id="cvCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>SUV / Crossover</option><option>Coupé</option><option>Cabriolet</option><option>Monospace</option><option>Utilitaire</option><option>Pick-up</option><option>Citadine</option><option>Compact</option></select></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Année de mise en circulation</label><input id="cvAnnee" type="number" min="1950" max="2030"></div>
-                    <div class="form-group"><label>Date 1ère mise en circulation</label><input id="cvDateMEC" type="date"></div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group"><label>Kilométrage</label><input id="cvKm" type="number" min="0"></div>
+                    <div class="form-group"><label>Année de construction</label><input id="cvAnnee" type="number" min="1950" max="2030"></div>
                     <div class="form-group"><label>Énergie</label><select id="cvEnergie"><option>Diesel</option><option>Essence</option><option>Hybride</option><option>Électrique</option><option>GPL</option></select></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Cylindrée (cm³)</label><input id="cvCylindree" type="number" min="0" placeholder="ex: 1968"></div>
+                    <div class="form-group"><label>Kilométrage</label><input id="cvKm" type="number" min="0"></div>
+                    <div class="form-group"><label>Transmission</label><select id="cvTransmission"><option value="">--</option><option>Traction avant</option><option>Propulsion</option><option>Traction intégrale</option></select></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Cylindrée (cm³)</label><input id="cvCylindree" type="number" min="0" placeholder="ex: 1896"></div>
                     <div class="form-group"><label>Puissance (CV)</label><input id="cvPuissance" type="number" min="0" placeholder="ex: 130"></div>
-                    <div class="form-group"><label>Puissance fiscale (CV fiscaux)</label><input id="cvPuissanceFisc" type="number" min="0"></div>
+                    <div class="form-group"><label>Puissance (KW)</label><input id="cvPuissanceKW" type="number" min="0" placeholder="ex: 96"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>N° VIN (chassis)</label><input id="cvVin" maxlength="17" style="text-transform:uppercase"></div>
-                    <div class="form-group"><label>Type Mine / CNIT</label><input id="cvTypeMine" style="text-transform:uppercase"></div>
+                    <div class="form-group"><label>Cylindres</label><input id="cvCylindres" type="number" min="0" placeholder="ex: 4"></div>
+                    <div class="form-group"><label>Code moteur</label><input id="cvCodeMoteur" placeholder="ex: AVF" style="text-transform:uppercase"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Couleur</label><input id="cvCouleur"></div>
                     <div class="form-group"><label>Boîte de vitesses</label><select id="cvBoite"><option>Manuelle</option><option>Automatique</option><option>Robotisée</option></select></div>
                 </div>
                 <div class="form-group"><label>Observations véhicule</label><textarea id="cvNotes" rows="2" placeholder="Remarques, accessoires, particularités..."></textarea></div>
@@ -652,28 +651,27 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Motorisation</label><input id="vMotorisation" placeholder="ex: TDI 130, 1.6 HDI 110, 2.0 TSI 190..."></div>
+                <div class="form-group"><label>Motorisation</label><input id="vMotorisation" placeholder="ex: 1.9 TDI 4motion, 1.6 HDI 110..."></div>
                 <div class="form-group"><label>Carrosserie</label><select id="vCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>SUV / Crossover</option><option>Coupé</option><option>Cabriolet</option><option>Monospace</option><option>Utilitaire</option><option>Pick-up</option><option>Citadine</option><option>Compact</option></select></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Année de mise en circulation</label><input id="vAnnee" type="number" min="1950" max="2030"></div>
-                <div class="form-group"><label>Date 1ère mise en circulation</label><input id="vDateMEC" type="date"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Kilométrage</label><input id="vKm" type="number" min="0"></div>
+                <div class="form-group"><label>Année de construction</label><input id="vAnnee" type="number" min="1950" max="2030"></div>
                 <div class="form-group"><label>Énergie</label><select id="vEnergie"><option>Diesel</option><option>Essence</option><option>Hybride</option><option>Électrique</option><option>GPL</option></select></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Cylindrée (cm³)</label><input id="vCylindree" type="number" min="0" placeholder="ex: 1968"></div>
+                <div class="form-group"><label>Kilométrage</label><input id="vKm" type="number" min="0"></div>
+                <div class="form-group"><label>Transmission</label><select id="vTransmission"><option value="">--</option><option>Traction avant</option><option>Propulsion</option><option>Traction intégrale</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Cylindrée (cm³)</label><input id="vCylindree" type="number" min="0" placeholder="ex: 1896"></div>
                 <div class="form-group"><label>Puissance (CV)</label><input id="vPuissance" type="number" min="0" placeholder="ex: 130"></div>
-                <div class="form-group"><label>Puissance fiscale (CV fiscaux)</label><input id="vPuissanceFisc" type="number" min="0"></div>
+                <div class="form-group"><label>Puissance (KW)</label><input id="vPuissanceKW" type="number" min="0" placeholder="ex: 96"></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>N° VIN (chassis)</label><input id="vVin" maxlength="17" style="text-transform:uppercase"></div>
-                <div class="form-group"><label>Type Mine / CNIT</label><input id="vTypeMine" style="text-transform:uppercase"></div>
+                <div class="form-group"><label>Cylindres</label><input id="vCylindres" type="number" min="0" placeholder="ex: 4"></div>
+                <div class="form-group"><label>Code moteur</label><input id="vCodeMoteur" placeholder="ex: AVF" style="text-transform:uppercase"></div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Couleur</label><input id="vCouleur"></div>
                 <div class="form-group"><label>Boîte de vitesses</label><select id="vBoite"><option>Manuelle</option><option>Automatique</option><option>Robotisée</option></select></div>
             </div>
             <div class="form-group"><label>Observations véhicule</label><textarea id="vNotesVeh" rows="2" placeholder="Remarques, accessoires, particularités..."></textarea></div>
@@ -1394,7 +1392,7 @@ function openClientModal(id) {
             <button class="btn btn-primary" onclick="saveClientOnly()">💾 Enregistrer</button>`;
     } else {
         ['cNom','cPrenom','cTel','cEmail','cAdresse','cCp','cVille','cNotes'].forEach(id => document.getElementById(id).value = '');
-        ['cvPlaque','cvAnnee','cvDateMEC','cvKm','cvCylindree','cvPuissance','cvPuissanceFisc','cvVin','cvTypeMine','cvCouleur','cvNotes','cvMotorisation'].forEach(id => document.getElementById(id).value = '');
+        ['cvPlaque','cvAnnee','cvKm','cvCylindree','cvPuissance','cvPuissanceKW','cvCylindres','cvCodeMoteur','cvNotes','cvMotorisation'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('cvEnergie').value = 'Diesel';
         document.getElementById('cvBoite').value = 'Manuelle';
         document.getElementById('cvCarrosserie').value = '';
@@ -1496,15 +1494,14 @@ function saveClientWithVehicle() {
         clientId: clientData.id,
         plaque, marque, modele,
         annee: parseInt(document.getElementById('cvAnnee').value) || null,
-        dateMEC: document.getElementById('cvDateMEC').value || null,
         km: parseInt(document.getElementById('cvKm').value) || null,
         energie: document.getElementById('cvEnergie').value,
         cylindree: parseInt(document.getElementById('cvCylindree').value) || null,
         puissance: parseInt(document.getElementById('cvPuissance').value) || null,
-        puissanceFisc: parseInt(document.getElementById('cvPuissanceFisc').value) || null,
-        vin: document.getElementById('cvVin').value.trim().toUpperCase(),
-        typeMine: document.getElementById('cvTypeMine').value.trim().toUpperCase(),
-        couleur: document.getElementById('cvCouleur').value.trim(),
+        puissanceKW: parseInt(document.getElementById('cvPuissanceKW').value) || null,
+        cylindres: parseInt(document.getElementById('cvCylindres').value) || null,
+        codeMoteur: document.getElementById('cvCodeMoteur').value.trim().toUpperCase(),
+        transmission: document.getElementById('cvTransmission').value,
         boite: document.getElementById('cvBoite').value,
         motorisation: document.getElementById('cvMotorisation').value.trim(),
         carrosserie: document.getElementById('cvCarrosserie').value,
@@ -1819,9 +1816,9 @@ function parseAutodocPaste(prefix) {
     }
 
     // === REMPLIR LES VRAIS CHAMPS DU FORMULAIRE ===
-    const set = (id, val) => { const el = document.getElementById(id); if (el && val) { el.value = val; } };
+    const set = (id, val) => { const el = document.getElementById(id); if (el && val) { el.value = val; console.log('SET', id, '=', val); } };
 
-    // Marque dropdown
+    // Marque dropdown D'ABORD
     const marqueEl = document.getElementById(prefix + 'Marque');
     if (marqueEl && marque) {
         for (const opt of marqueEl.options) {
@@ -1831,80 +1828,92 @@ function parseAutodocPaste(prefix) {
                 break;
             }
         }
-        // Modèle après que le dropdown se peuple
-        setTimeout(() => {
-            const modeleEl = document.getElementById(prefix + 'Modele');
-            if (modeleEl && modele) {
-                const m1 = modele.split(' ')[0].toUpperCase();
-                for (const opt of modeleEl.options) {
-                    if (opt.value.toUpperCase().includes(m1) || opt.text.toUpperCase().includes(m1)) {
-                        modeleEl.value = opt.value;
-                        break;
-                    }
+    }
+
+    // TOUT LE RESTE dans un timeout — après que le changement de marque ait fini
+    setTimeout(() => {
+        // Modèle
+        const modeleEl = document.getElementById(prefix + 'Modele');
+        if (modeleEl && modele) {
+            const m1 = modele.split(' ')[0].toUpperCase();
+            for (const opt of modeleEl.options) {
+                if (opt.value.toUpperCase().includes(m1) || opt.text.toUpperCase().includes(m1)) {
+                    modeleEl.value = opt.value;
+                    break;
                 }
             }
-        }, 300);
-    }
+        }
 
-    // Champs texte
-    set(prefix + 'Motorisation', motorisation);
-    set(prefix + 'Annee', annee);
-    set(prefix + 'Cylindree', cylindree);
-    set(prefix + 'Puissance', puissanceCH || puissanceKW);
+        // Champs texte — remplis directement dans les vrais champs
+        set(prefix + 'Motorisation', motorisation);
+        set(prefix + 'Annee', annee);
+        set(prefix + 'Cylindree', cylindree);
+        set(prefix + 'Puissance', puissanceCH);
+        set(prefix + 'PuissanceKW', puissanceKW);
+        set(prefix + 'Cylindres', cylindres);
+        set(prefix + 'CodeMoteur', codeMoteur);
 
-    // Carrosserie dropdown
-    const carroEl = document.getElementById(prefix + 'Carrosserie');
-    if (carroEl && carrosserie) {
-        for (const opt of carroEl.options) {
-            if (opt.value.toLowerCase() === carrosserie.toLowerCase() || opt.text.toLowerCase() === carrosserie.toLowerCase()) {
-                carroEl.value = opt.value;
-                break;
+        // Carrosserie dropdown
+        const carroEl = document.getElementById(prefix + 'Carrosserie');
+        if (carroEl && carrosserie) {
+            for (const opt of carroEl.options) {
+                if (opt.value.toLowerCase() === carrosserie.toLowerCase() || opt.text.toLowerCase() === carrosserie.toLowerCase()) {
+                    carroEl.value = opt.value;
+                    break;
+                }
             }
         }
-    }
 
-    // Énergie dropdown
-    const energieEl = document.getElementById(prefix + 'Energie');
-    if (energieEl && energie) {
-        const ee = energie.toUpperCase();
-        for (const opt of energieEl.options) {
-            if (ee.includes('DIESEL') && opt.value.includes('Diesel')) { energieEl.value = opt.value; break; }
-            if ((ee.includes('ESSENCE') || ee.includes('SUPER')) && opt.value.includes('Essence')) { energieEl.value = opt.value; break; }
-            if (ee.includes('HYBRI') && opt.value.includes('Hybride')) { energieEl.value = opt.value; break; }
-            if (ee.includes('ELEC') && opt.value.includes('Électrique')) { energieEl.value = opt.value; break; }
+        // Énergie dropdown
+        const energieEl = document.getElementById(prefix + 'Energie');
+        if (energieEl && energie) {
+            const ee = energie.toUpperCase();
+            for (const opt of energieEl.options) {
+                if (ee.includes('DIESEL') && opt.value.includes('Diesel')) { energieEl.value = opt.value; break; }
+                if ((ee.includes('ESSENCE') || ee.includes('SUPER')) && opt.value.includes('Essence')) { energieEl.value = opt.value; break; }
+                if (ee.includes('HYBRI') && opt.value.includes('Hybride')) { energieEl.value = opt.value; break; }
+                if (ee.includes('ELEC') && opt.value.includes('Électrique')) { energieEl.value = opt.value; break; }
+            }
         }
-    }
 
-    // Boîte dropdown
-    const boiteEl = document.getElementById(prefix + 'Boite');
-    if (boiteEl && boite) {
-        if (/auto/i.test(boite)) boiteEl.value = 'Automatique';
-        else if (/robot/i.test(boite)) boiteEl.value = 'Robotisée';
-        else boiteEl.value = 'Manuelle';
-    }
+        // Transmission dropdown
+        const transEl = document.getElementById(prefix + 'Transmission');
+        if (transEl && transmission) {
+            const tt = transmission.toLowerCase();
+            for (const opt of transEl.options) {
+                if (tt.includes('intégral') && opt.value.includes('intégrale')) { transEl.value = opt.value; break; }
+                if (tt.includes('propulsion') && opt.value.includes('Propulsion')) { transEl.value = opt.value; break; }
+                if (tt.includes('traction') && !tt.includes('intégral') && opt.value.includes('avant')) { transEl.value = opt.value; break; }
+            }
+        }
 
-    // Observations — infos supplémentaires (bon ID selon le préfixe)
-    const obsId = prefix === 'cv' ? 'cvNotes' : 'vNotesVeh';
-    const obsEl = document.getElementById(obsId);
-    if (obsEl) {
-        let extras = [];
-        if (puissanceKW) extras.push(puissanceKW + ' KW');
-        if (puissanceCH) extras.push(puissanceCH + ' CV');
-        if (cylindres) extras.push(cylindres + ' cylindres');
-        if (soupapes) extras.push(soupapes + ' soupapes/cyl');
-        if (codeMoteur) extras.push('Moteur: ' + codeMoteur);
-        if (transmission) extras.push(transmission);
-        if (extras.length) obsEl.value = extras.join(' | ');
-    }
+        // Boîte dropdown
+        const boiteEl = document.getElementById(prefix + 'Boite');
+        if (boiteEl && boite) {
+            if (/auto/i.test(boite)) boiteEl.value = 'Automatique';
+            else if (/robot/i.test(boite)) boiteEl.value = 'Robotisée';
+            else boiteEl.value = 'Manuelle';
+        }
 
-    // Fermer le popup
+        // Observations — seulement les infos bonus
+        const obsId = prefix === 'cv' ? 'cvNotes' : 'vNotesVeh';
+        const obsEl = document.getElementById(obsId);
+        if (obsEl) {
+            let extras = [];
+            if (soupapes) extras.push(soupapes + ' soupapes/cyl');
+            if (extras.length) obsEl.value = extras.join(' | ');
+        }
+
+        let count = 0;
+        if (marque) count++; if (modele) count++; if (motorisation) count++;
+        if (carrosserie) count++; if (annee) count++; if (cylindree) count++;
+        if (puissanceCH) count++; if (puissanceKW) count++; if (energie) count++;
+        if (cylindres) count++; if (codeMoteur) count++; if (transmission) count++;
+        toast('✅ ' + count + ' champs remplis !', 'success');
+    }, 400); // fin du setTimeout
+
+    // Fermer le popup tout de suite
     document.getElementById('autodocPasteOverlay')?.remove();
-
-    let count = 0;
-    if (marque) count++; if (modele) count++; if (motorisation) count++;
-    if (carrosserie) count++; if (annee) count++; if (cylindree) count++;
-    if (puissanceCH || puissanceKW) count++; if (energie) count++;
-    toast('✅ ' + count + ' champs remplis !', 'success');
 }
 
 function deleteClient(id) {
@@ -1978,22 +1987,21 @@ function openVehicleModal(id) {
             updateModels();
             document.getElementById('vModele').value = v.modele;
             document.getElementById('vAnnee').value = v.annee || '';
-            document.getElementById('vDateMEC').value = v.dateMEC || '';
             document.getElementById('vKm').value = v.km || '';
             document.getElementById('vEnergie').value = v.energie || 'Diesel';
             document.getElementById('vCylindree').value = v.cylindree || '';
             document.getElementById('vPuissance').value = v.puissance || '';
-            document.getElementById('vPuissanceFisc').value = v.puissanceFisc || '';
-            document.getElementById('vVin').value = v.vin || '';
-            document.getElementById('vTypeMine').value = v.typeMine || '';
-            document.getElementById('vCouleur').value = v.couleur || '';
+            document.getElementById('vPuissanceKW').value = v.puissanceKW || '';
+            document.getElementById('vCylindres').value = v.cylindres || '';
+            document.getElementById('vCodeMoteur').value = v.codeMoteur || '';
+            document.getElementById('vTransmission').value = v.transmission || '';
             document.getElementById('vBoite').value = v.boite || 'Manuelle';
             document.getElementById('vNotesVeh').value = v.notesVeh || '';
             document.getElementById('vMotorisation').value = v.motorisation || '';
             document.getElementById('vCarrosserie').value = v.carrosserie || '';
         }
     } else {
-        ['vPlaque','vAnnee','vDateMEC','vKm','vCylindree','vPuissance','vPuissanceFisc','vVin','vTypeMine','vCouleur','vNotesVeh','vMotorisation'].forEach(id => document.getElementById(id).value = '');
+        ['vPlaque','vAnnee','vKm','vCylindree','vPuissance','vPuissanceKW','vCylindres','vCodeMoteur','vNotesVeh','vMotorisation'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('vClient').value = '';
         document.getElementById('vMarque').value = '';
         updateModels();
@@ -2015,15 +2023,14 @@ function saveVehicle() {
     const vehicleData = {
         plaque, clientId, marque, modele,
         annee: parseInt(document.getElementById('vAnnee').value) || null,
-        dateMEC: document.getElementById('vDateMEC').value || null,
         km: parseInt(document.getElementById('vKm').value) || null,
         energie: document.getElementById('vEnergie').value,
         cylindree: parseInt(document.getElementById('vCylindree').value) || null,
         puissance: parseInt(document.getElementById('vPuissance').value) || null,
-        puissanceFisc: parseInt(document.getElementById('vPuissanceFisc').value) || null,
-        vin: document.getElementById('vVin').value.trim().toUpperCase(),
-        typeMine: document.getElementById('vTypeMine').value.trim().toUpperCase(),
-        couleur: document.getElementById('vCouleur').value.trim(),
+        puissanceKW: parseInt(document.getElementById('vPuissanceKW').value) || null,
+        cylindres: parseInt(document.getElementById('vCylindres').value) || null,
+        codeMoteur: document.getElementById('vCodeMoteur').value.trim().toUpperCase(),
+        transmission: document.getElementById('vTransmission').value,
         boite: document.getElementById('vBoite').value,
         motorisation: document.getElementById('vMotorisation').value.trim(),
         carrosserie: document.getElementById('vCarrosserie').value,
