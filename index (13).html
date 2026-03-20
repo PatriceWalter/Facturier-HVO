@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AutoFact Pro — Facturier Atelier</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#F6F3EE;--c:#FFFFFF;--c2:#FAFAF8;--b:#DDD6CB;--br:#4A3728;--br2:#6B5344;--g:#C49A2A;--g2:#E8C547;--t:#2D2318;--m:#8D7E6F;--l:#EDE8E0;--gn:#2D8C4E;--bl:#2A6CB5;--rd:#C0392B;--sh:0 1px 3px rgba(0,0,0,.06)}
+body{font-family:'DM Sans',system-ui,sans-serif;color:var(--t);background:var(--bg);min-height:100vh}
+input,textarea,select,button{font-family:inherit}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--g)!important;box-shadow:0 0 0 3px rgba(196,154,42,.15)!important}
+input::placeholder,textarea::placeholder{color:#B5AA9C}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:#CCC4B8;border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media print{.np{display:none!important}body{background:#fff}}
+
+/* ─── Barre supérieure ─── */
+.bar{display:flex;align-items:center;gap:10px;padding:10px 20px;background:var(--br);position:sticky;top:0;z-index:99;flex-wrap:wrap}
+.bar h1{flex:1;font-size:14px;font-weight:600;color:#E8DFD3;min-width:160px;letter-spacing:.3px}
+.bar .logo-txt{font-family:'Playfair Display',serif;font-size:16px;color:var(--g2);margin-right:6px}
+.B{padding:8px 16px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600;border:none;white-space:nowrap;transition:all .15s}.B:hover{opacity:.88}.B:disabled{opacity:.5}
+.Bg{background:var(--g);color:#fff;box-shadow:0 2px 6px rgba(196,154,42,.3)}.Bw{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#E8DFD3}.Bv{background:var(--gn);color:#fff}.Bb{background:var(--bl);color:#fff}.Bs{background:#D4EDDA;border:1px solid #A3D9B1;color:var(--gn)}.Bx{padding:5px 10px;font-size:12px}
+.Bd{background:none;border:1.5px solid #E8C4C0;color:var(--rd);border-radius:5px;padding:4px 8px;font-size:12px;font-weight:700;cursor:pointer}
+.Ba{background:rgba(196,154,42,.08);border:1.5px dashed #C4A882;color:var(--br2);padding:8px 14px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600;margin-top:5px}
+
+/* ─── Conteneur ─── */
+.W{max-width:1100px;margin:0 auto;padding:20px;animation:fadeIn .3s}
+
+/* ─── Cartes ─── */
+.C{background:var(--c);border:1px solid var(--b);border-radius:10px;padding:16px 20px;box-shadow:var(--sh);margin-bottom:10px;transition:border-color .2s}.C:hover{border-color:#C4B8A6}
+.F{background:var(--c);border:1px solid var(--b);border-radius:10px;padding:22px;box-shadow:var(--sh)}
+
+/* ─── Grille et champs ─── */
+.G{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.D{display:flex;flex-direction:column;gap:3px}.D label{font-size:11px;color:var(--m);font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+.D input,.D textarea,.D select{background:var(--c2);border:1.5px solid var(--b);color:var(--t);padding:9px 11px;border-radius:7px;font-size:14px;width:100%}.D textarea{resize:vertical}
+
+/* ─── Onglets ─── */
+.T{display:flex;gap:2px;border-bottom:2px solid var(--b);margin-bottom:16px;flex-wrap:wrap;background:var(--c);border-radius:8px 8px 0 0;padding:0 4px}
+.Tb{background:none;border:none;color:var(--m);padding:10px 14px;cursor:pointer;font-size:13px;font-weight:500;border-bottom:2.5px solid transparent;transition:all .2s}.Tb:hover{color:var(--br)}.Tb.a{color:var(--g);font-weight:700;border-bottom-color:var(--g)}
+
+/* ─── Lignes saisie ─── */
+.R{display:flex;gap:6px;align-items:center;margin-bottom:6px;padding:6px 8px;background:var(--c2);border-radius:6px;border:1px solid transparent;transition:border-color .15s}.R:hover{border-color:var(--b)}
+.I{background:var(--c);border:1px solid var(--b);color:var(--t);padding:7px 9px;border-radius:5px;font-size:13px;font-family:inherit;transition:border-color .15s}.I:focus{border-color:var(--g)}
+.Lt{min-width:80px;text-align:right;font-weight:700;color:var(--br);font-size:13px}
+.Gt{text-align:right;font-weight:700;font-size:15px;color:var(--br);margin-top:8px;padding:10px 14px;background:linear-gradient(90deg,var(--l),#E8E2D6);border-radius:7px;border:1px solid var(--b)}
+.Sh{font-size:13px;font-weight:700;color:var(--br);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid var(--g);display:flex;align-items:center;gap:8px}
+
+/* ─── Plaque ─── */
+.Pb{background:linear-gradient(135deg,#F0EBE2,#E8E2D6);border:2px solid var(--g);border-radius:10px;padding:16px;margin-bottom:16px}
+.Pi{max-width:260px;padding:12px 16px;background:#fff;border:3px solid var(--g);border-radius:10px;font-size:22px;font-weight:800;color:var(--br);text-align:center;text-transform:uppercase;letter-spacing:4px;font-family:'DM Sans',system-ui}
+
+/* ─── Recherche véhicule ─── */
+.Vr{position:relative}.Vl{position:absolute;top:100%;left:0;right:0;background:var(--c);border:1.5px solid var(--g);border-radius:0 0 8px 8px;max-height:200px;overflow-y:auto;z-index:50;box-shadow:0 6px 16px rgba(0,0,0,.1)}
+.Vi{padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--b);font-size:13px}.Vi:hover{background:var(--l)}.Vi b{color:var(--br)}
+
+/* ─── Badge / Chips ─── */
+.badge{font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600}
+.ch{background:var(--l);padding:3px 10px;border-radius:12px;font-size:12px;color:var(--br2)}
+.chT{background:var(--br);color:var(--g2);padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700}
+
+/* ─── Templates opérations ─── */
+.tpl{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;padding:10px;background:var(--c2);border-radius:7px;border:1px solid var(--b)}
+.tpl button{padding:5px 10px;font-size:11px;border-radius:5px;border:1px solid var(--b);background:var(--c);color:var(--br2);cursor:pointer;font-weight:500;transition:all .15s}.tpl button:hover{background:var(--g);color:#fff;border-color:var(--g)}
+
+/* ─── Avertissement ─── */
+.wr{background:#FFF8E1;border:1px solid #F0D78C;border-radius:7px;padding:10px;color:#7A6520;font-size:12px;line-height:1.5;margin:8px 0}
+
+/* ─── Zone impression ─── */
+.Z{background:#fff;color:var(--t);padding:30px;border-radius:10px;font-size:11px;line-height:1.45;max-width:780px;margin:0 auto;box-shadow:0 4px 14px rgba(0,0,0,.06);border:1px solid var(--b)}
+.Z table{width:100%;border-collapse:collapse;margin-bottom:10px}.Z th{background:var(--br);color:#F0EBE2;font-weight:600;border:1px solid var(--br);padding:4px 7px;font-size:10px}.Z td{border:1px solid var(--b);padding:4px 7px;font-size:10px}
+.Z .sc{font-size:11px;font-weight:700;color:var(--br);border-bottom:2px solid var(--g);padding-bottom:3px;margin:14px 0 7px;text-transform:uppercase;letter-spacing:.5px}
+.Z .su td{background:var(--l);font-weight:600;color:var(--br)}.Z .to td{background:var(--br);color:#F0EBE2;font-weight:700;border-color:var(--br)}
+.Z .gl{color:var(--g2)}.Z .al{background:#FAFAF8}.Z .r{text-align:right}.Z .c{text-align:center}.Z .bo{font-weight:700}
+.Z .rc{margin-left:auto;width:250px;margin-top:8px}.Z .rc td{border:none;padding:4px 7px}.Z .rc .tt td{background:var(--br);color:var(--g2);font-size:12px;font-weight:700;border:none}
+.Z .logo-print{max-height:50px;max-width:180px;object-fit:contain}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+const {useState,useRef}=React;
+
+/* ═══ VÉHICULES ═══ */
+const VDB={"ALFA ROMEO":["Giulia","Stelvio","Tonale"],"ALPINE":["A110","A110 R","A110 S"],"AUDI":["A1","A3","A4","A5","A6","A7","A8","Q2","Q3","Q4 e-tron","Q5","Q7","Q8","e-tron","e-tron GT","TT","RS3","RS4","RS5","RS6","S3","S5"],"BMW":["Série 1","Série 2","Série 3","Série 4","Série 5","Série 7","X1","iX1","X2","X3","iX3","X4","X5","X6","X7","iX","i4","i5","i7","Z4","M2","M3","M4","M5"],"BYD":["Atto 3","Han","Seal","Dolphin"],"CITROËN":["C1","C3","C3 Aircross","C4","ë-C4","C4 X","C5 Aircross","C5 X","Berlingo","Jumpy","Jumper","Ami"],"CUPRA":["Born","Formentor","Leon","Tavascan"],"DACIA":["Sandero","Duster","Jogger","Spring","Logan"],"DS":["DS 3","DS 4","DS 7","DS 9"],"FERRARI":["296 GTB","SF90","Roma","Purosangue"],"FIAT":["500","500X","500e","Tipo","Panda","Ducato"],"FORD":["Fiesta","Focus","Puma","Kuga","Explorer","Mustang Mach-E","Mustang","Ranger","Transit","Bronco"],"HONDA":["Jazz","Civic","HR-V","CR-V","ZR-V","Honda e"],"HYUNDAI":["i10","i20","i30","Bayon","Kona","Tucson","Santa Fe","Ioniq 5","Ioniq 6"],"JAGUAR":["E-Pace","F-Pace","I-Pace","XE","XF","F-Type"],"JEEP":["Renegade","Compass","Avenger","Wrangler","Grand Cherokee"],"KIA":["Picanto","Rio","Ceed","Stonic","Niro","Sportage","Sorento","EV6","EV9"],"LAMBORGHINI":["Huracán","Urus","Revuelto"],"LAND ROVER":["Defender","Discovery","Discovery Sport","Range Rover","Range Rover Sport","Range Rover Velar","Range Rover Evoque"],"LEXUS":["UX","NX","RX","ES","IS","LC","LS","RZ"],"MASERATI":["Ghibli","Levante","MC20","Grecale"],"MAZDA":["Mazda2","Mazda3","CX-3","CX-30","CX-5","CX-60","MX-5","MX-30"],"MERCEDES":["Classe A","Classe B","Classe C","Classe E","Classe S","CLA","CLE","GLA","GLB","GLC","GLE","GLS","EQA","EQB","EQE","EQS","AMG GT","Classe G","Vito","Sprinter"],"MG":["MG4","MG5","ZS EV","HS"],"MINI":["Cooper","Countryman","Clubman"],"MITSUBISHI":["Space Star","ASX","Eclipse Cross","Outlander","L200"],"NISSAN":["Micra","Juke","Qashqai","X-Trail","Leaf","Ariya","Navara","GT-R"],"OPEL":["Corsa","Astra","Mokka","Grandland","Combo","Vivaro"],"PEUGEOT":["208","e-208","308","e-308","408","508","2008","e-2008","3008","5008","Rifter","Partner","Expert","Boxer"],"POLESTAR":["Polestar 2","Polestar 3"],"PORSCHE":["911","718 Cayman","718 Boxster","Cayenne","Macan","Panamera","Taycan"],"RENAULT":["Clio","Mégane","Mégane E-Tech","Captur","Kadjar","Arkana","Austral","Scénic","Espace","Koleos","Twingo","Zoé","Kangoo","Trafic","Master"],"SEAT":["Ibiza","Leon","Arona","Ateca","Tarraco"],"ŠKODA":["Fabia","Octavia","Superb","Scala","Kamiq","Karoq","Kodiaq","Enyaq"],"SMART":["Fortwo","Forfour","#1"],"SUBARU":["Impreza","Forester","Outback","Solterra","BRZ"],"SUZUKI":["Swift","Ignis","Vitara","S-Cross","Jimny"],"TESLA":["Model 3","Model Y","Model S","Model X"],"TOYOTA":["Yaris","Yaris Cross","Corolla","Corolla Cross","C-HR","RAV4","Highlander","Land Cruiser","Hilux","Proace","GR86","Supra","bZ4X","Aygo X","Prius","Camry"],"VOLKSWAGEN":["Polo","Golf","Golf GTI","Golf R","ID.3","ID.4","ID.5","T-Roc","T-Cross","Tiguan","Touareg","Arteon","Passat","Taigo","Caddy","Transporter","Crafter","Multivan"],"VOLVO":["XC40","C40","XC60","XC90","S60","S90","V60","V90","EX30","EX90"]};
+const MRQ=Object.keys(VDB).sort();
+const AV=[];MRQ.forEach(m=>VDB[m].forEach(mo=>AV.push({marque:m,modele:mo,s:(m+" "+mo).toLowerCase()})));
+
+/* ═══ MODÈLES D'OPÉRATIONS PRÉ-REMPLIES ═══ */
+const TPL={
+  "T1":[
+    {op:"Vidange moteur + remplacement filtre à huile + contrôle étanchéité carter",temps:0.8},
+    {op:"Remplacement filtre à air moteur + nettoyage boîtier admission",temps:0.3},
+    {op:"Remplacement filtre d'habitacle",temps:0.25},
+    {op:"Remplacement filtre à carburant + amorçage circuit",temps:0.5},
+    {op:"Remplacement plaquettes de frein avant + contrôle disques",temps:1.0},
+    {op:"Remplacement plaquettes de frein arrière + réglage frein stationnement",temps:0.9},
+    {op:"Remplacement disques + plaquettes avant",temps:1.5},
+    {op:"Remplacement disques + plaquettes arrière",temps:1.3},
+    {op:"Purge + remplacement liquide de frein",temps:0.8},
+    {op:"Remplacement liquide de refroidissement + purge circuit",temps:1.0},
+    {op:"Remplacement bougies d'allumage (x4)",temps:0.6},
+    {op:"Remplacement bougies de préchauffage (x4)",temps:0.8},
+    {op:"Remplacement essuie-glaces avant + arrière",temps:0.15},
+    {op:"Remplacement batterie + réinitialisation calculateur",temps:0.4},
+    {op:"Équilibrage + permutation des pneumatiques",temps:0.5},
+    {op:"Montage 4 pneumatiques neufs + équilibrage + géométrie",temps:1.2},
+    {op:"Contrôle et réglage géométrie (parallélisme)",temps:0.6},
+    {op:"Remplacement ampoule(s) / LED",temps:0.3},
+    {op:"Remplacement courroie d'accessoires + galet tendeur",temps:0.8},
+    {op:"Recharge climatisation R134a / R1234yf + contrôle étanchéité",temps:0.7},
+  ],
+  "T2":[
+    {op:"Remplacement kit de distribution + pompe à eau + accessoires",temps:4.0},
+    {op:"Remplacement embrayage complet (mécanisme + disque + butée)",temps:3.5},
+    {op:"Remplacement volant moteur bimasse + embrayage",temps:5.0},
+    {op:"Remplacement amortisseurs avant (x2) + coupelles + butées",temps:1.8},
+    {op:"Remplacement amortisseurs arrière (x2)",temps:1.2},
+    {op:"Remplacement rotule(s) de direction",temps:1.0},
+    {op:"Remplacement biellette(s) de barre stabilisatrice",temps:0.6},
+    {op:"Remplacement roulement de roue avant / arrière",temps:1.5},
+    {op:"Remplacement cardan / soufflet de transmission",temps:1.8},
+    {op:"Remplacement silent-blocs de train arrière",temps:2.0},
+    {op:"Remplacement triangle(s) de suspension avant",temps:1.5},
+    {op:"Remplacement pot d'échappement / catalyseur / FAP",temps:1.5},
+    {op:"Remplacement turbocompresseur + joints + durites",temps:4.0},
+    {op:"Remplacement démarreur",temps:1.2},
+    {op:"Remplacement alternateur",temps:1.5},
+    {op:"Remplacement radiateur moteur + liquide de refroidissement",temps:1.5},
+    {op:"Remplacement pompe à eau (sans distribution)",temps:1.2},
+    {op:"Vidange boîte de vitesses automatique / DSG",temps:1.0},
+  ],
+  "T3":[
+    {op:"Diagnostic électronique complet — lecture / effacement codes défaut tous calculateurs",temps:0.75},
+    {op:"Recherche de panne électronique approfondie — mesures + essais",temps:1.5},
+    {op:"Calibrage caméra ADAS (freinage automatique / aide au stationnement)",temps:1.0},
+    {op:"Paramétrage / codage calculateur (remplacement pièce)",temps:0.5},
+    {op:"Mise à jour logicielle calculateur moteur / boîte",temps:0.5},
+    {op:"Essai routier dynamique de validation (25-30 km)",temps:1.0},
+    {op:"Passage au banc de contrôle freinage",temps:0.5},
+    {op:"Contrôle antipollution / passage aux gaz",temps:0.4},
+    {op:"Remise à zéro indicateur de maintenance",temps:0.15},
+    {op:"Contrôle / diagnostic circuit de climatisation",temps:0.5},
+  ]
+};
+
+/* ═══ MENTIONS LÉGALES PAR DÉFAUT ═══ */
+const DFLT_LEGAL="Conditions de paiement : à réception de facture. Pénalités de retard : 3 fois le taux d'intérêt légal (art. L441-10 Code de commerce). Indemnité forfaitaire de recouvrement : 40,00 € (art. D441-5). Garantie pièces : 2 ans. Garantie main-d'œuvre : 1 an.";
+
+/* ═══ PLAQUE ═══ */
+async function chercherPlaque(pl,url){
+  if(!url)return{ok:false,erreur:"URL du script non configurée (Paramètres)."};
+  try{const r=await fetch(url+(url.includes("?")?"&":"?")+"plaque="+encodeURIComponent(pl));if(!r.ok)return{ok:false,erreur:"HTTP "+r.status};return await r.json()}catch(e){return{ok:false,erreur:e.message}}
+}
+
+/* ═══ UTILITAIRES ═══ */
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const fE=n=>(parseFloat(n)||0).toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2})+" \u20AC";
+const fH=n=>(parseFloat(n)||0).toFixed(2).replace(".",",")+"\u00A0h";
+const LS={g(k,f){try{return JSON.parse(localStorage.getItem(k))||f}catch{return f}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const NI=()=>({id:uid(),num:"",date:new Date().toISOString().slice(0,10),or:"",status:"brouillon",client:{name:"",addr:"",city:"",tel:"",email:""},vehicle:{marque:"",modele:"",annee:"",finition:"",vin:"",moteur:"",boite:"",km:"",energie:"",couleur:"",immat:""},laborT1:[],laborT2:[],laborT3:[],parts:[],ecoFees:[],checks:[],tvaRate:20,notes:"",tauxT1:78,tauxT2:92,tauxT3:105});
+const NL=()=>({id:uid(),op:"",temps:"",taux:""});const NP=()=>({id:uid(),ref:"",desc:"",qty:1,pu:""});const NE=()=>({id:uid(),desc:"",pu:""});const NC=()=>({id:uid(),pt:"",res:""});
+const DFLT_SHOP={name:"",sub:"",addr:"",city:"",tel:"",email:"",siret:"",tvaIntra:"",ape:"",iban:"",scriptUrl:"",logo:"",prefix:"FA",legal:DFLT_LEGAL};
+const SM={brouillon:{l:"Brouillon",bg:"#F3EEE6",fg:"#8D7E6F"},envoyee:{l:"Envoyée",bg:"#E3EEFA",fg:"#2A6CB5"},payee:{l:"Payée",bg:"#DEF0E5",fg:"#2D8C4E"},annulee:{l:"Annulée",bg:"#FBEAE8",fg:"#C0392B"}};
+const cT=i=>{const mo=[...(i.laborT1||[]),...(i.laborT2||[]),...(i.laborT3||[])].reduce((s,l)=>s+(parseFloat(l.temps)||0)*(parseFloat(l.taux)||0),0),p=(i.parts||[]).reduce((s,x)=>s+(parseFloat(x.qty)||0)*(parseFloat(x.pu)||0),0),e=(i.ecoFees||[]).reduce((s,x)=>s+(parseFloat(x.pu)||0),0);return(mo+p+e)*(1+(i.tvaRate||20)/100)};
+
+/* ═══ APP ═══ */
+function App(){
+  const[vw,setVw]=useState("dash"),[inv,setInv]=useState(LS.g("af8-i",[])),[cur,setCur]=useState(null),[shop,setShop]=useState(LS.g("af8-s",DFLT_SHOP)),[nn,setNN]=useState(LS.g("af8-n",1)),[sr,setSr]=useState(""),[clients,setCli]=useState(LS.g("af8-c",[]));
+  const sv=(i,s,n,c)=>{LS.s("af8-i",i);if(s)LS.s("af8-s",s);if(n!==undefined)LS.s("af8-n",n);if(c)LS.s("af8-c",c)};
+  const creer=()=>{const i=NI(),y=new Date().getFullYear(),p=shop.prefix||"FA";i.num=p+"-"+y+"-"+String(nn).padStart(4,"0");i.or="OR-"+y+"-"+String(nn+1000).padStart(4,"0");const n2=nn+1;setNN(n2);setCur(i);setVw("edit");sv(inv,null,n2)};
+  const sauver=f=>{const idx=inv.findIndex(x=>x.id===f.id);const nl=idx>=0?inv.map((x,i)=>i===idx?f:x):[f,...inv];setInv(nl);setCur(f);sv(nl);
+    // Auto-save client
+    if(f.client.name){const ex=clients.findIndex(c=>c.name===f.client.name);const nc=ex>=0?clients.map((c,i)=>i===ex?{...f.client}:c):[...clients,{...f.client}];setCli(nc);sv(nl,null,undefined,nc)}};
+  const suppr=id=>{const nl=inv.filter(x=>x.id!==id);setInv(nl);sv(nl);if(cur&&cur.id===id){setCur(null);setVw("dash")}};
+  const dupl=f=>{const d=JSON.parse(JSON.stringify(f));d.id=uid();const p=shop.prefix||"FA";d.num=p+"-"+new Date().getFullYear()+"-"+String(nn).padStart(4,"0");d.date=new Date().toISOString().slice(0,10);d.status="brouillon";const n2=nn+1;setNN(n2);setCur(d);setVw("edit");sv(inv,null,n2)};
+  const exportData=()=>{const data=JSON.stringify({inv,shop,nn,clients},null,2);const blob=new Blob([data],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="autofact_backup_"+new Date().toISOString().slice(0,10)+".json";a.click()};
+  const importData=(e)=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=(ev)=>{try{const d=JSON.parse(ev.target.result);if(d.inv){setInv(d.inv);sv(d.inv)}if(d.shop){setShop(d.shop);sv(d.inv||inv,d.shop)}if(d.nn){setNN(d.nn);sv(d.inv||inv,d.shop||shop,d.nn)}if(d.clients){setCli(d.clients);sv(d.inv||inv,d.shop||shop,d.nn||nn,d.clients)}alert("Import réussi !")}catch(err){alert("Erreur : fichier invalide")}};reader.readAsText(file)};
+  const fl=inv.filter(f=>!sr||[f.num,f.client.name,f.vehicle.marque,f.vehicle.modele,f.vehicle.immat].some(v=>(v||"").toLowerCase().includes(sr.toLowerCase())));
+  return<div>
+    <div className="bar np">
+      <span className="logo-txt">⚙ AutoFact Pro</span>
+      <h1>{vw==="dash"?"Tableau de bord":vw==="edit"?"Édition "+(cur?cur.num:""):vw==="prev"?"Aperçu "+(cur?cur.num:""):"Paramètres"}</h1>
+      <button className="B Bw Bx" onClick={()=>setVw("dash")}>Accueil</button>
+      <button className="B Bw Bx" onClick={()=>setVw("set")}>Paramètres</button>
+      <button className="B Bg" onClick={creer}>+ Nouvelle facture</button>
+    </div>
+    <div className="W">
+      {vw==="dash"&&<Dash inv={fl} all={inv} sr={sr} setSr={setSr} onE={f=>{setCur(f);setVw("edit")}} onP={f=>{setCur(f);setVw("prev")}} onD={suppr} onDu={dupl} onC={creer} onExport={exportData} onImport={importData}/>}
+      {vw==="edit"&&cur&&<Edit inv={cur} shop={shop} clients={clients} onS={sauver} onP={f=>{sauver(f);setVw("prev")}} onB={()=>setVw("dash")}/>}
+      {vw==="prev"&&cur&&<Prev inv={cur} shop={shop} onB={()=>setVw("edit")} onD={()=>setVw("dash")}/>}
+      {vw==="set"&&<Sett shop={shop} onS={s=>{setShop(s);sv(inv,s)}}/>}
+    </div></div>;
+}
+
+/* ═══ TABLEAU DE BORD ═══ */
+function Dash({inv,all,sr,setSr,onE,onP,onD,onDu,onC,onExport,onImport}){
+  const enc=all.filter(i=>i.status==="payee").reduce((s,i)=>s+cT(i),0),att=all.filter(i=>i.status==="envoyee").reduce((s,i)=>s+cT(i),0);
+  const fileRef=useRef();
+  return<div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(155px,1fr))",gap:10,marginBottom:16}}>
+      {[{l:"Encaissé",v:fE(enc),c:"var(--gn)"},{l:"En attente",v:fE(att),c:"var(--g)"},{l:"Brouillons",v:all.filter(i=>i.status==="brouillon").length,c:"var(--m)"},{l:"Total",v:all.length,c:"var(--bl)"}].map((s,i)=><div key={i} style={{background:"var(--c)",border:"1px solid var(--b)",borderRadius:10,padding:"12px 16px",borderLeft:"4px solid "+s.c,boxShadow:"var(--sh)"}}><div style={{fontSize:10,color:"var(--m)",textTransform:"uppercase",letterSpacing:1,fontWeight:600}}>{s.l}</div><div style={{fontSize:20,fontWeight:700,color:s.c,marginTop:2}}>{s.v}</div></div>)}
+    </div>
+    <div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}}>
+      <input style={{flex:1,minWidth:200,padding:"9px 12px",background:"var(--c)",border:"1.5px solid var(--b)",borderRadius:8,fontSize:14}} placeholder="Rechercher : n°, client, véhicule, plaque…" value={sr} onChange={e=>setSr(e.target.value)}/>
+      <button className="B Bw Bx" onClick={onExport}>📦 Exporter</button>
+      <button className="B Bw Bx" onClick={()=>fileRef.current.click()}>📥 Importer</button>
+      <input ref={fileRef} type="file" accept=".json" style={{display:"none"}} onChange={onImport}/>
+    </div>
+    {inv.length===0?<div style={{textAlign:"center",padding:"50px 0"}}><p style={{color:"var(--m)",marginBottom:14}}>Aucune facture</p><button className="B Bg" onClick={onC}>+ Créer une facture</button></div>
+    :inv.map(f=>{const ttc=cT(f),st=SM[f.status]||SM.brouillon;return<div className="C" key={f.id}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+        <div style={{display:"flex",alignItems:"center",gap:7}}><b style={{fontSize:14,color:"var(--br)"}}>{f.num}</b><span className="badge" style={{background:st.bg,color:st.fg}}>{st.l}</span></div>
+        <span style={{fontSize:12,color:"var(--m)"}}>{new Date(f.date).toLocaleDateString("fr-FR")}</span></div>
+      <div style={{marginBottom:6}}><div style={{fontSize:13,fontWeight:600,color:"var(--br)"}}>{f.client.name||"—"}</div><div style={{fontSize:12,color:"var(--m)"}}>{[f.vehicle.marque,f.vehicle.modele,f.vehicle.immat].filter(Boolean).join(" — ")||"—"}</div></div>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:8,borderTop:"1px solid var(--l)"}}>
+        <b style={{fontSize:18,color:"var(--g)"}}>{fE(ttc)}</b>
+        <div style={{display:"flex",gap:4}}><button className="B Bw Bx" onClick={()=>onE(f)}>Éditer</button><button className="B Bw Bx" onClick={()=>onP(f)}>Voir</button><button className="B Bw Bx" onClick={()=>onDu(f)}>Dupl.</button><button className="B Bw Bx" style={{color:"var(--rd)"}} onClick={()=>{if(confirm("Supprimer ?"))onD(f.id)}}>×</button></div></div></div>})}</div>;
+}
+
+/* ═══ ÉDITEUR ═══ */
+function Edit({inv:init,shop,clients,onS,onP,onB}){
+  const[f,sf]=useState(JSON.parse(JSON.stringify(init))),[tab,sTab]=useState("gen"),[dirty,sD]=useState(false),[pL,sPL]=useState(false),[pM,sPM]=useState(""),[pC,sPC]=useState(""),[vs,sVs]=useState(""),[vO,sVO]=useState(false),[cO,sCO]=useState(false);
+  const u=(p,v)=>{sf(prev=>{const n=JSON.parse(JSON.stringify(prev)),pp=p.split(".");let o=n;for(let i=0;i<pp.length-1;i++)o=o[pp[i]];o[pp[pp.length-1]]=v;return n});sD(true)};
+  const uL=(lk,id,fi,v)=>{sf(prev=>{const n=JSON.parse(JSON.stringify(prev)),it=n[lk].find(i=>i.id===id);if(it)it[fi]=v;return n});sD(true)};
+  const aL=(lk,fac)=>{sf(prev=>{const n=JSON.parse(JSON.stringify(prev)),it=fac();if(lk.startsWith("labor"))it.taux=lk==="laborT1"?prev.tauxT1:lk==="laborT2"?prev.tauxT2:prev.tauxT3;n[lk].push(it);return n});sD(true)};
+  const rL=(lk,id)=>{sf(prev=>{const n=JSON.parse(JSON.stringify(prev));n[lk]=n[lk].filter(i=>i.id!==id);return n});sD(true)};
+  const addTpl=(tier,t)=>{const lk="labor"+tier;sf(prev=>{const n=JSON.parse(JSON.stringify(prev)),it=NL();it.op=t.op;it.temps=t.temps;it.taux=tier==="T1"?prev.tauxT1:tier==="T2"?prev.tauxT2:prev.tauxT3;n[lk].push(it);return n});sD(true)};
+  const pickClient=c=>{sf(prev=>{const n=JSON.parse(JSON.stringify(prev));n.client={...c};return n});sD(true);sCO(false)};
+  const doP=async()=>{const pl=(f.vehicle.immat||"").trim();if(!pl||pl.length<4){sPM("Saisissez une plaque.");sPC("perr");return}sPL(true);sPM("Interrogation…");sPC("pwt");const res=await chercherPlaque(pl,shop.scriptUrl);sPL(false);if(res&&res.ok){sf(prev=>{const n=JSON.parse(JSON.stringify(prev));["marque","modele","annee","finition","vin","moteur","boite","energie","couleur"].forEach(k=>{if(res[k])n.vehicle[k]=res[k]});return n});sD(true);sPM("Véhicule identifié !");sPC("pok")}else{sPM(res?res.erreur||"Non trouvé":"Erreur");sPC("perr")}};
+  const pickV=(m,mo)=>{u("vehicle.marque",m);u("vehicle.modele",mo);sVs("");sVO(false)};
+  const vR=vs.length>=2?AV.filter(v=>v.s.includes(vs.toLowerCase())).slice(0,10):[];
+  const mc=l=>l.reduce((s,x)=>s+(parseFloat(x.temps)||0)*(parseFloat(x.taux)||0),0);
+  const m1=mc(f.laborT1),m2=mc(f.laborT2),m3=mc(f.laborT3),mT=m1+m2+m3,pT=f.parts.reduce((s,p)=>s+(parseFloat(p.qty)||0)*(parseFloat(p.pu)||0),0),eT=f.ecoFees.reduce((s,e)=>s+(parseFloat(e.pu)||0),0),ht=mT+pT+eT,ttc=ht*(1+f.tvaRate/100);
+  const cM=VDB[f.vehicle.marque]||[];
+  const cFilt=cO?clients.filter(c=>c.name):[];
+  return<div>
+    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12,flexWrap:"wrap"}} className="np">
+      <button className="B Bw" onClick={onB}>← Retour</button>
+      <div style={{flex:1,display:"flex",gap:5,flexWrap:"wrap"}}><span className="ch"><b>MO</b> {fE(mT)}</span><span className="ch"><b>Pièces</b> {fE(pT)}</span><span className="chT"><b>TTC</b> {fE(ttc)}</span></div>
+      <select style={{padding:"6px 10px",background:"var(--c)",border:"1px solid var(--b)",borderRadius:6,fontSize:13}} value={f.status} onChange={e=>u("status",e.target.value)}>{Object.entries(SM).map(([k,v])=><option key={k} value={k}>{v.l}</option>)}</select>
+      <button className={dirty?"B Bv":"B Bs"} onClick={()=>{onS(f);sD(false)}}>{dirty?"💾 Sauvegarder":"✓ OK"}</button>
+      <button className="B Bb" onClick={()=>onP(f)}>Aperçu</button></div>
+    <div className="T np">{[["gen","Général"],["cli","Client"],["veh","Véhicule"],["mo","Main-d'œuvre"],["pi","Pièces"],["eco","Éco/Frais"],["chk","Contrôles"]].map(([k,l])=><button key={k} className={"Tb"+(tab===k?" a":"")} onClick={()=>sTab(k)}>{l}</button>)}</div>
+    <div className="F">
+      {tab==="gen"&&<div className="G"><Fd l="N° facture" v={f.num} c={v=>u("num",v)}/><Fd l="Date" t="date" v={f.date} c={v=>u("date",v)}/><Fd l="N° O.R." v={f.or} c={v=>u("or",v)}/><Fd l="TVA (%)" t="number" v={f.tvaRate} c={v=>u("tvaRate",parseFloat(v)||0)}/><Fd l="Taux T1 (€/h)" t="number" v={f.tauxT1} c={v=>u("tauxT1",parseFloat(v)||0)}/><Fd l="Taux T2 (€/h)" t="number" v={f.tauxT2} c={v=>u("tauxT2",parseFloat(v)||0)}/><Fd l="Taux T3 (€/h)" t="number" v={f.tauxT3} c={v=>u("tauxT3",parseFloat(v)||0)}/><div/><div style={{gridColumn:"1/-1"}}><Fd l="Notes / observations" v={f.notes} c={v=>u("notes",v)} ml/></div></div>}
+
+      {tab==="cli"&&<div>
+        {clients.length>0&&<div style={{marginBottom:14}}><div className="Sh">📇 Clients enregistrés ({clients.length})</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:5}}>{clients.filter(c=>c.name).map((c,i)=><button key={i} className="Ba" style={{margin:0}} onClick={()=>pickClient(c)}>{c.name}</button>)}</div></div>}
+        <div className="G"><Fd l="Nom / raison sociale" v={f.client.name} c={v=>u("client.name",v)}/><Fd l="Téléphone" v={f.client.tel} c={v=>u("client.tel",v)}/><Fd l="Adresse" v={f.client.addr} c={v=>u("client.addr",v)}/><Fd l="E-mail" v={f.client.email} c={v=>u("client.email",v)}/><Fd l="CP / Ville" v={f.client.city} c={v=>u("client.city",v)}/></div></div>}
+
+      {tab==="veh"&&<div>
+        <div className="Pb"><div style={{fontSize:14,fontWeight:700,color:"var(--br)",marginBottom:3}}>RECHERCHE PAR PLAQUE</div>
+          <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap"}}><input className="Pi" placeholder="AB-123-CD" value={f.vehicle.immat||""} onChange={e=>u("vehicle.immat",e.target.value.toUpperCase())} onKeyDown={e=>{if(e.key==="Enter")doP()}}/><button className="B Bg" disabled={pL} onClick={doP}>{pL?"…":"Rechercher"}</button></div>
+          {pM&&<div style={{marginTop:8,fontSize:13,fontWeight:600,padding:"6px 12px",borderRadius:5,display:"inline-block",background:pC==="pok"?"#DEF0E5":pC==="perr"?"#FBEAE8":"#FFF8E1",color:pC==="pok"?"var(--gn)":pC==="perr"?"var(--rd)":"#7A6520"}}>{pM}</div>}
+          {!shop.scriptUrl&&<div className="wr">⚠ Script non configuré → Paramètres</div>}</div>
+        <div style={{background:"var(--c2)",border:"1px solid var(--b)",borderRadius:10,padding:14,marginBottom:14}}>
+          <div style={{fontSize:13,fontWeight:700,color:"var(--br)",marginBottom:6}}>RECHERCHE RAPIDE ({AV.length} véhicules)</div>
+          <div className="Vr"><input className="I" style={{width:"100%",fontSize:14,padding:"9px 11px"}} placeholder="Tapez : Golf, Clio, 308, Hilux…" value={vs} onChange={e=>{sVs(e.target.value);sVO(true)}} onFocus={()=>sVO(true)} onBlur={()=>setTimeout(()=>sVO(false),200)}/>
+          {vO&&vR.length>0&&<div className="Vl">{vR.map((v,i)=><div key={i} className="Vi" onMouseDown={()=>pickV(v.marque,v.modele)}><b>{v.marque}</b> — {v.modele}</div>)}</div>}</div></div>
+        <div className="G" style={{marginBottom:12}}><div className="D"><label>Marque ({MRQ.length})</label><select style={{padding:"8px",background:"var(--c)",border:"1px solid var(--b)",borderRadius:6,fontSize:14,width:"100%"}} value={f.vehicle.marque} onChange={e=>{u("vehicle.marque",e.target.value);u("vehicle.modele","")}}><option value="">—</option>{MRQ.map(m=><option key={m} value={m}>{m}</option>)}</select></div><div className="D"><label>Modèle ({cM.length})</label><select style={{padding:"8px",background:"var(--c)",border:"1px solid var(--b)",borderRadius:6,fontSize:14,width:"100%"}} value={f.vehicle.modele} onChange={e=>u("vehicle.modele",e.target.value)} disabled={!f.vehicle.marque}><option value="">—</option>{cM.map(m=><option key={m} value={m}>{m}</option>)}</select></div></div>
+        <div className="G"><Fd l="Immatriculation" v={f.vehicle.immat} c={v=>u("vehicle.immat",v.toUpperCase())}/><Fd l="Marque" v={f.vehicle.marque} c={v=>u("vehicle.marque",v)}/><Fd l="Modèle" v={f.vehicle.modele} c={v=>u("vehicle.modele",v)}/><Fd l="Année" v={f.vehicle.annee} c={v=>u("vehicle.annee",v)}/><Fd l="Finition" v={f.vehicle.finition} c={v=>u("vehicle.finition",v)}/><Fd l="VIN" v={f.vehicle.vin} c={v=>u("vehicle.vin",v)}/><Fd l="Code moteur" v={f.vehicle.moteur} c={v=>u("vehicle.moteur",v)}/><Fd l="Boîte" v={f.vehicle.boite} c={v=>u("vehicle.boite",v)}/><Fd l="Kilométrage" v={f.vehicle.km} c={v=>u("vehicle.km",v)}/><Fd l="Énergie" v={f.vehicle.energie} c={v=>u("vehicle.energie",v)}/><Fd l="Couleur" v={f.vehicle.couleur} c={v=>u("vehicle.couleur",v)}/></div></div>}
+
+      {tab==="mo"&&<div>
+        <MS t="T1 — Entretien / mécanique rapide" tier="T1" lk="laborT1" items={f.laborT1} tot={m1} uL={uL} aL={aL} rL={rL} addTpl={addTpl}/>
+        <MS t="T2 — Mécanique lourde" tier="T2" lk="laborT2" items={f.laborT2} tot={m2} uL={uL} aL={aL} rL={rL} addTpl={addTpl}/>
+        <MS t="T3 — Haute technicité / diagnostic" tier="T3" lk="laborT3" items={f.laborT3} tot={m3} uL={uL} aL={aL} rL={rL} addTpl={addTpl}/>
+        <div className="Gt">TOTAL MAIN-D'ŒUVRE HT : {fE(mT)}</div></div>}
+
+      {tab==="pi"&&<div><div className="Sh">Pièces et fluides</div>{f.parts.map(p=><div key={p.id} className="R"><input className="I" style={{width:95}} placeholder="Réf." value={p.ref} onChange={e=>uL("parts",p.id,"ref",e.target.value)}/><input className="I" style={{flex:1}} placeholder="Désignation" value={p.desc} onChange={e=>uL("parts",p.id,"desc",e.target.value)}/><input className="I" style={{width:45}} type="number" placeholder="Qté" value={p.qty} onChange={e=>uL("parts",p.id,"qty",e.target.value)}/><input className="I" style={{width:75}} type="number" step="0.01" placeholder="P.U." value={p.pu} onChange={e=>uL("parts",p.id,"pu",e.target.value)}/><span className="Lt">{fE((parseFloat(p.qty)||0)*(parseFloat(p.pu)||0))}</span><button className="Bd" onClick={()=>rL("parts",p.id)}>×</button></div>)}<button className="Ba" onClick={()=>aL("parts",NP)}>+ Pièce</button><div className="Gt">TOTAL PIÈCES HT : {fE(pT)}</div></div>}
+      {tab==="eco"&&<div><div className="Sh">Frais environnementaux</div>{f.ecoFees.map(e=><div key={e.id} className="R"><input className="I" style={{flex:1}} placeholder="Désignation" value={e.desc} onChange={ev=>uL("ecoFees",e.id,"desc",ev.target.value)}/><input className="I" style={{width:85}} type="number" step="0.01" placeholder="HT €" value={e.pu} onChange={ev=>uL("ecoFees",e.id,"pu",ev.target.value)}/><button className="Bd" onClick={()=>rL("ecoFees",e.id)}>×</button></div>)}<button className="Ba" onClick={()=>aL("ecoFees",NE)}>+ Frais</button><div className="Gt">TOTAL FRAIS HT : {fE(eT)}</div></div>}
+      {tab==="chk"&&<div><div className="Sh">Check-list sécurité</div>{f.checks.map(c=><div key={c.id} className="R"><input className="I" style={{flex:1}} placeholder="Point de contrôle" value={c.pt} onChange={e=>uL("checks",c.id,"pt",e.target.value)}/><input className="I" style={{flex:1}} placeholder="Résultat" value={c.res} onChange={e=>uL("checks",c.id,"res",e.target.value)}/><button className="Bd" onClick={()=>rL("checks",c.id)}>×</button></div>)}<button className="Ba" onClick={()=>aL("checks",NC)}>+ Contrôle</button></div>}
+    </div></div>;
+}
+
+/* ─── Section main-d'œuvre avec templates ─── */
+function MS({t,tier,lk,items,tot,uL,aL,rL,addTpl}){
+  const[showTpl,setShowTpl]=useState(false);
+  const tpls=TPL[tier]||[];
+  return<div style={{marginBottom:20}}><div className="Sh">{t} <button className="B Bw Bx" style={{marginLeft:"auto"}} onClick={()=>setShowTpl(!showTpl)}>{showTpl?"▲ Masquer modèles":"▼ Modèles pré-remplis"}</button></div>
+    {showTpl&&<div className="tpl">{tpls.map((tp,i)=><button key={i} onClick={()=>addTpl(tier,tp)} title={tp.op}>{tp.op.length>50?tp.op.substring(0,50)+"…":tp.op} ({tp.temps}h)</button>)}</div>}
+    {items.map(l=><div key={l.id} className="R"><input className="I" style={{flex:1}} placeholder="Opération" value={l.op} onChange={e=>uL(lk,l.id,"op",e.target.value)}/><input className="I" style={{width:55}} type="number" step="0.05" placeholder="h" value={l.temps} onChange={e=>uL(lk,l.id,"temps",e.target.value)}/><input className="I" style={{width:60}} type="number" step="0.5" placeholder="€/h" value={l.taux} onChange={e=>uL(lk,l.id,"taux",e.target.value)}/><span className="Lt">{fE((parseFloat(l.temps)||0)*(parseFloat(l.taux)||0))}</span><button className="Bd" onClick={()=>rL(lk,l.id)}>×</button></div>)}
+    <button className="Ba" onClick={()=>aL(lk,NL)}>+ Ajouter</button>
+    <div style={{textAlign:"right",color:"var(--m)",fontSize:11,marginTop:2}}>Sous-total : {fE(tot)}</div></div>;
+}
+
+function Fd({l,v,c,t,ml}){return<div className="D"><label>{l}</label>{ml?<textarea value={v!=null?v:""} onChange={e=>c(e.target.value)} rows={3}/>:<input type={t||"text"} value={v!=null?v:""} onChange={e=>c(e.target.value)}/>}</div>}
+
+/* ═══ PARAMÈTRES ═══ */
+function Sett({shop,onS}){
+  const[s,ss]=useState({...shop}),[ok,so]=useState(false);
+  const u=(k,v)=>{ss(p=>({...p,[k]:v}));so(false)};
+  const handleLogo=e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{u("logo",ev.target.result)};reader.readAsDataURL(file)};
+  return<div>
+    <div className="F" style={{marginBottom:14}}>
+      <div className="Sh">🔍 Recherche par plaque (Google Apps Script)</div>
+      <div className="wr">Collez l'URL de votre script. Voir <b>INSTRUCTIONS.html</b> pour le déploiement.<br/>Format : <code>https://script.google.com/macros/s/xxxxx/exec</code></div>
+      <Fd l="URL du script" v={s.scriptUrl} c={v=>u("scriptUrl",v)}/>
+    </div>
+    <div className="F" style={{marginBottom:14}}>
+      <div className="Sh">🏢 Coordonnées de l'atelier</div>
+      <div className="G">
+        <Fd l="Nom de l'atelier" v={s.name} c={v=>u("name",v)}/><Fd l="Sous-titre / activité" v={s.sub} c={v=>u("sub",v)}/>
+        <Fd l="Adresse" v={s.addr} c={v=>u("addr",v)}/><Fd l="CP / Ville" v={s.city} c={v=>u("city",v)}/>
+        <Fd l="Téléphone" v={s.tel} c={v=>u("tel",v)}/><Fd l="E-mail" v={s.email} c={v=>u("email",v)}/>
+        <Fd l="SIRET" v={s.siret} c={v=>u("siret",v)}/><Fd l="TVA intracommunautaire" v={s.tvaIntra} c={v=>u("tvaIntra",v)}/>
+        <Fd l="Code APE" v={s.ape} c={v=>u("ape",v)}/><Fd l="IBAN" v={s.iban} c={v=>u("iban",v)}/>
+        <Fd l="Préfixe numérotation (ex : FA)" v={s.prefix} c={v=>u("prefix",v)}/>
+        <div className="D"><label>Logo de l'atelier</label><input type="file" accept="image/*" onChange={handleLogo} style={{fontSize:13}}/>{s.logo&&<img src={s.logo} style={{maxHeight:50,maxWidth:180,objectFit:"contain",marginTop:6,border:"1px solid var(--b)",borderRadius:6,padding:4}}/>}</div>
+      </div>
+    </div>
+    <div className="F" style={{marginBottom:14}}>
+      <div className="Sh">⚖ Mentions légales / conditions de paiement</div>
+      <Fd l="Texte imprimé en bas de chaque facture" v={s.legal} c={v=>u("legal",v)} ml/>
+    </div>
+    <button className={ok?"B Bs":"B Bv"} onClick={()=>{onS(s);so(true)}}>{ok?"✓ Sauvegardé":"Sauvegarder"}</button>
+  </div>;
+}
+
+/* ═══ APERÇU / IMPRESSION ═══ */
+function Prev({inv:f,shop,onB,onD}){
+  const aM=[...(f.laborT1||[]),...(f.laborT2||[]),...(f.laborT3||[])],mT=aM.reduce((s,l)=>s+(parseFloat(l.temps)||0)*(parseFloat(l.taux)||0),0),pT=(f.parts||[]).reduce((s,p)=>s+(parseFloat(p.qty)||0)*(parseFloat(p.pu)||0),0),eT=(f.ecoFees||[]).reduce((s,e)=>s+(parseFloat(e.pu)||0),0),ht=mT+pT+eT,tva=ht*(f.tvaRate/100),ttc=ht+tva,tH=aM.reduce((s,l)=>s+(parseFloat(l.temps)||0),0);
+  const pr=()=>{const el=document.getElementById("pz");if(!el)return;const w=window.open("","_blank");w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+f.num+'</title><style>@page{size:A4;margin:14mm}*{box-sizing:border-box;margin:0;padding:0}body{font-family:Georgia,serif;font-size:10px;color:#2D2318;line-height:1.4}table{width:100%;border-collapse:collapse}th,td{padding:4px 7px;text-align:left;font-size:10px}th{background:#4A3728;color:#F0EBE2;font-weight:600;border:1px solid #4A3728}td{border:1px solid #DDD6CB}.sc{font-size:11px;font-weight:700;color:#4A3728;border-bottom:2px solid #C49A2A;padding-bottom:3px;margin:14px 0 7px;text-transform:uppercase;letter-spacing:.5px}.su td{background:#EDE8E0;font-weight:600;color:#4A3728}.to td{background:#4A3728;color:#F0EBE2;font-weight:700;border-color:#4A3728}.gl{color:#E8C547}.al{background:#FAFAF8}.r{text-align:right}.c{text-align:center}.bo{font-weight:700}.rc{margin-left:auto;width:250px;margin-top:8px}.rc td{border:none;padding:4px 7px}.tt td{background:#4A3728;color:#E8C547;font-size:12px;font-weight:700;border:none}.logo-print{max-height:50px;max-width:180px;object-fit:contain}.legal{margin-top:12px;padding:8px;font-size:8px;color:#8D7E6F;border-top:1px solid #DDD6CB;line-height:1.5}</style></head><body>'+el.innerHTML+'</body></html>');w.document.close();setTimeout(()=>w.print(),400)};
+  const mb=(titre,items)=>{if(!items||!items.length)return null;return<>{[<tr key={"s"+titre} className="su"><td colSpan={4}>{titre}</td></tr>,...items.map((l,i)=>{const t=(parseFloat(l.temps)||0)*(parseFloat(l.taux)||0);return<tr key={l.id||i} className={i%2?"al":""}><td>{l.op}</td><td className="c">{fH(l.temps)}</td><td className="r">{fE(l.taux)}</td><td className="r">{fE(t)}</td></tr>})]}</>};
+  const vc={fontWeight:600,background:"#EDE8E0",width:"15%"},vv={width:"35%"};
+  return<div>
+    <div style={{display:"flex",gap:7,marginBottom:14}} className="np"><button className="B Bw" onClick={onB}>← Éditer</button><button className="B Bw" onClick={onD}>Accueil</button><div style={{flex:1}}/><button className="B Bg" onClick={pr}>🖨 Imprimer / PDF</button></div>
+    <div id="pz" className="Z">
+      <div style={{display:"flex",justifyContent:"space-between",paddingBottom:10,marginBottom:14,borderBottom:"3px solid #C49A2A"}}>
+        <div>{shop.logo&&<img src={shop.logo} className="logo-print" style={{marginBottom:4,display:"block"}}/>}<div style={{fontSize:14,fontWeight:700,color:"#4A3728",letterSpacing:1}}>{shop.name}</div><div style={{fontSize:9,color:"#C49A2A",fontStyle:"italic"}}>{shop.sub}</div><div style={{fontSize:9,color:"#6B5344",marginTop:4,lineHeight:1.5}}>{shop.addr}<br/>{shop.city}<br/>{shop.tel} — {shop.email}</div></div>
+        <div style={{textAlign:"right"}}><div style={{fontWeight:700,fontSize:10,color:"#4A3728",marginBottom:2}}>CLIENT</div><div style={{fontWeight:700,fontSize:11}}>{f.client.name}</div><div style={{fontSize:9,color:"#6B5344",lineHeight:1.5}}>{f.client.addr}<br/>{f.client.city}<br/>{f.client.tel}{f.client.email?" — "+f.client.email:""}</div></div></div>
+      <div style={{textAlign:"center",marginBottom:14,padding:"8px 0",border:"2px solid #C49A2A",background:"linear-gradient(to right,#FAFAF8,#F0EBE2,#FAFAF8)"}}><h1 style={{fontSize:17,color:"#4A3728",letterSpacing:3,marginBottom:1,fontFamily:"Georgia,serif"}}>FACTURE D'INTERVENTION</h1><p style={{color:"#C49A2A",fontSize:10}}>N° {f.num} | {new Date(f.date).toLocaleDateString("fr-FR")} | O.R. {f.or}</p></div>
+      <div className="sc">Véhicule</div>
+      <table><tbody>{[[["Marque",f.vehicle.marque],["Modèle",f.vehicle.modele]],[["Année",f.vehicle.annee],["Finition",f.vehicle.finition]],[["VIN",f.vehicle.vin],["Immatriculation",f.vehicle.immat]],[["Code moteur",f.vehicle.moteur],["Boîte",f.vehicle.boite]],[["Kilométrage",f.vehicle.km],["Énergie",f.vehicle.energie]],[["Couleur",f.vehicle.couleur],["",""]]].map((r,i)=><tr key={i}><td style={vc}>{r[0][0]}</td><td style={vv}>{r[0][1]}</td><td style={vc}>{r[1][0]}</td><td style={vv}>{r[1][1]}</td></tr>)}</tbody></table>
+      {aM.length>0&&<><div className="sc">Main-d'œuvre</div><table><thead><tr><th>Opération</th><th style={{width:50}} className="c">Temps</th><th style={{width:60}} className="r">Taux</th><th style={{width:60}} className="r">Total HT</th></tr></thead><tbody>{mb("T1 — Entretien",f.laborT1)}{mb("T2 — Mécanique lourde",f.laborT2)}{mb("T3 — Diagnostic",f.laborT3)}<tr className="to"><td colSpan={3} className="r">Sous-total MO ({fH(tH)})</td><td className="r gl">{fE(mT)}</td></tr></tbody></table></>}
+      {f.parts.length>0&&<><div className="sc">Pièces et fluides</div><table><thead><tr><th style={{width:70}}>Réf.</th><th>Désignation</th><th style={{width:28}} className="c">Qté</th><th style={{width:55}} className="r">P.U.</th><th style={{width:55}} className="r">Total</th></tr></thead><tbody>{f.parts.map((p,i)=><tr key={p.id||i} className={i%2?"al":""}><td style={{fontSize:9}}>{p.ref}</td><td>{p.desc}</td><td className="c">{p.qty}</td><td className="r">{fE(p.pu)}</td><td className="r">{fE((parseFloat(p.qty)||0)*(parseFloat(p.pu)||0))}</td></tr>)}<tr className="to"><td colSpan={4} className="r">Sous-total pièces</td><td className="r gl">{fE(pT)}</td></tr></tbody></table></>}
+      {f.ecoFees.length>0&&<><div className="sc">Frais environnementaux</div><table><thead><tr><th>Désignation</th><th style={{width:55}} className="r">HT</th></tr></thead><tbody>{f.ecoFees.map((e,i)=><tr key={e.id||i} className={i%2?"al":""}><td>{e.desc}</td><td className="r">{fE(e.pu)}</td></tr>)}<tr className="to"><td className="r">Sous-total frais</td><td className="r gl">{fE(eT)}</td></tr></tbody></table></>}
+      <div className="sc">Récapitulatif</div><table className="rc"><tbody><tr><td className="bo">Total MO HT</td><td className="r">{fE(mT)}</td></tr><tr><td className="bo">Total pièces HT</td><td className="r">{fE(pT)}</td></tr>{eT>0&&<tr><td className="bo">Total frais HT</td><td className="r">{fE(eT)}</td></tr>}<tr style={{borderTop:"2px solid #C49A2A"}}><td className="bo">BASE HT</td><td className="r bo">{fE(ht)}</td></tr><tr><td>TVA {f.tvaRate} %</td><td className="r">{fE(tva)}</td></tr><tr className="tt"><td>NET À PAYER TTC</td><td className="r">{fE(ttc)}</td></tr></tbody></table>
+      {f.checks.length>0&&<><div className="sc">Contrôles</div><table><thead><tr><th>Point</th><th>Résultat</th></tr></thead><tbody>{f.checks.map((c,i)=><tr key={c.id||i} className={i%2?"al":""}><td className="bo">{c.pt}</td><td>{c.res}</td></tr>)}</tbody></table></>}
+      {f.notes&&<div style={{marginTop:10,padding:8,background:"#FAFAF8",borderRadius:4,fontSize:10,border:"1px solid #DDD6CB"}}><b>Notes :</b> {f.notes}</div>}
+      {shop.legal&&<div className="legal">{shop.legal}</div>}
+      <div style={{marginTop:14,paddingTop:6,borderTop:"1px solid #DDD6CB",fontSize:8,color:"#8D7E6F",textAlign:"center"}}>{shop.name} — {shop.addr} — {shop.city} | SIRET : {shop.siret} | TVA : {shop.tvaIntra} | APE : {shop.ape}</div>
+      <div style={{marginTop:18}}><b style={{color:"#4A3728",fontSize:10}}>Bon pour accord — Signature du client :</b><div style={{height:40,borderBottom:"1px solid #DDD6CB",marginTop:24}}><span style={{fontSize:9,color:"#8D7E6F"}}>Date :{"                              "}Signature :</span></div></div>
+    </div></div>;
+}
+
+ReactDOM.createRoot(document.getElementById("app")).render(<App/>);
+</script>
+</body>
+</html>
