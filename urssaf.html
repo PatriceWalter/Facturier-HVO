@@ -3,29 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HVO - Tableau de bord</title>
+<title>HVO - URSSAF</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-
-<!-- ===== LOGIN SCREEN ===== -->
-<div class="login-screen" id="loginScreen">
-    <div class="login-box">
-        <div class="logo">
-            <img src=""  alt="HVO" id="loginLogo" style="display:none">
-        </div>
-        <h2>Facturier</h2>
-        <p class="subtitle">Réparation Véhicule Multi Marque</p>
-        <input type="password" id="loginCode" placeholder="Code d'accès" maxlength="6" onkeydown="if(event.key==='Enter')doLogin()">
-        <button class="btn-login" onclick="doLogin()">ACCÉDER</button>
-        <div class="login-error" id="loginError">Code incorrect</div>
-    </div>
-</div>
+<script>
+if (sessionStorage.getItem('hvo_logged') !== 'true') { window.location.href = 'index.html'; }
+</script>
 
 <!-- ===== APP ===== -->
-<div class="app" id="app" style="display:none">
+<div class="app" id="app">
     <header class="app-header">
         <img src="" alt="HVO" class="header-logo" id="headerLogo">
         <div class="header-title">
@@ -41,22 +30,36 @@
 
     <!-- TAB NAVIGATION -->
     <nav class="tab-nav" id="tabNav">
-        <a href="index.html" class="tab-btn active" style="text-decoration:none"><span class="tab-icon">📊</span><span class="tab-text">Tableau de bord</span></a>
+        <a href="index.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">📊</span><span class="tab-text">Tableau de bord</span></a>
         <a href="clients.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">👥</span><span class="tab-text">Clients</span></a>
         <a href="vehicules.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">🚗</span><span class="tab-text">Véhicules</span></a>
         <a href="factures.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">🧾</span><span class="tab-text">Factures</span></a>
         <a href="prestations.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">🔧</span><span class="tab-text">Opérations</span></a>
-        <a href="urssaf.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">🏛️</span><span class="tab-text">URSSAF</span></a>
+        <a href="urssaf.html" class="tab-btn active" style="text-decoration:none"><span class="tab-icon">🏛️</span><span class="tab-text">URSSAF</span></a>
         <a href="vo.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">🏷️</span><span class="tab-text">VO Occasions</span></a>
         <a href="parametres.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">⚙️</span><span class="tab-text">Paramètres</span></a>
     </nav>
 
     <main class="content">
-        <div class="section active" id="sec-dashboard">
-            <div class="stats-grid" id="statsGrid"></div>
+        <div class="section active" id="sec-urssaf">
+            <div class="stats-grid" id="urssafStats"></div>
             <div class="card">
-                <div class="card-title">📋 Dernières factures</div>
-                <div class="table-wrap"><table><thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Véhicule</th><th>Total TTC</th><th>Statut</th></tr></thead><tbody id="dashLastInvoices"></tbody></table></div>
+                <div class="card-title">🏛️ Cotisations URSSAF <span style="margin-left:auto;font-weight:400;font-size:0.8em">Année : <select id="urssafYear" onchange="renderURSSAF()" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:1em"></select></span></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Mois</th><th>CA Encaissé</th><th>Nb Factures</th><th>Cotisations</th><th></th></tr></thead>
+                        <tbody id="urssafMonthly"></tbody>
+                        <tfoot id="urssafTotal"></tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">📅 Récapitulatif trimestriel</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px" id="urssafTrimestres"></div>
+            </div>
+            <div class="card" style="background:#fffbeb;border:1px solid #f59e0b">
+                <div class="card-title" style="color:#92400e;border-bottom-color:#fcd34d">ℹ️ Informations</div>
+                <div style="font-size:0.85em;color:#78350f;line-height:1.8" id="urssafInfo"></div>
             </div>
         </div>
     </main>
@@ -85,7 +88,8 @@ fetch('modals.html').then(r=>r.text()).then(h=>{
     });
 });
 
-
+// Show app (login already checked)
+document.getElementById('app').style.display='block';
 // Init
 init();
 </script>

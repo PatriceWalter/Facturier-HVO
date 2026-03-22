@@ -3,29 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HVO - Tableau de bord</title>
+<title>HVO - Véhicules</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-
-<!-- ===== LOGIN SCREEN ===== -->
-<div class="login-screen" id="loginScreen">
-    <div class="login-box">
-        <div class="logo">
-            <img src=""  alt="HVO" id="loginLogo" style="display:none">
-        </div>
-        <h2>Facturier</h2>
-        <p class="subtitle">Réparation Véhicule Multi Marque</p>
-        <input type="password" id="loginCode" placeholder="Code d'accès" maxlength="6" onkeydown="if(event.key==='Enter')doLogin()">
-        <button class="btn-login" onclick="doLogin()">ACCÉDER</button>
-        <div class="login-error" id="loginError">Code incorrect</div>
-    </div>
-</div>
+<script>
+if (sessionStorage.getItem('hvo_logged') !== 'true') { window.location.href = 'index.html'; }
+</script>
 
 <!-- ===== APP ===== -->
-<div class="app" id="app" style="display:none">
+<div class="app" id="app">
     <header class="app-header">
         <img src="" alt="HVO" class="header-logo" id="headerLogo">
         <div class="header-title">
@@ -41,9 +30,9 @@
 
     <!-- TAB NAVIGATION -->
     <nav class="tab-nav" id="tabNav">
-        <a href="index.html" class="tab-btn active" style="text-decoration:none"><span class="tab-icon">📊</span><span class="tab-text">Tableau de bord</span></a>
+        <a href="index.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">📊</span><span class="tab-text">Tableau de bord</span></a>
         <a href="clients.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">👥</span><span class="tab-text">Clients</span></a>
-        <a href="vehicules.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">🚗</span><span class="tab-text">Véhicules</span></a>
+        <a href="vehicules.html" class="tab-btn active" style="text-decoration:none"><span class="tab-icon">🚗</span><span class="tab-text">Véhicules</span></a>
         <a href="factures.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">🧾</span><span class="tab-text">Factures</span></a>
         <a href="prestations.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">🔧</span><span class="tab-text">Opérations</span></a>
         <a href="urssaf.html" class="tab-btn" style="text-decoration:none"><span class="tab-icon">🏛️</span><span class="tab-text">URSSAF</span></a>
@@ -52,11 +41,14 @@
     </nav>
 
     <main class="content">
-        <div class="section active" id="sec-dashboard">
-            <div class="stats-grid" id="statsGrid"></div>
+        <div class="section active" id="sec-vehicules">
             <div class="card">
-                <div class="card-title">📋 Dernières factures</div>
-                <div class="table-wrap"><table><thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Véhicule</th><th>Total TTC</th><th>Statut</th></tr></thead><tbody id="dashLastInvoices"></tbody></table></div>
+                <div class="card-title">🚗 Gestion des véhicules <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openVehicleModal()">+ Nouveau véhicule</button></div>
+                <div class="search-bar" style="position:relative">
+                    <input type="text" id="vehicleSearch" placeholder="Rechercher par plaque, marque, modèle..." oninput="renderVehicles();showSuggestions('vehicle')" onfocus="showSuggestions('vehicle')" autocomplete="off">
+                    <div id="vehicleSuggestions" class="suggestions-dropdown"></div>
+                </div>
+                <div class="table-wrap"><table><thead><tr><th>Plaque</th><th>Marque</th><th>Modèle</th><th>Motorisation</th><th>Énergie</th><th>Client</th><th>Km</th><th>Actions</th></tr></thead><tbody id="vehiclesTable"></tbody></table></div>
             </div>
         </div>
     </main>
@@ -85,7 +77,8 @@ fetch('modals.html').then(r=>r.text()).then(h=>{
     });
 });
 
-
+// Show app (login already checked)
+document.getElementById('app').style.display='block';
 // Init
 init();
 </script>
