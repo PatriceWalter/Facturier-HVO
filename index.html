@@ -486,7 +486,7 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
             <div class="vo-subtabs" id="voSubtabs">
                 <button class="vo-subtab active" data-vosub="voStock">📦 Stock VO</button>
                 <button class="vo-subtab" data-vosub="voAnnonce">📄 Fiche Annonce</button>
-                <button class="vo-subtab" data-vosub="voCession">📋 Cerfa Cession</button>
+                <button class="vo-subtab" data-vosub="voCession">📋 Déclaration de Cession</button>
                 <button class="vo-subtab" data-vosub="voFacture">🧾 Facture de Vente</button>
                 <button class="vo-subtab" data-vosub="voBonCmd">📝 Bon de Commande</button>
             </div>
@@ -530,10 +530,11 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                 </div>
             </div>
 
-            <!-- SUB: CERFA CESSION -->
+            <!-- SUB: DECLARATION DE CESSION -->
             <div class="vo-sub" id="voCession">
                 <div class="card">
-                    <div class="card-title">📋 Déclaration de Cession — Cerfa 15776*02</div>
+                    <div class="card-title">📋 Déclaration de Cession — Document interne</div>
+                    <div style="padding:10px 14px;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;margin-bottom:14px;font-size:0.85em;color:#856404">⚠️ <strong>Ce document est un aide-mémoire interne.</strong> La déclaration de cession officielle doit être faite sur <a href="https://ants.gouv.fr" target="_blank" style="color:#856404;font-weight:700">ants.gouv.fr</a> avec le formulaire Cerfa 15776.</div>
                     <div class="form-group"><label>Sélectionner un véhicule</label><select id="voSelCession" onchange="prefillCession()" style="font-size:1em;padding:10px"></select></div>
                     <div class="vo-doc-section"><h4>I — LE VENDEUR (Cédant)</h4>
                         <div class="form-row"><div class="form-group"><label>Raison sociale / Nom</label><input id="cesVendeurNom"></div><div class="form-group"><label>SIRET</label><input id="cesVendeurSiret"></div></div>
@@ -5452,8 +5453,8 @@ function prefillCession(){
 function prefillCessionClient(){
     var c=getClient('cesClientSel');if(!c)return;
     document.getElementById('cesAcheteurNom').value=c.nom||'';document.getElementById('cesAcheteurPrenom').value=c.prenom||'';
-    document.getElementById('cesAcheteurAdresse').value=c.address||'';document.getElementById('cesAcheteurCP').value=c.zip||'';document.getElementById('cesAcheteurVille').value=c.city||'';
-    document.getElementById('cesAcheteurTel').value=c.phone||'';
+    document.getElementById('cesAcheteurAdresse').value=c.adresse||'';document.getElementById('cesAcheteurCP').value=c.cp||'';document.getElementById('cesAcheteurVille').value=c.ville||'';
+    document.getElementById('cesAcheteurTel').value=c.tel||'';
 }
 
 function prefillFacture(){
@@ -5468,8 +5469,8 @@ function prefillFacture(){
 function prefillFactureClient(){
     var c=getClient('facClientSel');if(!c)return;
     document.getElementById('facClientNom').value=c.nom||'';document.getElementById('facClientPrenom').value=c.prenom||'';
-    document.getElementById('facClientAdresse').value=c.address||'';document.getElementById('facClientCP').value=c.zip||'';document.getElementById('facClientVille').value=c.city||'';
-    document.getElementById('facClientTel').value=c.phone||'';
+    document.getElementById('facClientAdresse').value=c.adresse||'';document.getElementById('facClientCP').value=c.cp||'';document.getElementById('facClientVille').value=c.ville||'';
+    document.getElementById('facClientTel').value=c.tel||'';
 }
 
 function prefillBonCmd(){
@@ -5482,8 +5483,8 @@ function prefillBonCmd(){
 function prefillBonCmdClient(){
     var c=getClient('bcClientSel');if(!c)return;
     document.getElementById('bcClientNom').value=c.nom||'';document.getElementById('bcClientPrenom').value=c.prenom||'';
-    document.getElementById('bcClientAdresse').value=c.address||'';document.getElementById('bcClientCP').value=c.zip||'';document.getElementById('bcClientVille').value=c.city||'';
-    document.getElementById('bcClientTel').value=c.phone||'';
+    document.getElementById('bcClientAdresse').value=c.adresse||'';document.getElementById('bcClientCP').value=c.cp||'';document.getElementById('bcClientVille').value=c.ville||'';
+    document.getElementById('bcClientTel').value=c.tel||'';
 }
 
 // ============================================================
@@ -5525,12 +5526,12 @@ function printAnnonce(){
     openPrintWindow(h);
 }
 
-// 📋 CERFA CESSION 15776*02
+// 📋 DECLARATION DE CESSION (document interne)
 function printCession(){
     var plaque=document.getElementById('cesPlaque').value;
     if(!plaque&&!document.getElementById('cesMarque').value)return toast('Sélectionnez ou remplissez un véhicule','error');
-    var h=getPrintHeader('DÉCLARATION DE CESSION D\'UN VÉHICULE');
-    h+='<p style="font-size:0.85em;color:#555;margin-bottom:12px;font-style:italic">Conformément à l\'article R.322-4 du Code de la Route — Cerfa n° 15776*02</p>';
+    var h=getPrintHeader('DÉCLARATION DE CESSION — Document interne');
+    h+='<div style="padding:8px 12px;background:#fff3cd;border:1px solid #ffc107;border-radius:6px;margin-bottom:12px;font-size:0.8em;color:#856404">⚠️ Ce document est un récapitulatif interne. La déclaration officielle doit être faite sur ants.gouv.fr (Cerfa 15776).</div>';
     h+='<div class="bloc"><h3>I — LE VENDEUR (Cédant)</h3><table>';
     h+=dotLine('Raison sociale',document.getElementById('cesVendeurNom').value)+dotLine('SIRET',document.getElementById('cesVendeurSiret').value);
     h+=dotLine('Adresse',document.getElementById('cesVendeurAdresse').value+' '+document.getElementById('cesVendeurCP').value+' '+document.getElementById('cesVendeurVille').value);
