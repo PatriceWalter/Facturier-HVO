@@ -486,7 +486,7 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
             <div class="vo-subtabs" id="voSubtabs">
                 <button class="vo-subtab active" data-vosub="voStock">📦 Stock VO</button>
                 <button class="vo-subtab" data-vosub="voAnnonce">📄 Fiche Annonce</button>
-                <button class="vo-subtab" data-vosub="voCession">📋 Déclaration de Cession</button>
+                <button class="vo-subtab" data-vosub="voCession">📋 Cession (ANTS)</button>
                 <button class="vo-subtab" data-vosub="voFacture">🧾 Facture de Vente</button>
                 <button class="vo-subtab" data-vosub="voBonCmd">📝 Bon de Commande</button>
             </div>
@@ -530,59 +530,57 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                 </div>
             </div>
 
-            <!-- SUB: DECLARATION DE CESSION -->
+            <!-- SUB: CESSION (ANTS) -->
             <div class="vo-sub" id="voCession">
-                <div class="card">
-                    <div class="card-title">📋 Déclaration de Cession — Document interne</div>
-                    <div style="padding:10px 14px;background:#fff3cd;border:1px solid #ffc107;border-radius:8px;margin-bottom:14px;font-size:0.85em;color:#856404">⚠️ <strong>Ce document est un aide-mémoire interne.</strong> La déclaration de cession officielle doit être faite sur <a href="https://ants.gouv.fr" target="_blank" style="color:#856404;font-weight:700">ants.gouv.fr</a> avec le formulaire Cerfa 15776.</div>
-                    <div class="form-group"><label>Sélectionner un véhicule</label><select id="voSelCession" onchange="prefillCession()" style="font-size:1em;padding:10px"></select></div>
-                    <div class="vo-doc-section"><h4>I — LE VENDEUR (Cédant)</h4>
-                        <div class="form-row"><div class="form-group"><label>Raison sociale / Nom</label><input id="cesVendeurNom"></div><div class="form-group"><label>SIRET</label><input id="cesVendeurSiret"></div></div>
-                        <div class="form-row"><div class="form-group"><label>Adresse</label><input id="cesVendeurAdresse"></div><div class="form-group"><label>Code postal</label><input id="cesVendeurCP"></div><div class="form-group"><label>Ville</label><input id="cesVendeurVille"></div></div>
-                        <div class="form-row"><div class="form-group"><label>Téléphone</label><input id="cesVendeurTel"></div><div class="form-group"><label>Email</label><input id="cesVendeurEmail"></div></div>
+                <div class="card" style="text-align:center;padding:40px 24px">
+                    <div style="font-size:3em;margin-bottom:16px">📋</div>
+                    <div class="card-title" style="justify-content:center;border:none;font-size:1.4em;margin-bottom:12px">Déclaration de Cession de Véhicule</div>
+                    <p style="color:var(--text-light);max-width:600px;margin:0 auto 24px;line-height:1.6">La déclaration de cession est un document officiel (Cerfa 15776) qui doit être réalisé <strong>obligatoirement en ligne</strong> sur le site de l'ANTS dans les 15 jours suivant la vente.</p>
+                    <a href="https://immatriculation.ants.gouv.fr/services/vendez-votre-vehicule" target="_blank" class="btn btn-primary" style="padding:16px 40px;font-size:1.15em;display:inline-flex;align-items:center;gap:10px;text-decoration:none;border-radius:var(--radius)">
+                        🔗 Accéder au site ANTS — Déclarer une cession
+                    </a>
+                    <div style="margin-top:30px;padding:16px;background:#f0f7ff;border-radius:var(--radius);max-width:600px;margin-left:auto;margin-right:auto;text-align:left">
+                        <strong style="color:var(--blue)">📌 Documents nécessaires :</strong>
+                        <div style="margin-top:8px;font-size:0.9em;color:var(--text-light);line-height:1.8">
+                            • Carte grise du véhicule (barrée avec mention "cédé le…")<br>
+                            • Identité du vendeur et de l'acquéreur<br>
+                            • Kilométrage au compteur<br>
+                            • Date et heure de la cession<br>
+                            • Un code de cession sera généré à remettre à l'acheteur
+                        </div>
                     </div>
-                    <div class="vo-doc-section"><h4>II — L'ACQUÉREUR (Cessionnaire)</h4>
-                        <div class="form-group"><label>Sélectionner un client</label><select id="cesClientSel" onchange="prefillCessionClient()" style="padding:8px"></select></div>
-                        <div class="form-row"><div class="form-group"><label>Nom</label><input id="cesAcheteurNom"></div><div class="form-group"><label>Prénom</label><input id="cesAcheteurPrenom"></div></div>
-                        <div class="form-row"><div class="form-group"><label>Adresse</label><input id="cesAcheteurAdresse"></div><div class="form-group"><label>Code postal</label><input id="cesAcheteurCP"></div><div class="form-group"><label>Ville</label><input id="cesAcheteurVille"></div></div>
-                        <div class="form-row"><div class="form-group"><label>Téléphone</label><input id="cesAcheteurTel"></div><div class="form-group"><label>Date de naissance</label><input id="cesAcheteurDDN" type="date"></div></div>
-                    </div>
-                    <div class="vo-doc-section"><h4>III — LE VÉHICULE</h4>
-                        <div class="form-row"><div class="form-group"><label>N° d'immatriculation</label><input id="cesPlaque"></div><div class="form-group"><label>Date 1ère immatriculation</label><input id="cesDateMEC" type="date"></div></div>
-                        <div class="form-row"><div class="form-group"><label>Marque</label><input id="cesMarque"></div><div class="form-group"><label>Type / Modèle</label><input id="cesModele"></div></div>
-                        <div class="form-row"><div class="form-group"><label>N° VIN (chassis)</label><input id="cesVin" maxlength="17"></div><div class="form-group"><label>Kilométrage au compteur</label><input id="cesKm" type="number"></div></div>
-                    </div>
-                    <div class="vo-doc-section"><h4>IV — CONDITIONS DE LA CESSION</h4>
-                        <div class="form-row"><div class="form-group"><label>Date de cession</label><input id="cesDateCession" type="date"></div><div class="form-group"><label>Heure de cession</label><input id="cesHeureCession" type="time"></div></div>
-                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC (€)</label><input id="cesPrix" type="number" step="0.01" style="font-weight:700;font-size:1.1em"></div><div class="form-group"><label>Mode de paiement</label><input id="cesPaiement"></div></div>
-                        <div class="form-group"><label>Le véhicule est cédé en l'état</label><select id="cesEnEtat"><option value="oui">Oui</option><option value="non">Non — sous garantie</option></select></div>
-                    </div>
-                    <div class="vo-print-bar"><button class="btn btn-primary" onclick="printCession()">🖨️ Imprimer la déclaration de cession</button></div>
                 </div>
             </div>
 
             <!-- SUB: FACTURE VENTE -->
             <div class="vo-sub" id="voFacture">
                 <div class="card">
-                    <div class="card-title">🧾 Facture de Vente Véhicule</div>
+                    <div class="card-title">🧾 Facture de Vente Véhicule d'Occasion</div>
                     <div class="form-group"><label>Sélectionner un véhicule</label><select id="voSelFacture" onchange="prefillFacture()" style="font-size:1em;padding:10px"></select></div>
                     <div class="vo-doc-section"><h4>📋 Informations facture</h4>
                         <div class="form-row"><div class="form-group"><label>N° de facture</label><input id="facNumero"></div><div class="form-group"><label>Date de facture</label><input id="facDate" type="date"></div></div>
                     </div>
-                    <div class="vo-doc-section"><h4>👤 Client</h4>
+                    <div class="vo-doc-section"><h4>👤 Client (acquéreur)</h4>
                         <div class="form-group"><label>Sélectionner un client</label><select id="facClientSel" onchange="prefillFactureClient()" style="padding:8px"></select></div>
                         <div class="form-row"><div class="form-group"><label>Nom</label><input id="facClientNom"></div><div class="form-group"><label>Prénom</label><input id="facClientPrenom"></div></div>
                         <div class="form-row"><div class="form-group"><label>Adresse</label><input id="facClientAdresse"></div><div class="form-group"><label>CP</label><input id="facClientCP"></div><div class="form-group"><label>Ville</label><input id="facClientVille"></div></div>
                         <div class="form-group"><label>Téléphone</label><input id="facClientTel"></div>
                     </div>
-                    <div class="vo-doc-section"><h4>🚗 Véhicule vendu</h4>
-                        <div class="form-row"><div class="form-group"><label>Plaque</label><input id="facPlaque"></div><div class="form-group"><label>VIN</label><input id="facVin"></div></div>
+                    <div class="vo-doc-section"><h4>🚗 Véhicule d'occasion vendu</h4>
+                        <div class="form-row"><div class="form-group"><label>Plaque</label><input id="facPlaque"></div><div class="form-group"><label>VIN (n° châssis)</label><input id="facVin"></div></div>
                         <div class="form-row"><div class="form-group"><label>Marque</label><input id="facMarque"></div><div class="form-group"><label>Modèle</label><input id="facModele"></div><div class="form-group"><label>Version</label><input id="facVersion"></div></div>
-                        <div class="form-row"><div class="form-group"><label>Année</label><input id="facAnnee"></div><div class="form-group"><label>Km</label><input id="facKm"></div><div class="form-group"><label>Énergie</label><input id="facEnergie"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Année</label><input id="facAnnee"></div><div class="form-group"><label>Date 1ère MEC</label><input id="facDateMEC" type="date"></div><div class="form-group"><label>Km compteur</label><input id="facKm"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Énergie</label><input id="facEnergie"></div><div class="form-group"><label>Couleur</label><input id="facCouleur"></div></div>
                     </div>
                     <div class="vo-doc-section"><h4>💰 Montant & paiement</h4>
-                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC (€)</label><input id="facPrix" type="number" step="0.01" style="font-weight:700;font-size:1.2em"></div><div class="form-group"><label>Mode de paiement</label><input id="facPaiement"></div></div>
-                        <div class="form-group"><label>Garantie</label><input id="facGarantie"></div>
+                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC (€)</label><input id="facPrix" type="number" step="0.01" style="font-weight:700;font-size:1.2em"></div><div class="form-group"><label>Mode de paiement</label><select id="facPaiement"><option value="">--</option><option>Espèces</option><option>Chèque</option><option>Virement</option><option>Carte bancaire</option><option>Crédit</option><option>Mixte</option></select></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>🛡️ Garanties (mentions légales obligatoires)</h4>
+                        <div class="form-row">
+                            <div class="form-group"><label>Garantie légale de conformité</label><select id="facGarantieLegale"><option value="2 ans">2 ans (obligatoire par la loi)</option><option value="1 an (véhicule +5 ans ou +100 000 km)">1 an (véhicule de plus de 5 ans ou +100 000 km)</option></select></div>
+                            <div class="form-group"><label>Garantie commerciale (optionnelle)</label><input id="facGarantie" placeholder="Ex: 6 mois / 10 000 km"></div>
+                        </div>
+                        <div class="form-group"><label>Observations / état du véhicule</label><textarea id="facObs" rows="2" placeholder="Remarques sur l'état, défauts signalés..."></textarea></div>
                     </div>
                     <div class="vo-print-bar"><button class="btn btn-primary" onclick="printFactureVO()">🖨️ Imprimer la facture de vente</button></div>
                 </div>
@@ -5323,10 +5321,10 @@ function renderVOStock() {
 function populateVOSelects() {
     var opts = '<option value="">-- Sélectionner un véhicule --</option>';
     data.occasions.forEach(function(v) { opts += '<option value="'+v.id+'">'+v.plaque+' — '+v.marque+' '+v.modele+'</option>'; });
-    ['voSelAnnonce','voSelCession','voSelFacture','voSelBonCmd'].forEach(function(id) { var el=document.getElementById(id); if(el) el.innerHTML=opts; });
+    ['voSelAnnonce','voSelFacture','voSelBonCmd'].forEach(function(id) { var el=document.getElementById(id); if(el) el.innerHTML=opts; });
     var cOpts = '<option value="">-- Sélectionner un client --</option>';
     data.clients.forEach(function(c) { cOpts += '<option value="'+c.id+'">'+c.nom+' '+(c.prenom||'')+'</option>'; });
-    ['cesClientSel','facClientSel','bcClientSel'].forEach(function(id) { var el=document.getElementById(id); if(el) el.innerHTML=cOpts; });
+    ['facClientSel','bcClientSel'].forEach(function(id) { var el=document.getElementById(id); if(el) el.innerHTML=cOpts; });
 }
 
 function openVOModal(id) {
@@ -5440,30 +5438,16 @@ function prefillAnnonce(){
     document.getElementById('annEtat').value=v.etat||'';document.getElementById('annEquipements').value=v.equipements||'';document.getElementById('annObs').value=v.obs||'';
 }
 
-function prefillCession(){
-    var v=getVO('voSelCession');if(!v)return;var s=data.settings;
-    document.getElementById('cesVendeurNom').value=s.companyName||'';document.getElementById('cesVendeurSiret').value=s.siret||'';
-    document.getElementById('cesVendeurAdresse').value=s.address||'';document.getElementById('cesVendeurCP').value=s.zip||'';document.getElementById('cesVendeurVille').value=s.city||'';
-    document.getElementById('cesVendeurTel').value=s.phone||'';document.getElementById('cesVendeurEmail').value=s.email||'';
-    document.getElementById('cesPlaque').value=v.plaque||'';document.getElementById('cesDateMEC').value=v.dateMEC||'';
-    document.getElementById('cesMarque').value=v.marque||'';document.getElementById('cesModele').value=v.modele+' '+(v.version||'');
-    document.getElementById('cesVin').value=v.vin||'';document.getElementById('cesKm').value=v.km||'';
-    document.getElementById('cesPrix').value=v.prixVente||'';document.getElementById('cesDateCession').value=new Date().toISOString().split('T')[0];
-}
-function prefillCessionClient(){
-    var c=getClient('cesClientSel');if(!c)return;
-    document.getElementById('cesAcheteurNom').value=c.nom||'';document.getElementById('cesAcheteurPrenom').value=c.prenom||'';
-    document.getElementById('cesAcheteurAdresse').value=c.adresse||'';document.getElementById('cesAcheteurCP').value=c.cp||'';document.getElementById('cesAcheteurVille').value=c.ville||'';
-    document.getElementById('cesAcheteurTel').value=c.tel||'';
-}
-
 function prefillFacture(){
     var v=getVO('voSelFacture');if(!v)return;var s=data.settings;
     document.getElementById('facNumero').value=(s.prefix||'HVO-')+'VO-'+v.id.replace('vo_','').slice(-6);
     document.getElementById('facDate').value=new Date().toISOString().split('T')[0];
     document.getElementById('facPlaque').value=v.plaque||'';document.getElementById('facVin').value=v.vin||'';
     document.getElementById('facMarque').value=v.marque||'';document.getElementById('facModele').value=v.modele||'';document.getElementById('facVersion').value=v.version||'';
-    document.getElementById('facAnnee').value=v.annee||(v.dateMEC?new Date(v.dateMEC).getFullYear():'');document.getElementById('facKm').value=v.km||'';document.getElementById('facEnergie').value=v.energie||'';
+    document.getElementById('facAnnee').value=v.annee||(v.dateMEC?new Date(v.dateMEC).getFullYear():'');
+    document.getElementById('facDateMEC').value=v.dateMEC||'';
+    document.getElementById('facKm').value=v.km||'';document.getElementById('facEnergie').value=v.energie||'';
+    document.getElementById('facCouleur').value=v.couleur||'';
     document.getElementById('facPrix').value=v.prixVente||'';document.getElementById('facGarantie').value=v.garantie||'';
 }
 function prefillFactureClient(){
@@ -5526,66 +5510,69 @@ function printAnnonce(){
     openPrintWindow(h);
 }
 
-// 📋 DECLARATION DE CESSION (document interne)
-function printCession(){
-    var plaque=document.getElementById('cesPlaque').value;
-    if(!plaque&&!document.getElementById('cesMarque').value)return toast('Sélectionnez ou remplissez un véhicule','error');
-    var h=getPrintHeader('DÉCLARATION DE CESSION — Document interne');
-    h+='<div style="padding:8px 12px;background:#fff3cd;border:1px solid #ffc107;border-radius:6px;margin-bottom:12px;font-size:0.8em;color:#856404">⚠️ Ce document est un récapitulatif interne. La déclaration officielle doit être faite sur ants.gouv.fr (Cerfa 15776).</div>';
-    h+='<div class="bloc"><h3>I — LE VENDEUR (Cédant)</h3><table>';
-    h+=dotLine('Raison sociale',document.getElementById('cesVendeurNom').value)+dotLine('SIRET',document.getElementById('cesVendeurSiret').value);
-    h+=dotLine('Adresse',document.getElementById('cesVendeurAdresse').value+' '+document.getElementById('cesVendeurCP').value+' '+document.getElementById('cesVendeurVille').value);
-    h+=dotLine('Téléphone',document.getElementById('cesVendeurTel').value)+dotLine('Email',document.getElementById('cesVendeurEmail').value);
-    h+='</table></div>';
-    h+='<div class="bloc"><h3>II — L\'ACQUÉREUR (Cessionnaire)</h3><table>';
-    h+=dotLine('Nom',document.getElementById('cesAcheteurNom').value+' '+document.getElementById('cesAcheteurPrenom').value);
-    h+=dotLine('Adresse',document.getElementById('cesAcheteurAdresse').value+' '+document.getElementById('cesAcheteurCP').value+' '+document.getElementById('cesAcheteurVille').value);
-    h+=dotLine('Téléphone',document.getElementById('cesAcheteurTel').value)+dotLine('Date de naissance',document.getElementById('cesAcheteurDDN').value?new Date(document.getElementById('cesAcheteurDDN').value).toLocaleDateString('fr-FR'):'');
-    h+='</table></div>';
-    h+='<div class="bloc"><h3>III — DÉSIGNATION DU VÉHICULE</h3><table>';
-    h+=dotLine('N° d\'immatriculation',document.getElementById('cesPlaque').value)+dotLine('Date 1ère immatriculation',document.getElementById('cesDateMEC').value?new Date(document.getElementById('cesDateMEC').value).toLocaleDateString('fr-FR'):'');
-    h+=dotLine('Marque',document.getElementById('cesMarque').value)+dotLine('Type / Modèle',document.getElementById('cesModele').value);
-    h+=dotLine('N° VIN (chassis)',document.getElementById('cesVin').value)+dotLine('Kilométrage compteur',document.getElementById('cesKm').value?parseInt(document.getElementById('cesKm').value).toLocaleString('fr-FR')+' km':'');
-    h+='</table></div>';
-    h+='<div class="bloc"><h3>IV — CONDITIONS DE LA CESSION</h3><table>';
-    h+=dotLine('Date de cession',document.getElementById('cesDateCession').value?new Date(document.getElementById('cesDateCession').value).toLocaleDateString('fr-FR'):'');
-    h+=dotLine('Heure de cession',document.getElementById('cesHeureCession').value||'');
-    h+=dotLine('Prix de vente TTC',document.getElementById('cesPrix').value?parseFloat(document.getElementById('cesPrix').value).toFixed(2)+' €':'');
-    h+=dotLine('Mode de paiement',document.getElementById('cesPaiement').value);
-    h+=dotLine('Véhicule cédé en l\'état',document.getElementById('cesEnEtat').value==='oui'?'Oui — sans garantie':'Non — sous garantie');
-    h+='</table></div>';
-    h+='<div style="display:flex;justify-content:space-between;margin-top:25px"><div class="sig-zone">Le vendeur<br><small>Signature précédée de "Lu et approuvé"</small></div><div class="sig-zone">L\'acquéreur<br><small>Signature précédée de "Lu et approuvé"</small></div></div>';
-    h+='<p style="font-size:0.75em;color:#888;margin-top:15px;text-align:center">Le vendeur doit déclarer la cession dans les 15 jours sur ants.gouv.fr — L\'acquéreur dispose d\'un délai d\'un mois pour faire la carte grise.</p>';
-    openPrintWindow(h);
-}
-
-// 🧾 FACTURE DE VENTE VO
+// 🧾 FACTURE DE VENTE VO — avec mentions légales obligatoires
 function printFactureVO(){
     var marque=document.getElementById('facMarque').value;
     if(!marque)return toast('Sélectionnez ou remplissez un véhicule','error');
     var s=data.settings;var isAuto=(s.regime||'auto')==='auto';
     var prix=parseFloat(document.getElementById('facPrix').value)||0;
-    var h=getPrintHeader('FACTURE DE VENTE VÉHICULE');
+    var dateMEC=document.getElementById('facDateMEC').value;
+    var garLegale=document.getElementById('facGarantieLegale').value;
+    var garCommerciale=document.getElementById('facGarantie').value;
+    var obs=document.getElementById('facObs').value;
+
+    var h=getPrintHeader('FACTURE DE VENTE — VÉHICULE D\'OCCASION');
+
+    // N° facture + date
     h+='<div style="display:flex;justify-content:space-between;margin-bottom:14px"><div><strong>Facture N° :</strong> '+document.getElementById('facNumero').value+'</div><div><strong>Date :</strong> '+(document.getElementById('facDate').value?new Date(document.getElementById('facDate').value).toLocaleDateString('fr-FR'):'')+'</div></div>';
-    h+='<div style="border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:14px;background:#f8f9fa"><strong>Client :</strong><br>';
-    h+=document.getElementById('facClientNom').value+' '+document.getElementById('facClientPrenom').value+'<br>';
-    h+=document.getElementById('facClientAdresse').value+' '+document.getElementById('facClientCP').value+' '+document.getElementById('facClientVille').value;
-    var tel=document.getElementById('facClientTel').value;if(tel)h+='<br>Tél: '+tel;
-    h+='</div>';
-    h+='<div style="margin-bottom:10px"><strong style="color:#1a3a7a">Véhicule vendu :</strong></div>';
-    h+='<div style="padding:10px;background:#f8f9fa;border-radius:8px;margin-bottom:14px"><table>';
-    h+=fld('Plaque',document.getElementById('facPlaque').value)+fld('VIN',document.getElementById('facVin').value);
-    h+=fld('Marque',document.getElementById('facMarque').value)+fld('Modèle',document.getElementById('facModele').value)+fld('Version',document.getElementById('facVersion').value);
-    h+=fld('Année',document.getElementById('facAnnee').value)+fld('Kilométrage',document.getElementById('facKm').value?parseInt(document.getElementById('facKm').value).toLocaleString('fr-FR')+' km':'');
-    h+=fld('Énergie',document.getElementById('facEnergie').value);
+
+    // Client
+    h+='<div class="bloc"><h3>Acquéreur</h3><table>';
+    h+=dotLine('Nom / Prénom',document.getElementById('facClientNom').value+' '+document.getElementById('facClientPrenom').value);
+    h+=dotLine('Adresse',document.getElementById('facClientAdresse').value+' '+document.getElementById('facClientCP').value+' '+document.getElementById('facClientVille').value);
+    var tel=document.getElementById('facClientTel').value;if(tel)h+=dotLine('Téléphone',tel);
     h+='</table></div>';
+
+    // Véhicule
+    h+='<div class="bloc"><h3>Véhicule d\'occasion vendu</h3><table>';
+    h+=fld('Plaque immatriculation',document.getElementById('facPlaque').value);
+    h+=fld('N° VIN (châssis)',document.getElementById('facVin').value);
+    h+=fld('Marque',document.getElementById('facMarque').value);
+    h+=fld('Modèle',document.getElementById('facModele').value+(document.getElementById('facVersion').value?' — '+document.getElementById('facVersion').value:''));
+    h+=fld('Date 1ère mise en circulation',dateMEC?new Date(dateMEC).toLocaleDateString('fr-FR'):'');
+    h+=fld('Année',document.getElementById('facAnnee').value);
+    h+=fld('Kilométrage compteur',document.getElementById('facKm').value?parseInt(document.getElementById('facKm').value).toLocaleString('fr-FR')+' km':'');
+    h+=fld('Énergie',document.getElementById('facEnergie').value);
+    h+=fld('Couleur',document.getElementById('facCouleur').value);
+    h+='</table></div>';
+
+    // Tableau prix
     h+='<table style="margin:18px 0"><thead><tr style="background:#1a3a7a;color:#fff"><th style="padding:10px;text-align:left">Désignation</th><th style="padding:10px;text-align:right;width:150px">Montant TTC</th></tr></thead>';
-    h+='<tbody><tr style="border-bottom:1px solid #ddd"><td style="padding:10px">Vente véhicule '+marque+' '+document.getElementById('facModele').value+' '+(document.getElementById('facVersion').value||'')+'<br><small style="color:#555">Immat: '+(document.getElementById('facPlaque').value||'-')+' | VIN: '+(document.getElementById('facVin').value||'-')+'</small></td><td style="padding:10px;text-align:right;font-weight:700;font-size:1.1em">'+prix.toFixed(2)+' €</td></tr></tbody>';
+    h+='<tbody><tr style="border-bottom:1px solid #ddd"><td style="padding:10px">Vente véhicule d\'occasion '+marque+' '+document.getElementById('facModele').value+' '+(document.getElementById('facVersion').value||'')+'<br><small style="color:#555">Immat: '+(document.getElementById('facPlaque').value||'-')+' | VIN: '+(document.getElementById('facVin').value||'-')+' | '+(document.getElementById('facKm').value?parseInt(document.getElementById('facKm').value).toLocaleString('fr-FR')+' km':'')+'</small></td><td style="padding:10px;text-align:right;font-weight:700;font-size:1.1em">'+prix.toFixed(2)+' €</td></tr></tbody>';
     h+='<tfoot><tr class="total-row"><td style="padding:10px;text-align:right">TOTAL TTC :</td><td style="padding:10px;text-align:right" class="price-big">'+prix.toFixed(2)+' €</td></tr></tfoot></table>';
-    if(isAuto)h+='<p style="font-size:0.85em;color:#555">TVA non applicable, art. 293 B du CGI (auto-entrepreneur).</p>';
+
+    // TVA
+    if(isAuto) h+='<p style="font-size:0.85em;color:#555;margin:8px 0">TVA non applicable, article 293 B du Code Général des Impôts.</p>';
+    else h+='<p style="font-size:0.85em;color:#555;margin:8px 0">TVA sur marge conformément à l\'article 297 A du CGI et à la directive 2006/112/CE.</p>';
+
+    // Paiement
     h+='<div style="margin:12px 0"><strong>Mode de paiement :</strong> '+(document.getElementById('facPaiement').value||'-')+'</div>';
-    var gar=document.getElementById('facGarantie').value;if(gar)h+='<div style="margin:10px 0"><strong>Garantie :</strong> '+gar+'</div>';
-    if(s.mentions)h+='<div style="margin-top:18px;padding:10px;background:#f8f9fa;border-radius:8px;font-size:0.8em;color:#555;white-space:pre-wrap">'+s.mentions+'</div>';
+
+    // GARANTIES — mentions obligatoires
+    h+='<div class="bloc"><h3>Garanties</h3>';
+    h+='<p style="margin:6px 0"><strong>Garantie légale de conformité :</strong> '+garLegale+' (articles L.217-3 et suivants du Code de la consommation).</p>';
+    h+='<p style="margin:6px 0;font-size:0.85em;color:#555">Le consommateur bénéficie d\'un délai de deux ans à compter de la délivrance du bien pour agir. Il peut choisir entre la réparation ou le remplacement du bien, sous réserve des conditions de coût prévues par l\'article L.217-12 du Code de la consommation.</p>';
+    h+='<p style="margin:6px 0"><strong>Garantie des vices cachés :</strong> articles 1641 à 1649 du Code civil — 2 ans à compter de la découverte du vice.</p>';
+    if(garCommerciale) h+='<p style="margin:6px 0"><strong>Garantie commerciale :</strong> '+garCommerciale+'</p>';
+    h+='</div>';
+
+    // Observations
+    if(obs) h+='<div style="margin:10px 0"><strong>Observations :</strong> '+obs+'</div>';
+
+    // Mentions légales
+    if(s.mentions) h+='<div style="margin-top:14px;padding:10px;background:#f8f9fa;border-radius:8px;font-size:0.8em;color:#555;white-space:pre-wrap">'+s.mentions+'</div>';
+
+    // Signatures
     h+='<div style="display:flex;justify-content:space-between;margin-top:25px"><div class="sig-zone">Le vendeur</div><div class="sig-zone">L\'acquéreur<br><small>"Bon pour accord"</small></div></div>';
     openPrintWindow(h);
 }
