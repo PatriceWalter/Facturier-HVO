@@ -332,6 +332,23 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
 .racing-stripe {
     height:4px; background: linear-gradient(90deg, var(--blue) 0%, var(--blue) 33%, var(--silver) 33%, var(--silver) 66%, var(--red) 66%, var(--red) 100%);
 }
+
+/* ===== VO SUB-TABS ===== */
+.vo-subtabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:18px; }
+.vo-subtab {
+    padding:12px 22px; border:2px solid var(--blue); border-radius:var(--radius); background:#fff;
+    cursor:pointer; font-family:'Rajdhani',sans-serif; font-weight:700; font-size:1em;
+    color:var(--blue); transition:all .2s; display:flex; align-items:center; gap:8px;
+}
+.vo-subtab:hover { background:rgba(26,58,122,0.06); }
+.vo-subtab.active { background:var(--blue); color:#fff; }
+.vo-sub { display:none; animation:fadeIn .3s; }
+.vo-sub.active { display:block; }
+.vo-doc-section { border:2px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:16px; background:#fafbfc; }
+.vo-doc-section h4 { color:var(--blue); font-family:'Rajdhani',sans-serif; border-bottom:2px solid var(--blue); padding-bottom:6px; margin-bottom:12px; }
+.vo-print-bar { display:flex; justify-content:center; gap:12px; margin-top:20px; padding-top:16px; border-top:2px solid var(--border); }
+.vo-print-bar .btn { padding:12px 30px; font-size:1.05em; }
+@media (max-width:768px) { .vo-subtab { padding:10px 14px; font-size:0.85em; } }
 </style>
 </head>
 <body>
@@ -464,28 +481,138 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
         <!-- ===== VEHICULES OCCASIONS ===== -->
         <div class="section" id="sec-occasions">
             <div class="stats-grid" id="voStats"></div>
-            <div class="card">
-                <div class="card-title">🏷️ Stock Véhicules Occasions
-                    <span style="margin-left:auto;display:flex;gap:8px;align-items:center">
-                        <select id="voFilterStatus" onchange="renderOccasions()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.85em">
-                            <option value="all">Tous</option>
-                            <option value="stock">En stock</option>
-                            <option value="reserve">Réservé</option>
-                            <option value="vendu">Vendu</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="openVOModal()">+ Ajouter un VO</button>
-                    </span>
-                </div>
-                <div class="table-wrap">
-                    <table>
-                        <thead><tr>
-                            <th>Plaque</th><th>Marque / Modèle</th><th>Année</th><th>Km</th><th>Énergie</th>
-                            <th>Prix vente</th><th>Statut</th><th>Actions</th>
-                        </tr></thead>
-                        <tbody id="voTableBody"></tbody>
-                    </table>
+
+            <!-- SOUS-ONGLETS VO -->
+            <div class="vo-subtabs" id="voSubtabs">
+                <button class="vo-subtab active" data-vosub="voStock">📦 Stock VO</button>
+                <button class="vo-subtab" data-vosub="voAnnonce">📄 Fiche Annonce</button>
+                <button class="vo-subtab" data-vosub="voCession">📋 Cerfa Cession</button>
+                <button class="vo-subtab" data-vosub="voFacture">🧾 Facture de Vente</button>
+                <button class="vo-subtab" data-vosub="voBonCmd">📝 Bon de Commande</button>
+            </div>
+
+            <!-- SUB: STOCK -->
+            <div class="vo-sub active" id="voStock">
+                <div class="card">
+                    <div class="card-title">📦 Stock Véhicules Occasions
+                        <span style="margin-left:auto;display:flex;gap:8px;align-items:center">
+                            <select id="voFilterStatus" onchange="renderVOStock()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.85em">
+                                <option value="all">Tous</option><option value="stock">En stock</option><option value="reserve">Réservé</option><option value="vendu">Vendu</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="openVOModal()">+ Ajouter un VO</button>
+                        </span>
+                    </div>
+                    <div class="table-wrap">
+                        <table><thead><tr><th>Plaque</th><th>Marque / Modèle</th><th>Année</th><th>Km</th><th>Énergie</th><th>Prix vente</th><th>Statut</th><th>Actions</th></tr></thead>
+                        <tbody id="voTableBody"></tbody></table>
+                    </div>
                 </div>
             </div>
+
+            <!-- SUB: FICHE ANNONCE -->
+            <div class="vo-sub" id="voAnnonce">
+                <div class="card">
+                    <div class="card-title">📄 Fiche Annonce Véhicule</div>
+                    <div class="form-group"><label>Sélectionner un véhicule</label><select id="voSelAnnonce" onchange="prefillAnnonce()" style="font-size:1em;padding:10px"></select></div>
+                    <div class="vo-doc-section"><h4>🚗 Description véhicule</h4>
+                        <div class="form-row"><div class="form-group"><label>Marque</label><input id="annMarque"></div><div class="form-group"><label>Modèle</label><input id="annModele"></div><div class="form-group"><label>Version</label><input id="annVersion"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Motorisation</label><input id="annMotorisation"></div><div class="form-group"><label>Carrosserie</label><input id="annCarrosserie"></div><div class="form-group"><label>Couleur</label><input id="annCouleur"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Énergie</label><input id="annEnergie"></div><div class="form-group"><label>Boîte</label><input id="annBoite"></div><div class="form-group"><label>Année</label><input id="annAnnee"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Kilométrage</label><input id="annKm"></div><div class="form-group"><label>Puissance CV</label><input id="annCV"></div><div class="form-group"><label>Puissance ch</label><input id="annCh"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Contrôle technique</label><input id="annCT"></div><div class="form-group"><label>Garantie</label><input id="annGarantie"></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>💰 Prix & équipements</h4>
+                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC</label><input id="annPrix" type="number" step="0.01" style="font-size:1.2em;font-weight:700"></div><div class="form-group"><label>État général</label><input id="annEtat"></div></div>
+                        <div class="form-group"><label>Équipements</label><textarea id="annEquipements" rows="3"></textarea></div>
+                        <div class="form-group"><label>Observations</label><textarea id="annObs" rows="2"></textarea></div>
+                    </div>
+                    <div class="vo-print-bar"><button class="btn btn-primary" onclick="printAnnonce()">🖨️ Imprimer la fiche annonce</button></div>
+                </div>
+            </div>
+
+            <!-- SUB: CERFA CESSION -->
+            <div class="vo-sub" id="voCession">
+                <div class="card">
+                    <div class="card-title">📋 Déclaration de Cession — Cerfa 15776*02</div>
+                    <div class="form-group"><label>Sélectionner un véhicule</label><select id="voSelCession" onchange="prefillCession()" style="font-size:1em;padding:10px"></select></div>
+                    <div class="vo-doc-section"><h4>I — LE VENDEUR (Cédant)</h4>
+                        <div class="form-row"><div class="form-group"><label>Raison sociale / Nom</label><input id="cesVendeurNom"></div><div class="form-group"><label>SIRET</label><input id="cesVendeurSiret"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Adresse</label><input id="cesVendeurAdresse"></div><div class="form-group"><label>Code postal</label><input id="cesVendeurCP"></div><div class="form-group"><label>Ville</label><input id="cesVendeurVille"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Téléphone</label><input id="cesVendeurTel"></div><div class="form-group"><label>Email</label><input id="cesVendeurEmail"></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>II — L'ACQUÉREUR (Cessionnaire)</h4>
+                        <div class="form-group"><label>Sélectionner un client</label><select id="cesClientSel" onchange="prefillCessionClient()" style="padding:8px"></select></div>
+                        <div class="form-row"><div class="form-group"><label>Nom</label><input id="cesAcheteurNom"></div><div class="form-group"><label>Prénom</label><input id="cesAcheteurPrenom"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Adresse</label><input id="cesAcheteurAdresse"></div><div class="form-group"><label>Code postal</label><input id="cesAcheteurCP"></div><div class="form-group"><label>Ville</label><input id="cesAcheteurVille"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Téléphone</label><input id="cesAcheteurTel"></div><div class="form-group"><label>Date de naissance</label><input id="cesAcheteurDDN" type="date"></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>III — LE VÉHICULE</h4>
+                        <div class="form-row"><div class="form-group"><label>N° d'immatriculation</label><input id="cesPlaque"></div><div class="form-group"><label>Date 1ère immatriculation</label><input id="cesDateMEC" type="date"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Marque</label><input id="cesMarque"></div><div class="form-group"><label>Type / Modèle</label><input id="cesModele"></div></div>
+                        <div class="form-row"><div class="form-group"><label>N° VIN (chassis)</label><input id="cesVin" maxlength="17"></div><div class="form-group"><label>Kilométrage au compteur</label><input id="cesKm" type="number"></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>IV — CONDITIONS DE LA CESSION</h4>
+                        <div class="form-row"><div class="form-group"><label>Date de cession</label><input id="cesDateCession" type="date"></div><div class="form-group"><label>Heure de cession</label><input id="cesHeureCession" type="time"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC (€)</label><input id="cesPrix" type="number" step="0.01" style="font-weight:700;font-size:1.1em"></div><div class="form-group"><label>Mode de paiement</label><input id="cesPaiement"></div></div>
+                        <div class="form-group"><label>Le véhicule est cédé en l'état</label><select id="cesEnEtat"><option value="oui">Oui</option><option value="non">Non — sous garantie</option></select></div>
+                    </div>
+                    <div class="vo-print-bar"><button class="btn btn-primary" onclick="printCession()">🖨️ Imprimer la déclaration de cession</button></div>
+                </div>
+            </div>
+
+            <!-- SUB: FACTURE VENTE -->
+            <div class="vo-sub" id="voFacture">
+                <div class="card">
+                    <div class="card-title">🧾 Facture de Vente Véhicule</div>
+                    <div class="form-group"><label>Sélectionner un véhicule</label><select id="voSelFacture" onchange="prefillFacture()" style="font-size:1em;padding:10px"></select></div>
+                    <div class="vo-doc-section"><h4>📋 Informations facture</h4>
+                        <div class="form-row"><div class="form-group"><label>N° de facture</label><input id="facNumero"></div><div class="form-group"><label>Date de facture</label><input id="facDate" type="date"></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>👤 Client</h4>
+                        <div class="form-group"><label>Sélectionner un client</label><select id="facClientSel" onchange="prefillFactureClient()" style="padding:8px"></select></div>
+                        <div class="form-row"><div class="form-group"><label>Nom</label><input id="facClientNom"></div><div class="form-group"><label>Prénom</label><input id="facClientPrenom"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Adresse</label><input id="facClientAdresse"></div><div class="form-group"><label>CP</label><input id="facClientCP"></div><div class="form-group"><label>Ville</label><input id="facClientVille"></div></div>
+                        <div class="form-group"><label>Téléphone</label><input id="facClientTel"></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>🚗 Véhicule vendu</h4>
+                        <div class="form-row"><div class="form-group"><label>Plaque</label><input id="facPlaque"></div><div class="form-group"><label>VIN</label><input id="facVin"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Marque</label><input id="facMarque"></div><div class="form-group"><label>Modèle</label><input id="facModele"></div><div class="form-group"><label>Version</label><input id="facVersion"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Année</label><input id="facAnnee"></div><div class="form-group"><label>Km</label><input id="facKm"></div><div class="form-group"><label>Énergie</label><input id="facEnergie"></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>💰 Montant & paiement</h4>
+                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC (€)</label><input id="facPrix" type="number" step="0.01" style="font-weight:700;font-size:1.2em"></div><div class="form-group"><label>Mode de paiement</label><input id="facPaiement"></div></div>
+                        <div class="form-group"><label>Garantie</label><input id="facGarantie"></div>
+                    </div>
+                    <div class="vo-print-bar"><button class="btn btn-primary" onclick="printFactureVO()">🖨️ Imprimer la facture de vente</button></div>
+                </div>
+            </div>
+
+            <!-- SUB: BON DE COMMANDE -->
+            <div class="vo-sub" id="voBonCmd">
+                <div class="card">
+                    <div class="card-title">📝 Bon de Commande Véhicule</div>
+                    <div class="form-group"><label>Sélectionner un véhicule</label><select id="voSelBonCmd" onchange="prefillBonCmd()" style="font-size:1em;padding:10px"></select></div>
+                    <div class="vo-doc-section"><h4>🚗 Véhicule commandé</h4>
+                        <div class="form-row"><div class="form-group"><label>Marque</label><input id="bcMarque"></div><div class="form-group"><label>Modèle</label><input id="bcModele"></div><div class="form-group"><label>Version</label><input id="bcVersion"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Plaque</label><input id="bcPlaque"></div><div class="form-group"><label>VIN</label><input id="bcVin"></div><div class="form-group"><label>Km</label><input id="bcKm"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Couleur</label><input id="bcCouleur"></div><div class="form-group"><label>Énergie</label><input id="bcEnergie"></div><div class="form-group"><label>Année</label><input id="bcAnnee"></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>👤 Acheteur</h4>
+                        <div class="form-group"><label>Sélectionner un client</label><select id="bcClientSel" onchange="prefillBonCmdClient()" style="padding:8px"></select></div>
+                        <div class="form-row"><div class="form-group"><label>Nom</label><input id="bcClientNom"></div><div class="form-group"><label>Prénom</label><input id="bcClientPrenom"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Adresse</label><input id="bcClientAdresse"></div><div class="form-group"><label>CP</label><input id="bcClientCP"></div><div class="form-group"><label>Ville</label><input id="bcClientVille"></div></div>
+                        <div class="form-group"><label>Téléphone</label><input id="bcClientTel"></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>💰 Conditions financières</h4>
+                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC (€)</label><input id="bcPrix" type="number" step="0.01" style="font-weight:700;font-size:1.1em"></div><div class="form-group"><label>Acompte versé (€)</label><input id="bcAcompte" type="number" step="0.01"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Solde restant (€)</label><input id="bcSolde" type="number" step="0.01"></div><div class="form-group"><label>Mode de paiement</label><input id="bcPaiement"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Date de livraison prévue</label><input id="bcDateLivraison" type="date"></div><div class="form-group"><label>Garantie</label><input id="bcGarantie"></div></div>
+                        <div class="form-group"><label>Conditions particulières</label><textarea id="bcConditions" rows="2" placeholder="Reprise ancien véhicule, travaux prévus..."></textarea></div>
+                    </div>
+                    <div class="vo-print-bar"><button class="btn btn-primary" onclick="printBonCmd()">🖨️ Imprimer le bon de commande</button></div>
+                </div>
+            </div>
+
         </div>
 
         <!-- ===== SETTINGS ===== -->
@@ -831,64 +958,32 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
     <div class="modal" style="max-width:800px;max-height:92vh;overflow-y:auto">
         <div class="modal-header"><h3 id="voModalTitle">Nouveau Véhicule Occasion</h3><button class="modal-close" onclick="closeModal('voModal')">&times;</button></div>
         <div class="modal-body">
-            <h4 style="color:var(--blue);margin-bottom:10px;font-family:'Rajdhani',sans-serif;border-bottom:2px solid var(--blue);padding-bottom:6px">🚗 Identification véhicule</h4>
-            <div class="form-row">
-                <div class="form-group"><label>Plaque immat.</label><input id="voPlaque" placeholder="AA-123-BB" oninput="this.value=this.value.toUpperCase()"></div>
-                <div class="form-group"><label>VIN (n° de série)</label><input id="voVin" maxlength="17" placeholder="17 caractères"></div>
+            <div class="vo-doc-section"><h4>🚗 Identification véhicule</h4>
+                <div class="form-row"><div class="form-group"><label>Plaque immat.</label><div style="display:flex;gap:8px"><input id="voPlaque" placeholder="AA-123-BB" oninput="this.value=this.value.toUpperCase()" style="flex:1"><button class="btn btn-outline btn-sm" onclick="openAutodocPaste('vo')" title="Coller infos Autodoc">🔍</button></div></div><div class="form-group"><label>VIN</label><input id="voVin" maxlength="17" style="text-transform:uppercase"></div></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Marque *</label><select id="voMarque" onchange="updateModelsVO()"><option value="">-- Sélectionner --</option></select><div style="position:relative"><input id="voMarqueSearch" placeholder="🔍 Recherche marque..." oninput="comboSearch(this,'voMarque','brand')" autocomplete="off" style="margin-top:4px"><div id="voMarqueDropdown" class="combo-dropdown"></div></div></div>
+                    <div class="form-group"><label>Modèle *</label><select id="voModele" onchange="updateMotorList('vo')"><option value="">-- Sélectionner marque --</option></select><div style="position:relative"><input id="voModeleSearch" placeholder="🔍 Recherche modèle..." oninput="comboSearch(this,'voModele','model')" autocomplete="off" style="margin-top:4px"><div id="voModeleDropdown" class="combo-dropdown"></div></div></div>
+                    <div class="form-group"><label>Version / Finition</label><input id="voVersion" placeholder="Ex: Confortline"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Motorisation</label><select id="voMotorSelect" onchange="applyMotorSelection('vo')" style="margin-bottom:4px"><option value="">-- Sélectionner modèle d'abord --</option></select><div style="position:relative"><input id="voMotorisation" placeholder="🔍 Recherche ou saisie libre" oninput="comboSearchMotor(this,'vo')" autocomplete="off"><div id="voMotorDropdown" class="combo-dropdown"></div></div></div>
+                    <div class="form-group"><label>Carrosserie</label><select id="voCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>SUV / Crossover</option><option>Coupé</option><option>Cabriolet</option><option>Monospace</option><option>Utilitaire</option><option>Pick-up</option><option>Citadine</option><option>Compact</option></select></div>
+                    <div class="form-group"><label>Couleur</label><input id="voCouleur"></div>
+                </div>
+                <div class="form-row"><div class="form-group"><label>Énergie</label><select id="voEnergie"><option value="">--</option><option>Diesel</option><option>Essence</option><option>Hybride</option><option>Électrique</option><option>GPL</option></select></div><div class="form-group"><label>Boîte</label><select id="voBoite"><option value="">--</option><option>Manuelle</option><option>Automatique</option><option>Robotisée</option></select></div><div class="form-group"><label>Transmission</label><select id="voTransmission"><option value="">--</option><option>Traction avant</option><option>Propulsion</option><option>Traction intégrale</option></select></div></div>
+                <div class="form-row"><div class="form-group"><label>Année</label><input id="voAnnee" type="number" min="1950" max="2030"></div><div class="form-group"><label>1ère MEC</label><input id="voDateMEC" type="date"></div><div class="form-group"><label>Km *</label><input id="voKm" type="number" min="0"></div></div>
+                <div class="form-row"><div class="form-group"><label>Cylindrée (cm³)</label><input id="voCylindree" type="number" min="0"></div><div class="form-group"><label>Puissance (CV)</label><input id="voPuissance" type="number" min="0"></div><div class="form-group"><label>Puissance (KW)</label><input id="voPuissanceKW" type="number" min="0"></div></div>
+                <div class="form-row"><div class="form-group"><label>Cylindres</label><input id="voCylindres" type="number" min="0"></div><div class="form-group"><label>Code moteur</label><input id="voCodeMoteur" style="text-transform:uppercase"></div><div class="form-group"><label>CV fiscaux</label><input id="voPuisFiscale" type="number"></div></div>
             </div>
-            <div class="form-row">
-                <div class="form-group"><label>Marque *</label><input id="voMarque" placeholder="Ex: Volkswagen"></div>
-                <div class="form-group"><label>Modèle *</label><input id="voModele" placeholder="Ex: Passat"></div>
-                <div class="form-group"><label>Version / Finition</label><input id="voVersion" placeholder="Ex: Confortline"></div>
+            <div class="vo-doc-section"><h4>💰 Tarification</h4>
+                <div class="form-row"><div class="form-group"><label>Prix achat (€)</label><input id="voPrixAchat" type="number" step="0.01"></div><div class="form-group"><label>Frais remise en état (€)</label><input id="voFrais" type="number" step="0.01"></div><div class="form-group"><label>Prix vente TTC (€) *</label><input id="voPrixVente" type="number" step="0.01" style="font-weight:700;font-size:1.1em"></div></div>
             </div>
-            <div class="form-row">
-                <div class="form-group"><label>Motorisation</label><input id="voMotorisation" placeholder="Ex: 1.9 TDI 130"></div>
-                <div class="form-group"><label>Carrosserie</label><select id="voCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>SUV</option><option>Citadine</option><option>Coupé</option><option>Cabriolet</option><option>Monospace</option><option>Utilitaire</option><option>Pick-up</option><option>Autre</option></select></div>
-                <div class="form-group"><label>Couleur</label><input id="voCouleur" placeholder="Ex: Gris Titane"></div>
+            <div class="vo-doc-section"><h4>📋 État & vente</h4>
+                <div class="form-row"><div class="form-group"><label>État</label><select id="voEtat"><option value="">--</option><option>Excellent</option><option>Très bon</option><option>Bon</option><option>Correct</option><option>À rénover</option></select></div><div class="form-group"><label>CT</label><select id="voCT"><option value="">--</option><option>OK (favorable)</option><option>OK avec observations</option><option>À passer</option><option>Contre-visite</option><option>Moins de 4 ans</option></select></div><div class="form-group"><label>Date CT</label><input id="voDateCT" type="date"></div></div>
+                <div class="form-group"><label>Équipements</label><textarea id="voEquipements" rows="2"></textarea></div>
+                <div class="form-group"><label>Observations</label><textarea id="voObs" rows="2"></textarea></div>
+                <div class="form-row"><div class="form-group"><label>Statut</label><select id="voStatut"><option value="stock">En stock</option><option value="reserve">Réservé</option><option value="vendu">Vendu</option></select></div><div class="form-group"><label>Garantie</label><input id="voGarantie"></div></div>
             </div>
-            <div class="form-row">
-                <div class="form-group"><label>Énergie</label><select id="voEnergie"><option value="">--</option><option>Diesel</option><option>Essence</option><option>Hybride</option><option>Électrique</option><option>GPL</option></select></div>
-                <div class="form-group"><label>Boîte de vitesses</label><select id="voBoite"><option value="">--</option><option>Manuelle</option><option>Automatique</option><option>Séquentielle</option></select></div>
-                <div class="form-group"><label>Transmission</label><select id="voTransmission"><option value="">--</option><option>Traction</option><option>Propulsion</option><option>Intégrale</option></select></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>1ère mise en circulation</label><input id="voDateMEC" type="date"></div>
-                <div class="form-group"><label>Kilométrage *</label><input id="voKm" type="number" min="0" placeholder="km"></div>
-                <div class="form-group"><label>Nb portes</label><input id="voPortes" type="number" min="2" max="5" placeholder="5"></div>
-                <div class="form-group"><label>Nb places</label><input id="voPlaces" type="number" min="1" max="9" placeholder="5"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Puissance fiscale (CV)</label><input id="voPuisFiscale" type="number" min="0"></div>
-                <div class="form-group"><label>Puissance DIN (ch)</label><input id="voPuisDin" type="number" min="0"></div>
-            </div>
-
-            <h4 style="color:var(--blue);margin:18px 0 10px;font-family:'Rajdhani',sans-serif;border-bottom:2px solid var(--blue);padding-bottom:6px">💰 Tarification</h4>
-            <div class="form-row">
-                <div class="form-group"><label>Prix d'achat (€)</label><input id="voPrixAchat" type="number" step="0.01" min="0" placeholder="Coût d'achat"></div>
-                <div class="form-group"><label>Frais de remise en état (€)</label><input id="voFrais" type="number" step="0.01" min="0" placeholder="CT, réparations..."></div>
-                <div class="form-group"><label>Prix de vente TTC (€) *</label><input id="voPrixVente" type="number" step="0.01" min="0" placeholder="Prix affiché" style="font-weight:700;font-size:1.1em"></div>
-            </div>
-
-            <h4 style="color:var(--blue);margin:18px 0 10px;font-family:'Rajdhani',sans-serif;border-bottom:2px solid var(--blue);padding-bottom:6px">📋 État & équipements</h4>
-            <div class="form-row">
-                <div class="form-group"><label>État général</label><select id="voEtat"><option value="">--</option><option>Excellent</option><option>Très bon</option><option>Bon</option><option>Correct</option><option>À rénover</option></select></div>
-                <div class="form-group"><label>Contrôle technique</label><select id="voCT"><option value="">--</option><option>OK (favorable)</option><option>OK avec observations</option><option>À passer</option><option>Contre-visite</option><option>Moins de 4 ans</option></select></div>
-                <div class="form-group"><label>Date CT</label><input id="voDateCT" type="date"></div>
-            </div>
-            <div class="form-group"><label>Équipements / Options</label><textarea id="voEquipements" rows="3" placeholder="Climatisation, GPS, Toit ouvrant, Sièges chauffants..."></textarea></div>
-            <div class="form-group"><label>Observations</label><textarea id="voObs" rows="2" placeholder="Remarques, historique, dégâts..."></textarea></div>
-
-            <h4 style="color:var(--blue);margin:18px 0 10px;font-family:'Rajdhani',sans-serif;border-bottom:2px solid var(--blue);padding-bottom:6px">📌 Vente</h4>
-            <div class="form-row">
-                <div class="form-group"><label>Statut</label><select id="voStatut"><option value="stock">En stock</option><option value="reserve">Réservé</option><option value="vendu">Vendu</option></select></div>
-                <div class="form-group"><label>Date mise en vente</label><input id="voDateMiseEnVente" type="date"></div>
-                <div class="form-group"><label>Date de vente</label><input id="voDateVente" type="date"></div>
-            </div>
-            <div class="form-row">
-                <div class="form-group"><label>Client acheteur</label><select id="voClientId"><option value="">-- Sélectionner --</option></select></div>
-                <div class="form-group"><label>Mode de paiement</label><select id="voPaiement"><option value="">--</option><option>Espèces</option><option>Chèque</option><option>Virement</option><option>Crédit</option><option>CB</option><option>Mixte</option></select></div>
-            </div>
-            <div class="form-group"><label>Garantie</label><input id="voGarantie" placeholder="Ex: 3 mois / 5000 km"></div>
         </div>
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeModal('voModal')">Annuler</button>
@@ -3542,7 +3637,18 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         else if (tab === 'factures') renderInvoices();
         else if (tab === 'operations') renderOperations();
         else if (tab === 'urssaf') renderURSSAF();
+        else if (tab === 'occasions') renderOccasions();
         else if (tab === 'settings') loadSettings();
+    });
+});
+
+// VO Sub-tabs navigation
+document.querySelectorAll('.vo-subtab').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.vo-subtab').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.vo-sub').forEach(s => s.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.vosub).classList.add('active');
     });
 });
 
@@ -4314,7 +4420,7 @@ function parseAutodocPaste(prefix) {
     if (result.boite && g(prefix + 'Boite')) {
         const s = g(prefix + 'Boite');
         if (/auto|dsg|dct|tiptronic/i.test(result.boite)) s.value = 'Automatique';
-        else if (/robot/i.test(result.boite)) s.value = 'Robotisée';
+        else if (/robot|s[eé]quent/i.test(result.boite)) s.value = 'Robotisée';
     }
 
     let count = Object.keys(result).filter(k => !k.startsWith('_') && result[k]).length;
@@ -4336,6 +4442,25 @@ function populateBrands() {
     const sel = document.getElementById('vMarque');
     sel.innerHTML = '<option value="">-- Sélectionner --</option>' +
         Object.keys(BRANDS_MODELS).sort().map(b => `<option value="${b}">${b}</option>`).join('');
+}
+
+function populateBrandsVO() {
+    const sel = document.getElementById('voMarque');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">-- Sélectionner --</option>' +
+        Object.keys(BRANDS_MODELS).sort().map(b => '<option value="'+b+'">'+b+'</option>').join('');
+}
+
+function updateModelsVO() {
+    const brand = document.getElementById('voMarque').value;
+    const sel = document.getElementById('voModele');
+    if (brand && BRANDS_MODELS[brand]) {
+        sel.innerHTML = '<option value="">-- Sélectionner --</option>' +
+            BRANDS_MODELS[brand].map(m => '<option value="'+m+'">'+m+'</option>').join('');
+    } else {
+        sel.innerHTML = '<option value="">-- Sélectionner marque --</option>';
+    }
+    updateMotorList('vo');
 }
 
 function updateModels() {
@@ -5169,377 +5294,333 @@ function addSelectedOps() {
 // ============================================================
 function renderOccasions() {
     if (!data.occasions) data.occasions = [];
+    renderVOStock();
+    populateVOSelects();
+}
+
+function renderVOStock() {
     const filter = document.getElementById('voFilterStatus') ? document.getElementById('voFilterStatus').value : 'all';
     const list = filter === 'all' ? data.occasions : data.occasions.filter(v => v.statut === filter);
-
     const enStock = data.occasions.filter(v => v.statut === 'stock').length;
     const reserves = data.occasions.filter(v => v.statut === 'reserve').length;
     const vendus = data.occasions.filter(v => v.statut === 'vendu').length;
     const caVO = data.occasions.filter(v => v.statut === 'vendu').reduce((s,v) => s + (parseFloat(v.prixVente)||0), 0);
     const margeVO = data.occasions.filter(v => v.statut === 'vendu').reduce((s,v) => {
-        const achat = (parseFloat(v.prixAchat)||0) + (parseFloat(v.frais)||0);
-        return s + ((parseFloat(v.prixVente)||0) - achat);
+        return s + ((parseFloat(v.prixVente)||0) - (parseFloat(v.prixAchat)||0) - (parseFloat(v.frais)||0));
     }, 0);
-
-    const statsEl = document.getElementById('voStats');
-    if (statsEl) {
-        statsEl.innerHTML = `
-            <div class="stat-card"><div class="stat-value">${enStock}</div><div class="stat-label">En stock</div></div>
-            <div class="stat-card"><div class="stat-value">${reserves}</div><div class="stat-label">Réservés</div></div>
-            <div class="stat-card"><div class="stat-value">${vendus}</div><div class="stat-label">Vendus</div></div>
-            <div class="stat-card"><div class="stat-value">${caVO.toFixed(2)} €</div><div class="stat-label">CA Ventes VO</div></div>
-            <div class="stat-card"><div class="stat-value" style="color:${margeVO>=0?'var(--success)':'var(--danger)'}">${margeVO.toFixed(2)} €</div><div class="stat-label">Marge VO</div></div>
-        `;
-    }
-
+    const el = document.getElementById('voStats');
+    if (el) el.innerHTML = '<div class="stat-card"><div class="stat-value">'+enStock+'</div><div class="stat-label">En stock</div></div><div class="stat-card"><div class="stat-value">'+reserves+'</div><div class="stat-label">Réservés</div></div><div class="stat-card"><div class="stat-value">'+vendus+'</div><div class="stat-label">Vendus</div></div><div class="stat-card"><div class="stat-value">'+caVO.toFixed(2)+' €</div><div class="stat-label">CA Ventes VO</div></div><div class="stat-card"><div class="stat-value" style="color:'+(margeVO>=0?'var(--success)':'var(--danger)')+'">'+margeVO.toFixed(2)+' €</div><div class="stat-label">Marge VO</div></div>';
     const tbody = document.getElementById('voTableBody');
     if (!tbody) return;
-    if (list.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">Aucun véhicule occasion enregistré</td></tr>';
-        return;
-    }
+    if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">Aucun véhicule occasion</td></tr>'; return; }
     tbody.innerHTML = list.map(v => {
-        const statusBadge = v.statut === 'vendu' ? '<span style="background:#d4edda;color:#155724;padding:3px 10px;border-radius:12px;font-size:0.8em;font-weight:600">Vendu</span>'
-            : v.statut === 'reserve' ? '<span style="background:#fff3cd;color:#856404;padding:3px 10px;border-radius:12px;font-size:0.8em;font-weight:600">Réservé</span>'
-            : '<span style="background:#cce5ff;color:#004085;padding:3px 10px;border-radius:12px;font-size:0.8em;font-weight:600">En stock</span>';
-        return `<tr>
-            <td style="font-weight:600">${v.plaque||'-'}</td>
-            <td>${v.marque||''} ${v.modele||''} ${v.version?'<br><small style="color:var(--text-light)">'+v.version+'</small>':''}</td>
-            <td>${v.dateMEC ? new Date(v.dateMEC).getFullYear() : '-'}</td>
-            <td>${v.km ? parseInt(v.km).toLocaleString('fr-FR')+' km' : '-'}</td>
-            <td>${v.energie||'-'}</td>
-            <td style="font-weight:700;color:var(--blue)">${v.prixVente ? parseFloat(v.prixVente).toFixed(2)+' €' : '-'}</td>
-            <td>${statusBadge}</td>
-            <td style="white-space:nowrap">
-                <button class="btn btn-sm btn-outline" onclick="editVO('${v.id}')" title="Modifier">✏️</button>
-                <button class="btn btn-sm btn-outline" onclick="printVO_Annonce('${v.id}')" title="Fiche annonce">📄</button>
-                <button class="btn btn-sm btn-outline" onclick="printVO_Cession('${v.id}')" title="Déclaration cession">📋</button>
-                <button class="btn btn-sm btn-outline" onclick="printVO_Facture('${v.id}')" title="Facture de vente">🧾</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteVO('${v.id}')" title="Supprimer">🗑️</button>
-            </td>
-        </tr>`;
+        const sb = v.statut==='vendu'?'<span style="background:#d4edda;color:#155724;padding:3px 10px;border-radius:12px;font-size:0.8em;font-weight:600">Vendu</span>':v.statut==='reserve'?'<span style="background:#fff3cd;color:#856404;padding:3px 10px;border-radius:12px;font-size:0.8em;font-weight:600">Réservé</span>':'<span style="background:#cce5ff;color:#004085;padding:3px 10px;border-radius:12px;font-size:0.8em;font-weight:600">En stock</span>';
+        return '<tr><td style="font-weight:600">'+(v.plaque||'-')+'</td><td>'+v.marque+' '+v.modele+(v.version?' <small style="color:var(--text-light)">'+v.version+'</small>':'')+'</td><td>'+(v.annee||(v.dateMEC?new Date(v.dateMEC).getFullYear():'-'))+'</td><td>'+(v.km?parseInt(v.km).toLocaleString('fr-FR')+' km':'-')+'</td><td>'+(v.energie||'-')+'</td><td style="font-weight:700;color:var(--blue)">'+(v.prixVente?parseFloat(v.prixVente).toFixed(2)+' €':'-')+'</td><td>'+sb+'</td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="editVO(\''+v.id+'\')">✏️</button> <button class="btn btn-sm btn-danger" onclick="deleteVO(\''+v.id+'\')">🗑️</button></td></tr>';
     }).join('');
+}
+
+function populateVOSelects() {
+    var opts = '<option value="">-- Sélectionner un véhicule --</option>';
+    data.occasions.forEach(function(v) { opts += '<option value="'+v.id+'">'+v.plaque+' — '+v.marque+' '+v.modele+'</option>'; });
+    ['voSelAnnonce','voSelCession','voSelFacture','voSelBonCmd'].forEach(function(id) { var el=document.getElementById(id); if(el) el.innerHTML=opts; });
+    var cOpts = '<option value="">-- Sélectionner un client --</option>';
+    data.clients.forEach(function(c) { cOpts += '<option value="'+c.id+'">'+c.nom+' '+(c.prenom||'')+'</option>'; });
+    ['cesClientSel','facClientSel','bcClientSel'].forEach(function(id) { var el=document.getElementById(id); if(el) el.innerHTML=cOpts; });
 }
 
 function openVOModal(id) {
     editingVOId = id || null;
-    document.getElementById('voModalTitle').textContent = id ? 'Modifier Véhicule Occasion' : 'Nouveau Véhicule Occasion';
-    // Remplir la liste clients
-    const sel = document.getElementById('voClientId');
-    sel.innerHTML = '<option value="">-- Sélectionner --</option>' + data.clients.map(c => `<option value="${c.id}">${c.nom} ${c.prenom||''}</option>`).join('');
-
-    const fields = ['voPlaque','voVin','voMarque','voModele','voVersion','voMotorisation','voCarrosserie','voCouleur',
-        'voEnergie','voBoite','voTransmission','voDateMEC','voKm','voPortes','voPlaces','voPuisFiscale','voPuisDin',
-        'voPrixAchat','voFrais','voPrixVente','voEtat','voCT','voDateCT','voEquipements','voObs',
-        'voStatut','voDateMiseEnVente','voDateVente','voClientId','voPaiement','voGarantie'];
-
+    document.getElementById('voModalTitle').textContent = id ? 'Modifier VO' : 'Nouveau Véhicule Occasion';
+    populateBrandsVO();
+    var fields = ['voPlaque','voVin','voVersion','voCouleur','voDateMEC','voKm','voPuisFiscale','voPrixAchat','voFrais','voPrixVente','voDateCT','voEquipements','voObs','voGarantie','voAnnee','voCylindree','voPuissance','voPuissanceKW','voCylindres','voCodeMoteur','voMotorisation'];
+    var selects = ['voMarque','voModele','voCarrosserie','voEnergie','voBoite','voTransmission','voEtat','voCT','voStatut'];
     if (id) {
-        const v = data.occasions.find(x => x.id === id);
+        var v = data.occasions.find(function(x){return x.id===id;});
         if (v) {
-            const map = {voPlaque:'plaque',voVin:'vin',voMarque:'marque',voModele:'modele',voVersion:'version',
-                voMotorisation:'motorisation',voCarrosserie:'carrosserie',voCouleur:'couleur',voEnergie:'energie',
-                voBoite:'boite',voTransmission:'transmission',voDateMEC:'dateMEC',voKm:'km',voPortes:'portes',
-                voPlaces:'places',voPuisFiscale:'puisFiscale',voPuisDin:'puisDin',voPrixAchat:'prixAchat',
-                voFrais:'frais',voPrixVente:'prixVente',voEtat:'etat',voCT:'ct',voDateCT:'dateCT',
-                voEquipements:'equipements',voObs:'obs',voStatut:'statut',voDateMiseEnVente:'dateMiseEnVente',
-                voDateVente:'dateVente',voClientId:'clientId',voPaiement:'paiement',voGarantie:'garantie'};
-            fields.forEach(f => { const el = document.getElementById(f); if(el) el.value = v[map[f]] || ''; });
+            // Selects
+            if (v.marque) { document.getElementById('voMarque').value = v.marque; updateModelsVO(); }
+            if (v.modele) { document.getElementById('voModele').value = v.modele; updateMotorList('vo'); }
+            if (v.motorisation) document.getElementById('voMotorisation').value = v.motorisation;
+            document.getElementById('voCarrosserie').value = v.carrosserie||'';
+            document.getElementById('voEnergie').value = v.energie||'';
+            document.getElementById('voBoite').value = v.boite||'';
+            document.getElementById('voTransmission').value = v.transmission||'';
+            document.getElementById('voEtat').value = v.etat||'';
+            document.getElementById('voCT').value = v.ct||'';
+            document.getElementById('voStatut').value = v.statut||'stock';
+            // Inputs
+            document.getElementById('voPlaque').value = v.plaque||'';
+            document.getElementById('voVin').value = v.vin||'';
+            document.getElementById('voVersion').value = v.version||'';
+            document.getElementById('voCouleur').value = v.couleur||'';
+            document.getElementById('voDateMEC').value = v.dateMEC||'';
+            document.getElementById('voKm').value = v.km||'';
+            document.getElementById('voPuisFiscale').value = v.puisFiscale||'';
+            document.getElementById('voPrixAchat').value = v.prixAchat||'';
+            document.getElementById('voFrais').value = v.frais||'';
+            document.getElementById('voPrixVente').value = v.prixVente||'';
+            document.getElementById('voDateCT').value = v.dateCT||'';
+            document.getElementById('voEquipements').value = v.equipements||'';
+            document.getElementById('voObs').value = v.obs||'';
+            document.getElementById('voGarantie').value = v.garantie||'';
+            document.getElementById('voAnnee').value = v.annee||'';
+            document.getElementById('voCylindree').value = v.cylindree||'';
+            document.getElementById('voPuissance').value = v.puissance||'';
+            document.getElementById('voPuissanceKW').value = v.puissanceKW||'';
+            document.getElementById('voCylindres').value = v.cylindres||'';
+            document.getElementById('voCodeMoteur').value = v.codeMoteur||'';
+            document.getElementById('voMotorisation').value = v.motorisation||'';
         }
     } else {
-        fields.forEach(f => { const el = document.getElementById(f); if(el) el.value = ''; });
-        document.getElementById('voStatut').value = 'stock';
-        document.getElementById('voDateMiseEnVente').value = new Date().toISOString().split('T')[0];
+        fields.forEach(function(f){var el=document.getElementById(f);if(el)el.value='';});
+        selects.forEach(function(f){var el=document.getElementById(f);if(el)el.value='';});
+        document.getElementById('voStatut').value='stock';
+        document.getElementById('voModele').innerHTML='<option value="">-- Sélectionner marque --</option>';
+        document.getElementById('voMotorSelect').innerHTML='<option value="">-- Sélectionner modèle d\'abord --</option>';
     }
     openModal('voModal');
 }
-
-function editVO(id) { openVOModal(id); }
+function editVO(id){openVOModal(id);}
 
 function saveVO() {
-    const marque = document.getElementById('voMarque').value.trim();
-    const modele = document.getElementById('voModele').value.trim();
-    if (!marque || !modele) return toast('Marque et Modèle obligatoires', 'error');
-
-    const vo = {
-        id: editingVOId || 'vo_' + Date.now(),
-        plaque: document.getElementById('voPlaque').value.trim().toUpperCase(),
-        vin: document.getElementById('voVin').value.trim().toUpperCase(),
-        marque: marque, modele: modele,
-        version: document.getElementById('voVersion').value.trim(),
-        motorisation: document.getElementById('voMotorisation').value.trim(),
-        carrosserie: document.getElementById('voCarrosserie').value,
-        couleur: document.getElementById('voCouleur').value.trim(),
-        energie: document.getElementById('voEnergie').value,
-        boite: document.getElementById('voBoite').value,
-        transmission: document.getElementById('voTransmission').value,
-        dateMEC: document.getElementById('voDateMEC').value,
-        km: document.getElementById('voKm').value,
-        portes: document.getElementById('voPortes').value,
-        places: document.getElementById('voPlaces').value,
-        puisFiscale: document.getElementById('voPuisFiscale').value,
-        puisDin: document.getElementById('voPuisDin').value,
-        prixAchat: document.getElementById('voPrixAchat').value,
-        frais: document.getElementById('voFrais').value,
-        prixVente: document.getElementById('voPrixVente').value,
-        etat: document.getElementById('voEtat').value,
-        ct: document.getElementById('voCT').value,
-        dateCT: document.getElementById('voDateCT').value,
-        equipements: document.getElementById('voEquipements').value.trim(),
-        obs: document.getElementById('voObs').value.trim(),
-        statut: document.getElementById('voStatut').value,
-        dateMiseEnVente: document.getElementById('voDateMiseEnVente').value,
-        dateVente: document.getElementById('voDateVente').value,
-        clientId: document.getElementById('voClientId').value,
-        paiement: document.getElementById('voPaiement').value,
-        garantie: document.getElementById('voGarantie').value.trim()
+    var marque=document.getElementById('voMarque').value;
+    var modele=document.getElementById('voModele').value;
+    if(!marque||!modele)return toast('Marque et Modèle obligatoires','error');
+    var vo = {
+        id:editingVOId||'vo_'+Date.now(),
+        plaque:document.getElementById('voPlaque').value.trim().toUpperCase(),
+        vin:document.getElementById('voVin').value.trim().toUpperCase(),
+        marque:marque, modele:modele,
+        version:document.getElementById('voVersion').value.trim(),
+        motorisation:document.getElementById('voMotorisation').value.trim(),
+        carrosserie:document.getElementById('voCarrosserie').value,
+        couleur:document.getElementById('voCouleur').value.trim(),
+        energie:document.getElementById('voEnergie').value,
+        boite:document.getElementById('voBoite').value,
+        transmission:document.getElementById('voTransmission').value,
+        dateMEC:document.getElementById('voDateMEC').value,
+        annee:document.getElementById('voAnnee').value,
+        km:document.getElementById('voKm').value,
+        cylindree:document.getElementById('voCylindree').value,
+        puissance:document.getElementById('voPuissance').value,
+        puissanceKW:document.getElementById('voPuissanceKW').value,
+        cylindres:document.getElementById('voCylindres').value,
+        codeMoteur:document.getElementById('voCodeMoteur').value.trim().toUpperCase(),
+        puisFiscale:document.getElementById('voPuisFiscale').value,
+        prixAchat:document.getElementById('voPrixAchat').value,
+        frais:document.getElementById('voFrais').value,
+        prixVente:document.getElementById('voPrixVente').value,
+        etat:document.getElementById('voEtat').value,
+        ct:document.getElementById('voCT').value,
+        dateCT:document.getElementById('voDateCT').value,
+        equipements:document.getElementById('voEquipements').value.trim(),
+        obs:document.getElementById('voObs').value.trim(),
+        statut:document.getElementById('voStatut').value,
+        garantie:document.getElementById('voGarantie').value.trim()
     };
-
-    if (!data.occasions) data.occasions = [];
-    if (editingVOId) {
-        const idx = data.occasions.findIndex(x => x.id === editingVOId);
-        if (idx >= 0) data.occasions[idx] = vo;
-    } else {
-        data.occasions.push(vo);
-    }
-    saveData();
-    closeModal('voModal');
-    renderAll();
-    toast(editingVOId ? 'Véhicule modifié' : 'Véhicule ajouté', 'success');
+    if(!data.occasions)data.occasions=[];
+    if(editingVOId){var idx=data.occasions.findIndex(function(x){return x.id===editingVOId;});if(idx>=0)data.occasions[idx]=vo;}else{data.occasions.push(vo);}
+    saveData();closeModal('voModal');renderAll();toast(editingVOId?'Véhicule modifié':'Véhicule ajouté','success');
 }
 
-function deleteVO(id) {
-    if (!confirm('Supprimer ce véhicule occasion ?')) return;
-    data.occasions = data.occasions.filter(x => x.id !== id);
-    saveData();
-    renderAll();
-    toast('Véhicule supprimé', 'success');
+function deleteVO(id){if(!confirm('Supprimer ce véhicule occasion ?'))return;data.occasions=data.occasions.filter(function(x){return x.id!==id;});saveData();renderAll();toast('Véhicule supprimé','success');}
+
+// --- PREFILL FUNCTIONS ---
+function getVO(selId){var id=document.getElementById(selId).value;return id?data.occasions.find(function(x){return x.id===id;}):null;}
+function getClient(selId){var id=document.getElementById(selId).value;return id?data.clients.find(function(x){return x.id===id;}):null;}
+
+function prefillAnnonce(){
+    var v=getVO('voSelAnnonce');if(!v)return;
+    document.getElementById('annMarque').value=v.marque||'';document.getElementById('annModele').value=v.modele||'';document.getElementById('annVersion').value=v.version||'';
+    document.getElementById('annMotorisation').value=v.motorisation||'';document.getElementById('annCarrosserie').value=v.carrosserie||'';document.getElementById('annCouleur').value=v.couleur||'';
+    document.getElementById('annEnergie').value=v.energie||'';document.getElementById('annBoite').value=v.boite||'';document.getElementById('annAnnee').value=v.annee||(v.dateMEC?new Date(v.dateMEC).getFullYear():'');
+    document.getElementById('annKm').value=v.km||'';document.getElementById('annCV').value=v.puisFiscale||v.puissance||'';document.getElementById('annCh').value=v.puissance||v.puissanceKW||'';
+    document.getElementById('annCT').value=v.ct||'';document.getElementById('annGarantie').value=v.garantie||'';document.getElementById('annPrix').value=v.prixVente||'';
+    document.getElementById('annEtat').value=v.etat||'';document.getElementById('annEquipements').value=v.equipements||'';document.getElementById('annObs').value=v.obs||'';
+}
+
+function prefillCession(){
+    var v=getVO('voSelCession');if(!v)return;var s=data.settings;
+    document.getElementById('cesVendeurNom').value=s.companyName||'';document.getElementById('cesVendeurSiret').value=s.siret||'';
+    document.getElementById('cesVendeurAdresse').value=s.address||'';document.getElementById('cesVendeurCP').value=s.zip||'';document.getElementById('cesVendeurVille').value=s.city||'';
+    document.getElementById('cesVendeurTel').value=s.phone||'';document.getElementById('cesVendeurEmail').value=s.email||'';
+    document.getElementById('cesPlaque').value=v.plaque||'';document.getElementById('cesDateMEC').value=v.dateMEC||'';
+    document.getElementById('cesMarque').value=v.marque||'';document.getElementById('cesModele').value=v.modele+' '+(v.version||'');
+    document.getElementById('cesVin').value=v.vin||'';document.getElementById('cesKm').value=v.km||'';
+    document.getElementById('cesPrix').value=v.prixVente||'';document.getElementById('cesDateCession').value=new Date().toISOString().split('T')[0];
+}
+function prefillCessionClient(){
+    var c=getClient('cesClientSel');if(!c)return;
+    document.getElementById('cesAcheteurNom').value=c.nom||'';document.getElementById('cesAcheteurPrenom').value=c.prenom||'';
+    document.getElementById('cesAcheteurAdresse').value=c.address||'';document.getElementById('cesAcheteurCP').value=c.zip||'';document.getElementById('cesAcheteurVille').value=c.city||'';
+    document.getElementById('cesAcheteurTel').value=c.phone||'';
+}
+
+function prefillFacture(){
+    var v=getVO('voSelFacture');if(!v)return;var s=data.settings;
+    document.getElementById('facNumero').value=(s.prefix||'HVO-')+'VO-'+v.id.replace('vo_','').slice(-6);
+    document.getElementById('facDate').value=new Date().toISOString().split('T')[0];
+    document.getElementById('facPlaque').value=v.plaque||'';document.getElementById('facVin').value=v.vin||'';
+    document.getElementById('facMarque').value=v.marque||'';document.getElementById('facModele').value=v.modele||'';document.getElementById('facVersion').value=v.version||'';
+    document.getElementById('facAnnee').value=v.annee||(v.dateMEC?new Date(v.dateMEC).getFullYear():'');document.getElementById('facKm').value=v.km||'';document.getElementById('facEnergie').value=v.energie||'';
+    document.getElementById('facPrix').value=v.prixVente||'';document.getElementById('facGarantie').value=v.garantie||'';
+}
+function prefillFactureClient(){
+    var c=getClient('facClientSel');if(!c)return;
+    document.getElementById('facClientNom').value=c.nom||'';document.getElementById('facClientPrenom').value=c.prenom||'';
+    document.getElementById('facClientAdresse').value=c.address||'';document.getElementById('facClientCP').value=c.zip||'';document.getElementById('facClientVille').value=c.city||'';
+    document.getElementById('facClientTel').value=c.phone||'';
+}
+
+function prefillBonCmd(){
+    var v=getVO('voSelBonCmd');if(!v)return;
+    document.getElementById('bcMarque').value=v.marque||'';document.getElementById('bcModele').value=v.modele||'';document.getElementById('bcVersion').value=v.version||'';
+    document.getElementById('bcPlaque').value=v.plaque||'';document.getElementById('bcVin').value=v.vin||'';document.getElementById('bcKm').value=v.km||'';
+    document.getElementById('bcCouleur').value=v.couleur||'';document.getElementById('bcEnergie').value=v.energie||'';document.getElementById('bcAnnee').value=v.annee||(v.dateMEC?new Date(v.dateMEC).getFullYear():'');
+    document.getElementById('bcPrix').value=v.prixVente||'';document.getElementById('bcGarantie').value=v.garantie||'';
+}
+function prefillBonCmdClient(){
+    var c=getClient('bcClientSel');if(!c)return;
+    document.getElementById('bcClientNom').value=c.nom||'';document.getElementById('bcClientPrenom').value=c.prenom||'';
+    document.getElementById('bcClientAdresse').value=c.address||'';document.getElementById('bcClientCP').value=c.zip||'';document.getElementById('bcClientVille').value=c.city||'';
+    document.getElementById('bcClientTel').value=c.phone||'';
 }
 
 // ============================================================
 // IMPRESSION DOCUMENTS VO
 // ============================================================
-function getVOPrintHeader(title) {
-    const s = data.settings;
-    const logo = s.logo || (typeof DEFAULT_LOGO !== 'undefined' ? DEFAULT_LOGO : '');
-    return `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:15px;border-bottom:3px solid #1a3a7a">
-        <div style="display:flex;align-items:center;gap:12px">
-            ${logo ? '<img src="'+logo+'" style="height:60px">' : ''}
-            <div>
-                <div style="font-size:1.3em;font-weight:700;color:#1a3a7a">${s.companyName||'HVO'}</div>
-                <div style="font-size:0.8em;color:#555">${s.address||''} ${s.zip||''} ${s.city||''}</div>
-                <div style="font-size:0.8em;color:#555">Tél: ${s.phone||'-'} | Email: ${s.email||'-'}</div>
-                <div style="font-size:0.8em;color:#555">SIRET: ${s.siret||'-'} ${s.tva?'| TVA: '+s.tva:''} ${s.rcs?'| RCS: '+s.rcs:''}</div>
-            </div>
-        </div>
-        <div style="text-align:right">
-            <div style="font-size:1.2em;font-weight:700;color:#1a3a7a">${title}</div>
-            <div style="font-size:0.8em;color:#555">Date: ${new Date().toLocaleDateString('fr-FR')}</div>
-        </div>
-    </div>`;
+function openPrintWindow(html){
+    var w=window.open('','_blank');
+    w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Impression HVO</title><style>@page{margin:12mm}body{font-family:"Segoe UI",Arial,sans-serif;font-size:13px;color:#222;margin:0;padding:20px}table{border-collapse:collapse;width:100%}.sig-zone{display:inline-block;width:45%;text-align:center;padding-top:50px;border-top:1px solid #999;margin-top:25px}.hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:12px;border-bottom:3px solid #1a3a7a}.hdr-logo{height:55px}.hdr-co{font-size:1.3em;font-weight:700;color:#1a3a7a}.hdr-sub{font-size:0.8em;color:#555}.bloc{border:2px solid #1a3a7a;border-radius:8px;padding:14px;margin-bottom:14px}.bloc h3{color:#1a3a7a;margin:0 0 10px;font-size:1.1em}.fld{padding:3px 8px;border-bottom:1px solid #eee}.fld-l{font-weight:600;color:#333;width:180px}.total-row{border-top:2px solid #1a3a7a;font-weight:700;font-size:1.1em}.price-big{font-size:1.3em;color:#c41e1e;font-weight:700}</style></head><body>'+html+'</body></html>');
+    w.document.close();setTimeout(function(){w.print();},500);
 }
 
-function voFieldRow(label, value) {
-    return value ? `<tr><td style="padding:4px 10px;font-weight:600;color:#333;width:200px;border-bottom:1px solid #eee">${label}</td><td style="padding:4px 10px;border-bottom:1px solid #eee">${value}</td></tr>` : '';
+function getPrintHeader(title){
+    var s=data.settings;var logo=s.logo||(typeof DEFAULT_LOGO!=='undefined'?DEFAULT_LOGO:'');
+    return '<div class="hdr"><div style="display:flex;align-items:center;gap:12px">'+(logo?'<img src="'+logo+'" class="hdr-logo">':'')+'<div><div class="hdr-co">'+(s.companyName||'HVO')+'</div><div class="hdr-sub">'+(s.address||'')+' '+(s.zip||'')+' '+(s.city||'')+'</div><div class="hdr-sub">Tél: '+(s.phone||'-')+' | Email: '+(s.email||'-')+'</div><div class="hdr-sub">SIRET: '+(s.siret||'-')+(s.tva?' | TVA: '+s.tva:'')+(s.rcs?' | RCS: '+s.rcs:'')+'</div></div></div><div style="text-align:right"><div style="font-size:1.2em;font-weight:700;color:#1a3a7a">'+title+'</div><div class="hdr-sub">Date: '+new Date().toLocaleDateString('fr-FR')+'</div></div></div>';
 }
 
-function getVODetailsTable(v) {
-    return `<table style="width:100%;border-collapse:collapse;font-size:0.9em">
-        ${voFieldRow('Plaque immat.', v.plaque)}
-        ${voFieldRow('VIN', v.vin)}
-        ${voFieldRow('Marque', v.marque)}
-        ${voFieldRow('Modèle', v.modele)}
-        ${voFieldRow('Version / Finition', v.version)}
-        ${voFieldRow('Motorisation', v.motorisation)}
-        ${voFieldRow('Carrosserie', v.carrosserie)}
-        ${voFieldRow('Couleur', v.couleur)}
-        ${voFieldRow('Énergie', v.energie)}
-        ${voFieldRow('Boîte de vitesses', v.boite)}
-        ${voFieldRow('Transmission', v.transmission)}
-        ${voFieldRow('1ère mise en circulation', v.dateMEC ? new Date(v.dateMEC).toLocaleDateString('fr-FR') : '')}
-        ${voFieldRow('Kilométrage', v.km ? parseInt(v.km).toLocaleString('fr-FR')+' km' : '')}
-        ${voFieldRow('Portes / Places', (v.portes||'-') + ' / ' + (v.places||'-'))}
-        ${voFieldRow('Puissance fiscale', v.puisFiscale ? v.puisFiscale+' CV' : '')}
-        ${voFieldRow('Puissance DIN', v.puisDin ? v.puisDin+' ch' : '')}
-        ${voFieldRow('État général', v.etat)}
-        ${voFieldRow('Contrôle technique', v.ct)}
-        ${voFieldRow('Date CT', v.dateCT ? new Date(v.dateCT).toLocaleDateString('fr-FR') : '')}
-        ${voFieldRow('Garantie', v.garantie)}
-    </table>`;
+function fld(label,val){return val?'<tr><td class="fld fld-l">'+label+'</td><td class="fld">'+val+'</td></tr>':'';}
+function dotLine(label,val){return '<tr><td style="width:180px;font-weight:600;padding:5px">'+label+'</td><td style="border-bottom:1px dotted #999;padding:5px">'+(val||'.........................................')+'</td></tr>';}
+
+// 📄 FICHE ANNONCE
+function printAnnonce(){
+    var m=document.getElementById('annMarque').value;var mo=document.getElementById('annModele').value;
+    if(!m&&!mo)return toast('Sélectionnez ou remplissez un véhicule','error');
+    var prix=document.getElementById('annPrix').value;
+    var h=getPrintHeader('FICHE VÉHICULE OCCASION');
+    h+='<div style="text-align:center;margin:18px 0"><div style="font-size:1.6em;font-weight:700;color:#1a3a7a">'+m+' '+mo+' '+(document.getElementById('annVersion').value||'')+'</div>';
+    h+='<div style="font-size:1em;color:#555;margin-top:4px">'+(document.getElementById('annMotorisation').value||'')+' '+(document.getElementById('annCarrosserie').value?'— '+document.getElementById('annCarrosserie').value:'')+' '+(document.getElementById('annCouleur').value?'— '+document.getElementById('annCouleur').value:'')+'</div>';
+    h+='<div style="font-size:2em;font-weight:700;color:#c41e1e;margin-top:10px">'+(prix?parseFloat(prix).toFixed(2)+' € TTC':'-')+'</div></div>';
+    h+='<div style="padding:12px;background:#f8f9fa;border-radius:8px;margin:12px 0"><table>';
+    h+=fld('Énergie',document.getElementById('annEnergie').value)+fld('Boîte de vitesses',document.getElementById('annBoite').value);
+    h+=fld('Année',document.getElementById('annAnnee').value)+fld('Kilométrage',document.getElementById('annKm').value?parseInt(document.getElementById('annKm').value).toLocaleString('fr-FR')+' km':'');
+    h+=fld('Puissance fiscale',document.getElementById('annCV').value?document.getElementById('annCV').value+' CV':'')+fld('Puissance DIN',document.getElementById('annCh').value?document.getElementById('annCh').value+' ch':'');
+    h+=fld('Contrôle technique',document.getElementById('annCT').value)+fld('Garantie',document.getElementById('annGarantie').value);
+    h+=fld('État général',document.getElementById('annEtat').value);
+    h+='</table></div>';
+    var eq=document.getElementById('annEquipements').value;if(eq)h+='<div style="margin:12px 0"><strong style="color:#1a3a7a">Équipements :</strong><p style="margin:6px 0;white-space:pre-wrap">'+eq+'</p></div>';
+    var obs=document.getElementById('annObs').value;if(obs)h+='<div style="margin:12px 0"><strong style="color:#1a3a7a">Observations :</strong><p style="margin:6px 0;white-space:pre-wrap">'+obs+'</p></div>';
+    h+='<div style="text-align:center;margin-top:25px;padding:12px;background:#1a3a7a;color:#fff;border-radius:8px;font-size:1.1em">'+(data.settings.companyName||'HVO')+' — '+(data.settings.phone||'')+' — '+(data.settings.email||'')+'</div>';
+    openPrintWindow(h);
 }
 
-function openPrintWindow(html) {
-    const w = window.open('', '_blank');
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Impression</title>
-    <style>
-        @page { margin: 15mm; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #222; margin: 0; padding: 20px; }
-        table { border-collapse: collapse; width: 100%; }
-        .sig-zone { display: inline-block; width: 45%; text-align: center; padding-top: 60px; border-top: 1px solid #999; margin-top: 30px; }
-    </style></head><body>${html}</body></html>`);
-    w.document.close();
-    setTimeout(() => { w.print(); }, 500);
+// 📋 CERFA CESSION 15776*02
+function printCession(){
+    var plaque=document.getElementById('cesPlaque').value;
+    if(!plaque&&!document.getElementById('cesMarque').value)return toast('Sélectionnez ou remplissez un véhicule','error');
+    var h=getPrintHeader('DÉCLARATION DE CESSION D\'UN VÉHICULE');
+    h+='<p style="font-size:0.85em;color:#555;margin-bottom:12px;font-style:italic">Conformément à l\'article R.322-4 du Code de la Route — Cerfa n° 15776*02</p>';
+    h+='<div class="bloc"><h3>I — LE VENDEUR (Cédant)</h3><table>';
+    h+=dotLine('Raison sociale',document.getElementById('cesVendeurNom').value)+dotLine('SIRET',document.getElementById('cesVendeurSiret').value);
+    h+=dotLine('Adresse',document.getElementById('cesVendeurAdresse').value+' '+document.getElementById('cesVendeurCP').value+' '+document.getElementById('cesVendeurVille').value);
+    h+=dotLine('Téléphone',document.getElementById('cesVendeurTel').value)+dotLine('Email',document.getElementById('cesVendeurEmail').value);
+    h+='</table></div>';
+    h+='<div class="bloc"><h3>II — L\'ACQUÉREUR (Cessionnaire)</h3><table>';
+    h+=dotLine('Nom',document.getElementById('cesAcheteurNom').value+' '+document.getElementById('cesAcheteurPrenom').value);
+    h+=dotLine('Adresse',document.getElementById('cesAcheteurAdresse').value+' '+document.getElementById('cesAcheteurCP').value+' '+document.getElementById('cesAcheteurVille').value);
+    h+=dotLine('Téléphone',document.getElementById('cesAcheteurTel').value)+dotLine('Date de naissance',document.getElementById('cesAcheteurDDN').value?new Date(document.getElementById('cesAcheteurDDN').value).toLocaleDateString('fr-FR'):'');
+    h+='</table></div>';
+    h+='<div class="bloc"><h3>III — DÉSIGNATION DU VÉHICULE</h3><table>';
+    h+=dotLine('N° d\'immatriculation',document.getElementById('cesPlaque').value)+dotLine('Date 1ère immatriculation',document.getElementById('cesDateMEC').value?new Date(document.getElementById('cesDateMEC').value).toLocaleDateString('fr-FR'):'');
+    h+=dotLine('Marque',document.getElementById('cesMarque').value)+dotLine('Type / Modèle',document.getElementById('cesModele').value);
+    h+=dotLine('N° VIN (chassis)',document.getElementById('cesVin').value)+dotLine('Kilométrage compteur',document.getElementById('cesKm').value?parseInt(document.getElementById('cesKm').value).toLocaleString('fr-FR')+' km':'');
+    h+='</table></div>';
+    h+='<div class="bloc"><h3>IV — CONDITIONS DE LA CESSION</h3><table>';
+    h+=dotLine('Date de cession',document.getElementById('cesDateCession').value?new Date(document.getElementById('cesDateCession').value).toLocaleDateString('fr-FR'):'');
+    h+=dotLine('Heure de cession',document.getElementById('cesHeureCession').value||'');
+    h+=dotLine('Prix de vente TTC',document.getElementById('cesPrix').value?parseFloat(document.getElementById('cesPrix').value).toFixed(2)+' €':'');
+    h+=dotLine('Mode de paiement',document.getElementById('cesPaiement').value);
+    h+=dotLine('Véhicule cédé en l\'état',document.getElementById('cesEnEtat').value==='oui'?'Oui — sans garantie':'Non — sous garantie');
+    h+='</table></div>';
+    h+='<div style="display:flex;justify-content:space-between;margin-top:25px"><div class="sig-zone">Le vendeur<br><small>Signature précédée de "Lu et approuvé"</small></div><div class="sig-zone">L\'acquéreur<br><small>Signature précédée de "Lu et approuvé"</small></div></div>';
+    h+='<p style="font-size:0.75em;color:#888;margin-top:15px;text-align:center">Le vendeur doit déclarer la cession dans les 15 jours sur ants.gouv.fr — L\'acquéreur dispose d\'un délai d\'un mois pour faire la carte grise.</p>';
+    openPrintWindow(h);
 }
 
-// 📄 Fiche Annonce
-function printVO_Annonce(id) {
-    const v = data.occasions.find(x => x.id === id);
-    if (!v) return toast('Véhicule introuvable', 'error');
-    const prix = v.prixVente ? parseFloat(v.prixVente).toFixed(2) + ' €' : '-';
-    let html = getVOPrintHeader('FICHE VÉHICULE OCCASION');
-    html += `<div style="text-align:center;margin:20px 0">
-        <div style="font-size:1.6em;font-weight:700;color:#1a3a7a">${v.marque} ${v.modele} ${v.version||''}</div>
-        <div style="font-size:1.1em;color:#555;margin-top:4px">${v.motorisation||''} ${v.carrosserie?'— '+v.carrosserie:''} ${v.couleur?'— '+v.couleur:''}</div>
-        <div style="font-size:2em;font-weight:700;color:#c41e1e;margin-top:10px">${prix}</div>
-    </div>`;
-    html += `<div style="margin:15px 0;padding:15px;background:#f8f9fa;border-radius:8px">`;
-    html += getVODetailsTable(v);
-    html += `</div>`;
-    if (v.equipements) {
-        html += `<div style="margin:15px 0"><strong style="color:#1a3a7a">Équipements :</strong><p style="margin:6px 0;white-space:pre-wrap">${v.equipements}</p></div>`;
-    }
-    if (v.obs) {
-        html += `<div style="margin:15px 0"><strong style="color:#1a3a7a">Observations :</strong><p style="margin:6px 0;white-space:pre-wrap">${v.obs}</p></div>`;
-    }
-    html += `<div style="text-align:center;margin-top:30px;padding:12px;background:#1a3a7a;color:#fff;border-radius:8px;font-size:1.1em">
-        ${data.settings.companyName||'HVO'} — ${data.settings.phone||''} — ${data.settings.email||''}
-    </div>`;
-    openPrintWindow(html);
+// 🧾 FACTURE DE VENTE VO
+function printFactureVO(){
+    var marque=document.getElementById('facMarque').value;
+    if(!marque)return toast('Sélectionnez ou remplissez un véhicule','error');
+    var s=data.settings;var isAuto=(s.regime||'auto')==='auto';
+    var prix=parseFloat(document.getElementById('facPrix').value)||0;
+    var h=getPrintHeader('FACTURE DE VENTE VÉHICULE');
+    h+='<div style="display:flex;justify-content:space-between;margin-bottom:14px"><div><strong>Facture N° :</strong> '+document.getElementById('facNumero').value+'</div><div><strong>Date :</strong> '+(document.getElementById('facDate').value?new Date(document.getElementById('facDate').value).toLocaleDateString('fr-FR'):'')+'</div></div>';
+    h+='<div style="border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:14px;background:#f8f9fa"><strong>Client :</strong><br>';
+    h+=document.getElementById('facClientNom').value+' '+document.getElementById('facClientPrenom').value+'<br>';
+    h+=document.getElementById('facClientAdresse').value+' '+document.getElementById('facClientCP').value+' '+document.getElementById('facClientVille').value;
+    var tel=document.getElementById('facClientTel').value;if(tel)h+='<br>Tél: '+tel;
+    h+='</div>';
+    h+='<div style="margin-bottom:10px"><strong style="color:#1a3a7a">Véhicule vendu :</strong></div>';
+    h+='<div style="padding:10px;background:#f8f9fa;border-radius:8px;margin-bottom:14px"><table>';
+    h+=fld('Plaque',document.getElementById('facPlaque').value)+fld('VIN',document.getElementById('facVin').value);
+    h+=fld('Marque',document.getElementById('facMarque').value)+fld('Modèle',document.getElementById('facModele').value)+fld('Version',document.getElementById('facVersion').value);
+    h+=fld('Année',document.getElementById('facAnnee').value)+fld('Kilométrage',document.getElementById('facKm').value?parseInt(document.getElementById('facKm').value).toLocaleString('fr-FR')+' km':'');
+    h+=fld('Énergie',document.getElementById('facEnergie').value);
+    h+='</table></div>';
+    h+='<table style="margin:18px 0"><thead><tr style="background:#1a3a7a;color:#fff"><th style="padding:10px;text-align:left">Désignation</th><th style="padding:10px;text-align:right;width:150px">Montant TTC</th></tr></thead>';
+    h+='<tbody><tr style="border-bottom:1px solid #ddd"><td style="padding:10px">Vente véhicule '+marque+' '+document.getElementById('facModele').value+' '+(document.getElementById('facVersion').value||'')+'<br><small style="color:#555">Immat: '+(document.getElementById('facPlaque').value||'-')+' | VIN: '+(document.getElementById('facVin').value||'-')+'</small></td><td style="padding:10px;text-align:right;font-weight:700;font-size:1.1em">'+prix.toFixed(2)+' €</td></tr></tbody>';
+    h+='<tfoot><tr class="total-row"><td style="padding:10px;text-align:right">TOTAL TTC :</td><td style="padding:10px;text-align:right" class="price-big">'+prix.toFixed(2)+' €</td></tr></tfoot></table>';
+    if(isAuto)h+='<p style="font-size:0.85em;color:#555">TVA non applicable, art. 293 B du CGI (auto-entrepreneur).</p>';
+    h+='<div style="margin:12px 0"><strong>Mode de paiement :</strong> '+(document.getElementById('facPaiement').value||'-')+'</div>';
+    var gar=document.getElementById('facGarantie').value;if(gar)h+='<div style="margin:10px 0"><strong>Garantie :</strong> '+gar+'</div>';
+    if(s.mentions)h+='<div style="margin-top:18px;padding:10px;background:#f8f9fa;border-radius:8px;font-size:0.8em;color:#555;white-space:pre-wrap">'+s.mentions+'</div>';
+    h+='<div style="display:flex;justify-content:space-between;margin-top:25px"><div class="sig-zone">Le vendeur</div><div class="sig-zone">L\'acquéreur<br><small>"Bon pour accord"</small></div></div>';
+    openPrintWindow(h);
 }
 
-// 📋 Déclaration de cession (Cerfa 15776)
-function printVO_Cession(id) {
-    const v = data.occasions.find(x => x.id === id);
-    if (!v) return toast('Véhicule introuvable', 'error');
-    const client = v.clientId ? data.clients.find(c => c.id === v.clientId) : null;
-    const s = data.settings;
-
-    let html = getVOPrintHeader('DÉCLARATION DE CESSION D\'UN VÉHICULE');
-    html += `<p style="font-size:0.85em;color:#555;margin-bottom:15px;font-style:italic">Conformément à l'article R.322-4 du Code de la Route — Cerfa n° 15776*02</p>`;
-
-    // VENDEUR
-    html += `<div style="border:2px solid #1a3a7a;border-radius:8px;padding:15px;margin-bottom:15px">
-        <h3 style="color:#1a3a7a;margin:0 0 10px">I — LE VENDEUR (cédant)</h3>
-        <table style="width:100%;font-size:0.9em">
-            <tr><td style="width:150px;font-weight:600;padding:4px">Raison sociale :</td><td style="border-bottom:1px dotted #999;padding:4px">${s.companyName||''}</td></tr>
-            <tr><td style="font-weight:600;padding:4px">SIRET :</td><td style="border-bottom:1px dotted #999;padding:4px">${s.siret||''}</td></tr>
-            <tr><td style="font-weight:600;padding:4px">Adresse :</td><td style="border-bottom:1px dotted #999;padding:4px">${s.address||''} ${s.zip||''} ${s.city||''}</td></tr>
-            <tr><td style="font-weight:600;padding:4px">Téléphone :</td><td style="border-bottom:1px dotted #999;padding:4px">${s.phone||''}</td></tr>
-        </table>
-    </div>`;
-
-    // ACHETEUR
-    html += `<div style="border:2px solid #1a3a7a;border-radius:8px;padding:15px;margin-bottom:15px">
-        <h3 style="color:#1a3a7a;margin:0 0 10px">II — L'ACQUÉREUR (cessionnaire)</h3>
-        <table style="width:100%;font-size:0.9em">
-            <tr><td style="width:150px;font-weight:600;padding:4px">Nom :</td><td style="border-bottom:1px dotted #999;padding:4px">${client ? client.nom + ' ' + (client.prenom||'') : '.........................................'}</td></tr>
-            <tr><td style="font-weight:600;padding:4px">Adresse :</td><td style="border-bottom:1px dotted #999;padding:4px">${client ? (client.address||'') + ' ' + (client.zip||'') + ' ' + (client.city||'') : '.........................................'}</td></tr>
-            <tr><td style="font-weight:600;padding:4px">Téléphone :</td><td style="border-bottom:1px dotted #999;padding:4px">${client ? (client.phone||'') : '.........................................'}</td></tr>
-        </table>
-    </div>`;
-
-    // VEHICULE
-    html += `<div style="border:2px solid #1a3a7a;border-radius:8px;padding:15px;margin-bottom:15px">
-        <h3 style="color:#1a3a7a;margin:0 0 10px">III — LE VÉHICULE</h3>
-        <table style="width:100%;font-size:0.9em">
-            ${voFieldRow('N° d\'immatriculation', v.plaque)}
-            ${voFieldRow('Marque', v.marque)}
-            ${voFieldRow('Modèle / Type', v.modele + (v.version?' '+v.version:''))}
-            ${voFieldRow('N° VIN', v.vin)}
-            ${voFieldRow('Date 1ère mise en circulation', v.dateMEC ? new Date(v.dateMEC).toLocaleDateString('fr-FR') : '')}
-            ${voFieldRow('Kilométrage au compteur', v.km ? parseInt(v.km).toLocaleString('fr-FR')+' km' : '')}
-        </table>
-    </div>`;
-
-    // CONDITIONS
-    html += `<div style="border:2px solid #1a3a7a;border-radius:8px;padding:15px;margin-bottom:15px">
-        <h3 style="color:#1a3a7a;margin:0 0 10px">IV — CONDITIONS DE LA CESSION</h3>
-        <table style="width:100%;font-size:0.9em">
-            <tr><td style="width:150px;font-weight:600;padding:4px">Date de cession :</td><td style="border-bottom:1px dotted #999;padding:4px">${v.dateVente ? new Date(v.dateVente).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR')}</td></tr>
-            <tr><td style="font-weight:600;padding:4px">Heure de cession :</td><td style="border-bottom:1px dotted #999;padding:4px">........... h ...........</td></tr>
-            <tr><td style="font-weight:600;padding:4px">Prix de vente TTC :</td><td style="border-bottom:1px dotted #999;padding:4px;font-weight:700">${v.prixVente ? parseFloat(v.prixVente).toFixed(2)+' €' : '...........................'}</td></tr>
-            <tr><td style="font-weight:600;padding:4px">Mode de paiement :</td><td style="border-bottom:1px dotted #999;padding:4px">${v.paiement||'...........................'}</td></tr>
-        </table>
-    </div>`;
-
-    // SIGNATURES
-    html += `<div style="display:flex;justify-content:space-between;margin-top:30px">
-        <div class="sig-zone">Le vendeur<br><small>Signature précédée de "Lu et approuvé"</small></div>
-        <div class="sig-zone">L'acquéreur<br><small>Signature précédée de "Lu et approuvé"</small></div>
-    </div>`;
-    html += `<p style="font-size:0.75em;color:#888;margin-top:20px;text-align:center">Le vendeur doit déclarer la cession dans les 15 jours sur le site de l'ANTS (ants.gouv.fr).</p>`;
-    openPrintWindow(html);
-}
-
-// 🧾 Facture de vente VO
-function printVO_Facture(id) {
-    const v = data.occasions.find(x => x.id === id);
-    if (!v) return toast('Véhicule introuvable', 'error');
-    const client = v.clientId ? data.clients.find(c => c.id === v.clientId) : null;
-    const s = data.settings;
-    const isAuto = (s.regime || 'auto') === 'auto';
-    const dateVente = v.dateVente ? new Date(v.dateVente).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR');
-    const numFact = (s.prefix||'HVO-') + 'VO-' + (v.id.replace('vo_','').slice(-6));
-    const prixVente = parseFloat(v.prixVente) || 0;
-
-    let html = getVOPrintHeader('FACTURE DE VENTE VÉHICULE');
-
-    // Num facture + date
-    html += `<div style="display:flex;justify-content:space-between;margin-bottom:15px">
-        <div><strong>Facture N° :</strong> ${numFact}</div>
-        <div><strong>Date :</strong> ${dateVente}</div>
-    </div>`;
-
-    // Client
-    html += `<div style="border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:15px;background:#f8f9fa">
-        <strong>Client :</strong><br>
-        ${client ? client.nom + ' ' + (client.prenom||'') + '<br>' + (client.address||'') + ' ' + (client.zip||'') + ' ' + (client.city||'') + '<br>Tél: ' + (client.phone||'-') : '<em>Non renseigné</em>'}
-    </div>`;
-
-    // Détail véhicule
-    html += `<div style="margin-bottom:15px"><strong style="color:#1a3a7a">Véhicule vendu :</strong></div>`;
-    html += `<div style="padding:10px;background:#f8f9fa;border-radius:8px;margin-bottom:15px">`;
-    html += getVODetailsTable(v);
-    html += `</div>`;
-
-    // Ligne facture
-    html += `<table style="width:100%;border-collapse:collapse;margin:20px 0">
-        <thead><tr style="background:#1a3a7a;color:#fff">
-            <th style="padding:10px;text-align:left">Désignation</th>
-            <th style="padding:10px;text-align:right;width:150px">Montant TTC</th>
-        </tr></thead>
-        <tbody>
-            <tr style="border-bottom:1px solid #ddd">
-                <td style="padding:10px">Vente véhicule ${v.marque} ${v.modele} ${v.version||''}<br><small style="color:#555">Immat: ${v.plaque||'-'} | VIN: ${v.vin||'-'} | ${v.km ? parseInt(v.km).toLocaleString('fr-FR')+' km':'?'}</small></td>
-                <td style="padding:10px;text-align:right;font-weight:700;font-size:1.1em">${prixVente.toFixed(2)} €</td>
-            </tr>
-        </tbody>
-        <tfoot>
-            <tr style="border-top:2px solid #1a3a7a">
-                <td style="padding:10px;text-align:right;font-weight:700;font-size:1.1em">TOTAL TTC :</td>
-                <td style="padding:10px;text-align:right;font-weight:700;font-size:1.3em;color:#c41e1e">${prixVente.toFixed(2)} €</td>
-            </tr>
-        </tfoot>
-    </table>`;
-
-    if (isAuto) {
-        html += `<p style="font-size:0.85em;color:#555;margin:10px 0">TVA non applicable, art. 293 B du CGI (auto-entrepreneur).</p>`;
-    }
-
-    html += `<div style="margin:15px 0"><strong>Mode de paiement :</strong> ${v.paiement||'-'}</div>`;
-    if (v.garantie) html += `<div style="margin:10px 0"><strong>Garantie :</strong> ${v.garantie}</div>`;
-
-    // Mentions légales
-    if (s.mentions) {
-        html += `<div style="margin-top:20px;padding:10px;background:#f8f9fa;border-radius:8px;font-size:0.8em;color:#555;white-space:pre-wrap">${s.mentions}</div>`;
-    }
-
-    // Signatures
-    html += `<div style="display:flex;justify-content:space-between;margin-top:30px">
-        <div class="sig-zone">Le vendeur</div>
-        <div class="sig-zone">L'acquéreur<br><small>"Bon pour accord"</small></div>
-    </div>`;
-    openPrintWindow(html);
+// 📝 BON DE COMMANDE
+function printBonCmd(){
+    var marque=document.getElementById('bcMarque').value;
+    if(!marque)return toast('Sélectionnez ou remplissez un véhicule','error');
+    var s=data.settings;var prix=parseFloat(document.getElementById('bcPrix').value)||0;
+    var acompte=parseFloat(document.getElementById('bcAcompte').value)||0;
+    var solde=prix-acompte;document.getElementById('bcSolde').value=solde.toFixed(2);
+    var h=getPrintHeader('BON DE COMMANDE VÉHICULE');
+    h+='<div class="bloc"><h3>Acheteur</h3><table>';
+    h+=dotLine('Nom',document.getElementById('bcClientNom').value+' '+document.getElementById('bcClientPrenom').value);
+    h+=dotLine('Adresse',document.getElementById('bcClientAdresse').value+' '+document.getElementById('bcClientCP').value+' '+document.getElementById('bcClientVille').value);
+    h+=dotLine('Téléphone',document.getElementById('bcClientTel').value);
+    h+='</table></div>';
+    h+='<div class="bloc"><h3>Véhicule commandé</h3><table>';
+    h+=dotLine('Marque',document.getElementById('bcMarque').value)+dotLine('Modèle',document.getElementById('bcModele').value+' '+(document.getElementById('bcVersion').value||''));
+    h+=dotLine('Plaque',document.getElementById('bcPlaque').value)+dotLine('VIN',document.getElementById('bcVin').value);
+    h+=dotLine('Km',document.getElementById('bcKm').value?parseInt(document.getElementById('bcKm').value).toLocaleString('fr-FR')+' km':'');
+    h+=dotLine('Couleur',document.getElementById('bcCouleur').value)+dotLine('Énergie',document.getElementById('bcEnergie').value)+dotLine('Année',document.getElementById('bcAnnee').value);
+    h+='</table></div>';
+    h+='<div class="bloc"><h3>Conditions financières</h3><table>';
+    h+=dotLine('Prix de vente TTC',prix.toFixed(2)+' €');
+    h+=dotLine('Acompte versé',acompte.toFixed(2)+' €');
+    h+='<tr><td style="width:180px;font-weight:700;padding:5px;font-size:1.1em">Solde restant dû</td><td style="border-bottom:1px dotted #999;padding:5px;font-weight:700;font-size:1.1em;color:#c41e1e">'+solde.toFixed(2)+' €</td></tr>';
+    h+=dotLine('Mode de paiement',document.getElementById('bcPaiement').value);
+    h+=dotLine('Date de livraison prévue',document.getElementById('bcDateLivraison').value?new Date(document.getElementById('bcDateLivraison').value).toLocaleDateString('fr-FR'):'');
+    h+=dotLine('Garantie',document.getElementById('bcGarantie').value);
+    h+='</table></div>';
+    var cond=document.getElementById('bcConditions').value;
+    if(cond)h+='<div class="bloc"><h3>Conditions particulières</h3><p style="white-space:pre-wrap">'+cond+'</p></div>';
+    h+='<p style="font-size:0.8em;color:#555;margin-top:10px">Conformément à l\'article L.121-20-12 du Code de la consommation, l\'acheteur dispose d\'un délai de rétractation de 14 jours à compter de la livraison du véhicule (vente à distance uniquement). Ce bon de commande engage les deux parties dès sa signature.</p>';
+    h+='<div style="display:flex;justify-content:space-between;margin-top:25px"><div class="sig-zone">Le vendeur<br><small>Signature et cachet</small></div><div class="sig-zone">L\'acheteur<br><small>Signature précédée de "Bon pour commande"</small></div></div>';
+    openPrintWindow(h);
 }
 
 // ============================================================
