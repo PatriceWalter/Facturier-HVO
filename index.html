@@ -373,6 +373,7 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
         <button class="tab-btn" data-tab="factures"><span class="tab-icon">🧾</span><span class="tab-text">Factures</span></button>
         <button class="tab-btn" data-tab="operations"><span class="tab-icon">🔧</span><span class="tab-text">Opérations</span></button>
         <button class="tab-btn" data-tab="urssaf"><span class="tab-icon">🏛️</span><span class="tab-text">URSSAF</span></button>
+        <button class="tab-btn" data-tab="occasions"><span class="tab-icon">🏷️</span><span class="tab-text">VO Occasions</span></button>
         <button class="tab-btn" data-tab="settings"><span class="tab-icon">⚙️</span><span class="tab-text">Paramètres</span></button>
     </nav>
 
@@ -457,6 +458,33 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
             <div class="card" style="background:#fffbeb;border:1px solid #f59e0b">
                 <div class="card-title" style="color:#92400e;border-bottom-color:#fcd34d">ℹ️ Informations</div>
                 <div style="font-size:0.85em;color:#78350f;line-height:1.8" id="urssafInfo"></div>
+            </div>
+        </div>
+
+        <!-- ===== VEHICULES OCCASIONS ===== -->
+        <div class="section" id="sec-occasions">
+            <div class="stats-grid" id="voStats"></div>
+            <div class="card">
+                <div class="card-title">🏷️ Stock Véhicules Occasions
+                    <span style="margin-left:auto;display:flex;gap:8px;align-items:center">
+                        <select id="voFilterStatus" onchange="renderOccasions()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.85em">
+                            <option value="all">Tous</option>
+                            <option value="stock">En stock</option>
+                            <option value="reserve">Réservé</option>
+                            <option value="vendu">Vendu</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="openVOModal()">+ Ajouter un VO</button>
+                    </span>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr>
+                            <th>Plaque</th><th>Marque / Modèle</th><th>Année</th><th>Km</th><th>Énergie</th>
+                            <th>Prix vente</th><th>Statut</th><th>Actions</th>
+                        </tr></thead>
+                        <tbody id="voTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -798,6 +826,77 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
     </div>
 </div>
 
+<!-- VO Modal -->
+<div class="modal-overlay" id="voModal">
+    <div class="modal" style="max-width:800px;max-height:92vh;overflow-y:auto">
+        <div class="modal-header"><h3 id="voModalTitle">Nouveau Véhicule Occasion</h3><button class="modal-close" onclick="closeModal('voModal')">&times;</button></div>
+        <div class="modal-body">
+            <h4 style="color:var(--blue);margin-bottom:10px;font-family:'Rajdhani',sans-serif;border-bottom:2px solid var(--blue);padding-bottom:6px">🚗 Identification véhicule</h4>
+            <div class="form-row">
+                <div class="form-group"><label>Plaque immat.</label><input id="voPlaque" placeholder="AA-123-BB" oninput="this.value=this.value.toUpperCase()"></div>
+                <div class="form-group"><label>VIN (n° de série)</label><input id="voVin" maxlength="17" placeholder="17 caractères"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Marque *</label><input id="voMarque" placeholder="Ex: Volkswagen"></div>
+                <div class="form-group"><label>Modèle *</label><input id="voModele" placeholder="Ex: Passat"></div>
+                <div class="form-group"><label>Version / Finition</label><input id="voVersion" placeholder="Ex: Confortline"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Motorisation</label><input id="voMotorisation" placeholder="Ex: 1.9 TDI 130"></div>
+                <div class="form-group"><label>Carrosserie</label><select id="voCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>SUV</option><option>Citadine</option><option>Coupé</option><option>Cabriolet</option><option>Monospace</option><option>Utilitaire</option><option>Pick-up</option><option>Autre</option></select></div>
+                <div class="form-group"><label>Couleur</label><input id="voCouleur" placeholder="Ex: Gris Titane"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Énergie</label><select id="voEnergie"><option value="">--</option><option>Diesel</option><option>Essence</option><option>Hybride</option><option>Électrique</option><option>GPL</option></select></div>
+                <div class="form-group"><label>Boîte de vitesses</label><select id="voBoite"><option value="">--</option><option>Manuelle</option><option>Automatique</option><option>Séquentielle</option></select></div>
+                <div class="form-group"><label>Transmission</label><select id="voTransmission"><option value="">--</option><option>Traction</option><option>Propulsion</option><option>Intégrale</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>1ère mise en circulation</label><input id="voDateMEC" type="date"></div>
+                <div class="form-group"><label>Kilométrage *</label><input id="voKm" type="number" min="0" placeholder="km"></div>
+                <div class="form-group"><label>Nb portes</label><input id="voPortes" type="number" min="2" max="5" placeholder="5"></div>
+                <div class="form-group"><label>Nb places</label><input id="voPlaces" type="number" min="1" max="9" placeholder="5"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Puissance fiscale (CV)</label><input id="voPuisFiscale" type="number" min="0"></div>
+                <div class="form-group"><label>Puissance DIN (ch)</label><input id="voPuisDin" type="number" min="0"></div>
+            </div>
+
+            <h4 style="color:var(--blue);margin:18px 0 10px;font-family:'Rajdhani',sans-serif;border-bottom:2px solid var(--blue);padding-bottom:6px">💰 Tarification</h4>
+            <div class="form-row">
+                <div class="form-group"><label>Prix d'achat (€)</label><input id="voPrixAchat" type="number" step="0.01" min="0" placeholder="Coût d'achat"></div>
+                <div class="form-group"><label>Frais de remise en état (€)</label><input id="voFrais" type="number" step="0.01" min="0" placeholder="CT, réparations..."></div>
+                <div class="form-group"><label>Prix de vente TTC (€) *</label><input id="voPrixVente" type="number" step="0.01" min="0" placeholder="Prix affiché" style="font-weight:700;font-size:1.1em"></div>
+            </div>
+
+            <h4 style="color:var(--blue);margin:18px 0 10px;font-family:'Rajdhani',sans-serif;border-bottom:2px solid var(--blue);padding-bottom:6px">📋 État & équipements</h4>
+            <div class="form-row">
+                <div class="form-group"><label>État général</label><select id="voEtat"><option value="">--</option><option>Excellent</option><option>Très bon</option><option>Bon</option><option>Correct</option><option>À rénover</option></select></div>
+                <div class="form-group"><label>Contrôle technique</label><select id="voCT"><option value="">--</option><option>OK (favorable)</option><option>OK avec observations</option><option>À passer</option><option>Contre-visite</option><option>Moins de 4 ans</option></select></div>
+                <div class="form-group"><label>Date CT</label><input id="voDateCT" type="date"></div>
+            </div>
+            <div class="form-group"><label>Équipements / Options</label><textarea id="voEquipements" rows="3" placeholder="Climatisation, GPS, Toit ouvrant, Sièges chauffants..."></textarea></div>
+            <div class="form-group"><label>Observations</label><textarea id="voObs" rows="2" placeholder="Remarques, historique, dégâts..."></textarea></div>
+
+            <h4 style="color:var(--blue);margin:18px 0 10px;font-family:'Rajdhani',sans-serif;border-bottom:2px solid var(--blue);padding-bottom:6px">📌 Vente</h4>
+            <div class="form-row">
+                <div class="form-group"><label>Statut</label><select id="voStatut"><option value="stock">En stock</option><option value="reserve">Réservé</option><option value="vendu">Vendu</option></select></div>
+                <div class="form-group"><label>Date mise en vente</label><input id="voDateMiseEnVente" type="date"></div>
+                <div class="form-group"><label>Date de vente</label><input id="voDateVente" type="date"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Client acheteur</label><select id="voClientId"><option value="">-- Sélectionner --</option></select></div>
+                <div class="form-group"><label>Mode de paiement</label><select id="voPaiement"><option value="">--</option><option>Espèces</option><option>Chèque</option><option>Virement</option><option>Crédit</option><option>CB</option><option>Mixte</option></select></div>
+            </div>
+            <div class="form-group"><label>Garantie</label><input id="voGarantie" placeholder="Ex: 3 mois / 5000 km"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('voModal')">Annuler</button>
+            <button class="btn btn-primary" onclick="saveVO()">💾 Enregistrer</button>
+        </div>
+    </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
@@ -846,6 +945,7 @@ let data = {
     vehicles: [],
     invoices: [],
     operations: [],
+    occasions: [],
     settings: {
         companyName: 'HVO - Helmer Véhicule Occasion',
         siret: '', address: '', zip: '', city: '',
@@ -862,6 +962,7 @@ let editingClientId = null;
 let editingVehicleId = null;
 let editingInvoiceId = null;
 let editingOperationId = null;
+let editingVOId = null;
 let currentInvoiceLines = [];
 let selectedPickerOps = new Set();
 let pickerFilter = 'all';
@@ -2802,7 +2903,502 @@ const DEFAULT_OPERATIONS = [
     {id:'op79',type:'T3',name:'Réparation impact pare-brise',price:49.00,parts:[]},
     {id:'op80',type:'T3',name:'Forfait main d\'œuvre T1 (1 heure)',price:50.00,parts:[]},
     {id:'op81',type:'T3',name:'Forfait main d\'œuvre T2 (1 heure)',price:65.00,parts:[]},
-    {id:'op82',type:'T3',name:'Forfait main d\'œuvre T3 (1 heure)',price:85.00,parts:[]}
+    {id:'op82',type:'T3',name:'Forfait main d\'œuvre T3 (1 heure)',price:85.00,parts:[]},
+
+    // ======= T4 - ÉLECTRONIQUE / CAPTEURS / MODULES =======
+    {id:'op83',type:'T4',name:'Remplacement capteur PMH (position vilebrequin)',price:30.00,parts:[
+        {desc:'Capteur PMH',price:0}
+    ]},
+    {id:'op84',type:'T4',name:'Remplacement capteur arbre à cames',price:30.00,parts:[
+        {desc:'Capteur arbre à cames',price:0}
+    ]},
+    {id:'op85',type:'T4',name:'Remplacement capteur température eau',price:20.00,parts:[
+        {desc:'Capteur température eau',price:0}
+    ]},
+    {id:'op86',type:'T4',name:'Remplacement capteur température air admission',price:20.00,parts:[
+        {desc:'Capteur température air admission',price:0}
+    ]},
+    {id:'op87',type:'T4',name:'Remplacement capteur pression collecteur (MAP)',price:25.00,parts:[
+        {desc:'Capteur MAP',price:0}
+    ]},
+    {id:'op88',type:'T4',name:'Remplacement débitmètre air (MAF)',price:35.00,parts:[
+        {desc:'Débitmètre air MAF',price:0}
+    ]},
+    {id:'op89',type:'T4',name:'Remplacement sonde lambda (amont)',price:30.00,parts:[
+        {desc:'Sonde lambda amont',price:0}
+    ]},
+    {id:'op90',type:'T4',name:'Remplacement sonde lambda (aval)',price:30.00,parts:[
+        {desc:'Sonde lambda aval',price:0}
+    ]},
+    {id:'op91',type:'T4',name:'Remplacement capteur pression rail (common rail)',price:35.00,parts:[
+        {desc:'Capteur pression rail',price:0}
+    ]},
+    {id:'op92',type:'T4',name:'Remplacement capteur de recul / stationnement (unitaire)',price:20.00,parts:[
+        {desc:'Capteur de recul',price:0}
+    ]},
+    {id:'op93',type:'T4',name:'Remplacement capteur de vitesse roue ABS (unitaire)',price:25.00,parts:[
+        {desc:'Capteur ABS',price:0}
+    ]},
+    {id:'op94',type:'T4',name:'Remplacement capteur de pression pneu TPMS (unitaire)',price:15.00,parts:[
+        {desc:'Capteur TPMS',price:0}
+    ]},
+    {id:'op95',type:'T4',name:'Remplacement capteur angle volant',price:35.00,parts:[
+        {desc:'Capteur angle volant',price:0}
+    ]},
+    {id:'op96',type:'T4',name:'Remplacement capteur pédale accélérateur',price:30.00,parts:[
+        {desc:'Capteur pédale accélérateur',price:0}
+    ]},
+    {id:'op97',type:'T4',name:'Remplacement capteur pédale de frein',price:20.00,parts:[
+        {desc:'Contacteur pédale de frein',price:0}
+    ]},
+    {id:'op98',type:'T4',name:'Remplacement capteur pression huile',price:20.00,parts:[
+        {desc:'Capteur pression huile',price:0}
+    ]},
+    {id:'op99',type:'T4',name:'Remplacement capteur niveau huile',price:20.00,parts:[
+        {desc:'Capteur niveau huile',price:0}
+    ]},
+    {id:'op100',type:'T4',name:'Remplacement bobine d\'allumage (unitaire)',price:15.00,parts:[
+        {desc:'Bobine allumage',price:0}
+    ]},
+    {id:'op101',type:'T4',name:'Remplacement jeu de 4 bobines d\'allumage',price:35.00,parts:[
+        {desc:'Jeu 4 bobines allumage',price:0}
+    ]},
+    {id:'op102',type:'T4',name:'Remplacement module ABS / bloc hydraulique',price:95.00,parts:[
+        {desc:'Bloc ABS / module hydraulique',price:0}
+    ]},
+    {id:'op103',type:'T4',name:'Remplacement calculateur moteur (ECU)',price:85.00,parts:[
+        {desc:'Calculateur moteur ECU',price:0}
+    ]},
+    {id:'op104',type:'T4',name:'Remplacement calculateur boîte automatique (TCU)',price:85.00,parts:[
+        {desc:'Calculateur boîte TCU',price:0}
+    ]},
+    {id:'op105',type:'T4',name:'Remplacement boîtier BSI / BCM (boîtier servitude intelligent)',price:75.00,parts:[
+        {desc:'Boîtier BSI / BCM',price:0}
+    ]},
+    {id:'op106',type:'T4',name:'Remplacement module lève-vitre (MO)',price:30.00,parts:[
+        {desc:'Module lève-vitre',price:0}
+    ]},
+    {id:'op107',type:'T4',name:'Remplacement moteur lève-vitre (MO)',price:35.00,parts:[
+        {desc:'Moteur lève-vitre électrique',price:0}
+    ]},
+    {id:'op108',type:'T4',name:'Remplacement compresseur climatisation (MO)',price:95.00,parts:[
+        {desc:'Compresseur climatisation',price:0}
+    ]},
+    {id:'op109',type:'T4',name:'Remplacement résistance ventilateur chauffage',price:25.00,parts:[
+        {desc:'Résistance ventilateur habitacle',price:0}
+    ]},
+    {id:'op110',type:'T4',name:'Remplacement pulseur / ventilateur habitacle',price:45.00,parts:[
+        {desc:'Pulseur ventilateur habitacle',price:0}
+    ]},
+    {id:'op111',type:'T4',name:'Remplacement moteur de centralisation porte (MO)',price:25.00,parts:[
+        {desc:'Moteur centralisation',price:0}
+    ]},
+    {id:'op112',type:'T4',name:'Remplacement faisceau électrique porte (MO)',price:45.00,parts:[
+        {desc:'Faisceau électrique porte',price:0}
+    ]},
+    {id:'op113',type:'T4',name:'Remplacement platine feux AR / porte-ampoule',price:20.00,parts:[
+        {desc:'Platine feux AR',price:0}
+    ]},
+    {id:'op114',type:'T4',name:'Remplacement bloc phare complet AV (MO)',price:35.00,parts:[
+        {desc:'Bloc optique phare AV',price:0}
+    ]},
+    {id:'op115',type:'T4',name:'Remplacement feu AR complet (MO)',price:25.00,parts:[
+        {desc:'Bloc feu AR',price:0}
+    ]},
+    {id:'op116',type:'T4',name:'Remplacement ballast xénon (MO)',price:35.00,parts:[
+        {desc:'Ballast xénon',price:0}
+    ]},
+    {id:'op117',type:'T4',name:'Remplacement pompe de direction assistée électrique',price:65.00,parts:[
+        {desc:'Pompe direction assistée électrique',price:0}
+    ]},
+    {id:'op118',type:'T4',name:'Remplacement colonne de direction assistée électrique',price:85.00,parts:[
+        {desc:'Colonne direction assistée EPS',price:0}
+    ]},
+    {id:'op119',type:'T4',name:'Remplacement moteur essuie-glace AV',price:30.00,parts:[
+        {desc:'Moteur essuie-glace AV',price:0}
+    ]},
+    {id:'op120',type:'T4',name:'Remplacement moteur essuie-glace AR',price:25.00,parts:[
+        {desc:'Moteur essuie-glace AR',price:0}
+    ]},
+    {id:'op121',type:'T4',name:'Remplacement pompe lave-glace',price:15.00,parts:[
+        {desc:'Pompe lave-glace',price:0}
+    ]},
+    {id:'op122',type:'T4',name:'Remplacement klaxon / avertisseur',price:15.00,parts:[
+        {desc:'Klaxon',price:0}
+    ]},
+    {id:'op123',type:'T4',name:'Remplacement commodo phares / clignotants',price:35.00,parts:[
+        {desc:'Commodo phares/clignotants',price:0}
+    ]},
+    {id:'op124',type:'T4',name:'Remplacement commodo essuie-glaces',price:30.00,parts:[
+        {desc:'Commodo essuie-glaces',price:0}
+    ]},
+    {id:'op125',type:'T4',name:'Remplacement contacteur Neiman / démarrage',price:40.00,parts:[
+        {desc:'Contacteur Neiman',price:0}
+    ]},
+    {id:'op126',type:'T4',name:'Remplacement caméra de recul (MO + câblage)',price:35.00,parts:[
+        {desc:'Caméra de recul',price:0}
+    ]},
+    {id:'op127',type:'T4',name:'Remplacement antenne GPS / radio',price:20.00,parts:[
+        {desc:'Antenne GPS/radio',price:0}
+    ]},
+    {id:'op128',type:'T4',name:'Installation autoradio / système multimédia (MO)',price:45.00,parts:[
+        {desc:'Autoradio / système multimédia',price:0}
+    ]},
+    {id:'op129',type:'T4',name:'Installation dashcam (MO + câblage)',price:35.00,parts:[
+        {desc:'Dashcam',price:0}
+    ]},
+    {id:'op130',type:'T4',name:'Remplacement ventilateur refroidissement moteur',price:45.00,parts:[
+        {desc:'Moto-ventilateur refroidissement',price:0}
+    ]},
+    {id:'op131',type:'T4',name:'Remplacement électrovanne turbo / N75',price:25.00,parts:[
+        {desc:'Électrovanne turbo N75',price:0}
+    ]},
+    {id:'op132',type:'T4',name:'Remplacement électrovanne EGR',price:25.00,parts:[
+        {desc:'Électrovanne EGR',price:0}
+    ]},
+    {id:'op133',type:'T4',name:'Remplacement actuateur volet admission (MO)',price:35.00,parts:[
+        {desc:'Actuateur volet admission',price:0}
+    ]},
+    {id:'op134',type:'T4',name:'Remplacement papillon motorisé / boîtier papillon',price:45.00,parts:[
+        {desc:'Boîtier papillon motorisé',price:0}
+    ]},
+    {id:'op135',type:'T4',name:'Remplacement régulateur de pression carburant',price:30.00,parts:[
+        {desc:'Régulateur pression carburant',price:0}
+    ]},
+    {id:'op136',type:'T4',name:'Remplacement pompe à carburant (immergée)',price:55.00,parts:[
+        {desc:'Pompe à carburant immergée',price:0}
+    ]},
+    {id:'op137',type:'T4',name:'Remplacement jauge à carburant / sonde de niveau',price:30.00,parts:[
+        {desc:'Jauge / sonde niveau carburant',price:0}
+    ]},
+
+    // ======= T5 - REPROGRAMMATION MOTEUR =======
+    {id:'op138',type:'T5',name:'Reprogrammation Stage 1 (optimisation série)',price:350.00,parts:[]},
+    {id:'op139',type:'T5',name:'Reprogrammation Stage 1 + (série optimisée + pops & bangs)',price:450.00,parts:[]},
+    {id:'op140',type:'T5',name:'Reprogrammation Stage 2 (avec modification hardware)',price:550.00,parts:[]},
+    {id:'op141',type:'T5',name:'Reprogrammation E85 (conversion bioéthanol)',price:400.00,parts:[]},
+    {id:'op142',type:'T5',name:'Reprogrammation E85 + Stage 1 combiné',price:550.00,parts:[]},
+    {id:'op143',type:'T5',name:'Reprogrammation boîte automatique / DSG',price:300.00,parts:[]},
+    {id:'op144',type:'T5',name:'Suppression vanne EGR (reprog uniquement)',price:250.00,parts:[]},
+    {id:'op145',type:'T5',name:'Suppression FAP / DPF (reprog uniquement)',price:250.00,parts:[]},
+    {id:'op146',type:'T5',name:'Suppression AdBlue / SCR (reprog uniquement)',price:300.00,parts:[]},
+    {id:'op147',type:'T5',name:'Suppression swirl flaps / volets admission (reprog)',price:150.00,parts:[]},
+    {id:'op148',type:'T5',name:'Désactivation Start & Stop',price:100.00,parts:[]},
+    {id:'op149',type:'T5',name:'Activation fonctions cachées / codage VCDS / VCP',price:50.00,parts:[]},
+    {id:'op150',type:'T5',name:'Ajout Pops & Bangs / Crackles map',price:150.00,parts:[]},
+    {id:'op151',type:'T5',name:'Ajout Launch Control',price:150.00,parts:[]},
+    {id:'op152',type:'T5',name:'Limitation / délimitation vitesse maxi',price:100.00,parts:[]},
+    {id:'op153',type:'T5',name:'Reprogrammation retour stock / origine',price:150.00,parts:[]},
+    {id:'op154',type:'T5',name:'Lecture / sauvegarde cartographie ECU (backup)',price:50.00,parts:[]},
+    {id:'op155',type:'T5',name:'Diagnostic complet + passage banc de puissance',price:120.00,parts:[]},
+    {id:'op156',type:'T5',name:'Passage banc de puissance seul (mesure avant/après)',price:79.00,parts:[]},
+    {id:'op157',type:'T5',name:'Installation boîtier additionnel (piggyback)',price:80.00,parts:[
+        {desc:'Boîtier additionnel',price:0}
+    ]},
+    {id:'op158',type:'T5',name:'Installation kit boîtier E85 (flex fuel)',price:65.00,parts:[
+        {desc:'Boîtier E85 flex fuel',price:0}
+    ]},
+    {id:'op159',type:'T5',name:'Reprogrammation calculateur avec clonage IMMO',price:200.00,parts:[]},
+    {id:'op160',type:'T5',name:'Reprogrammation anti-démarrage (matching clé/ECU)',price:150.00,parts:[]},
+    {id:'op161',type:'T5',name:'Correction kilométrage compteur (remise conformité)',price:100.00,parts:[]},
+    {id:'op162',type:'T5',name:'Réparation calculateur (soudure / composants)',price:180.00,parts:[]},
+    {id:'op163',type:'T5',name:'Reprogrammation Stage 3 (turbo upgrade + intercooler)',price:750.00,parts:[]},
+
+    // ======= T6 - PRÉPARATION MOTEUR =======
+    {id:'op164',type:'T6',name:'Remplacement turbo par turbo upgraded (MO)',price:250.00,parts:[
+        {desc:'Turbo upgraded / hybride',price:0}
+    ]},
+    {id:'op165',type:'T6',name:'Installation intercooler racing / surdimensionné (MO)',price:120.00,parts:[
+        {desc:'Intercooler racing',price:0}
+    ]},
+    {id:'op166',type:'T6',name:'Installation kit admission directe / BMC / K&N',price:35.00,parts:[
+        {desc:'Kit admission directe',price:0}
+    ]},
+    {id:'op167',type:'T6',name:'Installation boîte à air racing / airbox carbone',price:45.00,parts:[
+        {desc:'Boîte à air racing',price:0}
+    ]},
+    {id:'op168',type:'T6',name:'Installation dump valve / blow off (MO)',price:35.00,parts:[
+        {desc:'Dump valve / blow off',price:0}
+    ]},
+    {id:'op169',type:'T6',name:'Installation kit catch can / récupérateur d\'huile',price:30.00,parts:[
+        {desc:'Kit catch can',price:0}
+    ]},
+    {id:'op170',type:'T6',name:'Remplacement injecteurs performance (jeu)',price:85.00,parts:[
+        {desc:'Jeu injecteurs performance',price:0}
+    ]},
+    {id:'op171',type:'T6',name:'Installation pompe à essence haute pression (HPFP)',price:65.00,parts:[
+        {desc:'Pompe essence haute pression',price:0}
+    ]},
+    {id:'op172',type:'T6',name:'Installation kit gros frein AV (MO)',price:180.00,parts:[
+        {desc:'Kit gros frein AV (étriers + disques + plaquettes)',price:0}
+    ]},
+    {id:'op173',type:'T6',name:'Installation kit gros frein AR (MO)',price:150.00,parts:[
+        {desc:'Kit gros frein AR (étriers + disques + plaquettes)',price:0}
+    ]},
+    {id:'op174',type:'T6',name:'Installation kit combinés filetés / coilovers (MO)',price:120.00,parts:[
+        {desc:'Kit combinés filetés',price:0}
+    ]},
+    {id:'op175',type:'T6',name:'Installation kit ressorts courts (MO)',price:65.00,parts:[
+        {desc:'Kit ressorts courts (-30/-50mm)',price:0}
+    ]},
+    {id:'op176',type:'T6',name:'Installation barre anti-rapprochement (MO)',price:30.00,parts:[
+        {desc:'Barre anti-rapprochement',price:0}
+    ]},
+    {id:'op177',type:'T6',name:'Installation renforts châssis / tirants (MO)',price:45.00,parts:[
+        {desc:'Renforts châssis / tirants',price:0}
+    ]},
+    {id:'op178',type:'T6',name:'Installation embrayage renforcé (MO)',price:280.00,parts:[
+        {desc:'Kit embrayage renforcé',price:0}
+    ]},
+    {id:'op179',type:'T6',name:'Installation volant moteur allégé (MO)',price:250.00,parts:[
+        {desc:'Volant moteur allégé',price:0}
+    ]},
+    {id:'op180',type:'T6',name:'Installation différentiel à glissement limité LSD (MO)',price:350.00,parts:[
+        {desc:'Différentiel LSD',price:0}
+    ]},
+    {id:'op181',type:'T6',name:'Installation radiateur huile moteur (MO)',price:65.00,parts:[
+        {desc:'Kit radiateur huile moteur',price:0}
+    ]},
+    {id:'op182',type:'T6',name:'Installation radiateur eau surdimensionné (MO)',price:65.00,parts:[
+        {desc:'Radiateur eau racing',price:0}
+    ]},
+    {id:'op183',type:'T6',name:'Portage culasse (travail atelier)',price:450.00,parts:[]},
+    {id:'op184',type:'T6',name:'Installation arbres à cames performance',price:250.00,parts:[
+        {desc:'Arbres à cames performance',price:0}
+    ]},
+    {id:'op185',type:'T6',name:'Installation pistons forgés + bielles (réfection bas moteur)',price:850.00,parts:[
+        {desc:'Kit pistons forgés + bielles',price:0}
+    ]},
+    {id:'op186',type:'T6',name:'Installation kit poulie crank (MO)',price:35.00,parts:[
+        {desc:'Poulie allégée / surdimensionnée',price:0}
+    ]},
+    {id:'op187',type:'T6',name:'Équilibrage vilebrequin + volant moteur',price:250.00,parts:[]},
+    {id:'op188',type:'T6',name:'Installation durites silicone renforcées (MO)',price:45.00,parts:[
+        {desc:'Kit durites silicone',price:0}
+    ]},
+    {id:'op189',type:'T6',name:'Vidange + remplissage huile compétition',price:45.00,parts:[
+        {desc:'Huile moteur compétition (5L)',price:0},
+        {desc:'Filtre à huile',price:0}
+    ]},
+    {id:'op190',type:'T6',name:'Installation plaquettes de frein compétition (AV)',price:25.00,parts:[
+        {desc:'Plaquettes compétition AV',price:0}
+    ]},
+    {id:'op191',type:'T6',name:'Installation durites de frein aviation (jeu 4)',price:35.00,parts:[
+        {desc:'Durites de frein aviation (jeu 4)',price:0}
+    ]},
+    {id:'op192',type:'T6',name:'Purge frein liquide compétition',price:30.00,parts:[
+        {desc:'Liquide de frein compétition DOT 5.1',price:0}
+    ]},
+
+    // ======= T7 - ÉCHAPPEMENT SUR MESURE =======
+    {id:'op193',type:'T7',name:'Fabrication downpipe inox sur mesure (turbo)',price:250.00,parts:[
+        {desc:'Tube inox + bride turbo + soudure',price:0}
+    ]},
+    {id:'op194',type:'T7',name:'Fabrication downpipe catted (avec catalyseur sport)',price:350.00,parts:[
+        {desc:'Tube inox + catalyseur sport 200 cellules',price:0}
+    ]},
+    {id:'op195',type:'T7',name:'Fabrication ligne complète inox sur mesure (cat-back)',price:450.00,parts:[
+        {desc:'Tubes inox + silencieux + embouts',price:0}
+    ]},
+    {id:'op196',type:'T7',name:'Fabrication ligne complète inox (turbo-back)',price:650.00,parts:[
+        {desc:'Downpipe + intermédiaire + silencieux + embouts inox',price:0}
+    ]},
+    {id:'op197',type:'T7',name:'Remplacement silencieux arrière par silencieux sport',price:120.00,parts:[
+        {desc:'Silencieux sport inox',price:0}
+    ]},
+    {id:'op198',type:'T7',name:'Remplacement silencieux intermédiaire inox',price:95.00,parts:[
+        {desc:'Silencieux intermédiaire inox',price:0}
+    ]},
+    {id:'op199',type:'T7',name:'Suppression silencieux intermédiaire (tube droit)',price:80.00,parts:[
+        {desc:'Tube droit inox remplacement silencieux',price:0}
+    ]},
+    {id:'op200',type:'T7',name:'Fabrication embouts d\'échappement sur mesure (paire)',price:65.00,parts:[
+        {desc:'Embouts inox (paire)',price:0}
+    ]},
+    {id:'op201',type:'T7',name:'Installation catalyseur sport 200 cellules (MO)',price:85.00,parts:[
+        {desc:'Catalyseur sport 200 cellules',price:0}
+    ]},
+    {id:'op202',type:'T7',name:'Installation catalyseur sport 100 cellules (MO)',price:85.00,parts:[
+        {desc:'Catalyseur sport 100 cellules',price:0}
+    ]},
+    {id:'op203',type:'T7',name:'Soudure / réparation ligne échappement inox',price:55.00,parts:[]},
+    {id:'op204',type:'T7',name:'Soudure / réparation collecteur échappement',price:75.00,parts:[]},
+    {id:'op205',type:'T7',name:'Fabrication collecteur échappement inox sur mesure',price:550.00,parts:[
+        {desc:'Collecteur inox sur mesure',price:0}
+    ]},
+    {id:'op206',type:'T7',name:'Remplacement collecteur par collecteur tubulaire sport',price:120.00,parts:[
+        {desc:'Collecteur tubulaire sport',price:0}
+    ]},
+    {id:'op207',type:'T7',name:'Remplacement flexible échappement',price:35.00,parts:[
+        {desc:'Flexible échappement inox',price:0}
+    ]},
+    {id:'op208',type:'T7',name:'Remplacement collier / bride échappement',price:15.00,parts:[
+        {desc:'Collier / bride échappement',price:0}
+    ]},
+    {id:'op209',type:'T7',name:'Remplacement silent bloc échappement (jeu)',price:15.00,parts:[
+        {desc:'Silent blocs échappement (jeu)',price:0}
+    ]},
+    {id:'op210',type:'T7',name:'Installation valve électronique échappement (MO + câblage)',price:85.00,parts:[
+        {desc:'Valve échappement électronique + télécommande',price:0}
+    ]},
+    {id:'op211',type:'T7',name:'Cintrage tube inox sur mesure (au mètre)',price:45.00,parts:[
+        {desc:'Tube inox (au mètre)',price:0}
+    ]},
+    {id:'op212',type:'T7',name:'Adaptation échappement double sortie (MO)',price:150.00,parts:[
+        {desc:'Kit double sortie inox',price:0}
+    ]},
+    {id:'op213',type:'T7',name:'Polissage / rénovation embouts échappement',price:25.00,parts:[]},
+
+    // ======= T8 - DÉPANNAGE =======
+    // --- Remorquage / Transport ---
+    {id:'op214',type:'T8',name:'Déplacement / intervention sur site (forfait 0-15 km)',price:50.00,parts:[]},
+    {id:'op215',type:'T8',name:'Déplacement / intervention sur site (forfait 15-30 km)',price:80.00,parts:[]},
+    {id:'op216',type:'T8',name:'Déplacement / intervention sur site (forfait 30-50 km)',price:120.00,parts:[]},
+    {id:'op217',type:'T8',name:'Remorquage véhicule (0-15 km)',price:90.00,parts:[]},
+    {id:'op218',type:'T8',name:'Remorquage véhicule (15-30 km)',price:140.00,parts:[]},
+    {id:'op219',type:'T8',name:'Remorquage véhicule (30-50 km)',price:190.00,parts:[]},
+    {id:'op220',type:'T8',name:'Remorquage véhicule (50-100 km)',price:280.00,parts:[]},
+    {id:'op221',type:'T8',name:'Mise sur plateau / chargement véhicule (supplément)',price:40.00,parts:[]},
+    {id:'op222',type:'T8',name:'Garde / stockage véhicule (par jour)',price:15.00,parts:[]},
+
+    // --- Démarrage / Batterie ---
+    {id:'op223',type:'T8',name:'Dépannage démarrage sur place (câbles / booster)',price:45.00,parts:[]},
+    {id:'op224',type:'T8',name:'Remplacement batterie sur place (MO dépannage)',price:35.00,parts:[
+        {desc:'Batterie',price:0}
+    ]},
+    {id:'op225',type:'T8',name:'Recharge batterie lente (atelier)',price:25.00,parts:[]},
+    {id:'op226',type:'T8',name:'Test batterie + alternateur (diagnostic)',price:15.00,parts:[]},
+    {id:'op227',type:'T8',name:'Remplacement fusible (diagnostic + remplacement)',price:20.00,parts:[
+        {desc:'Fusible(s)',price:0}
+    ]},
+    {id:'op228',type:'T8',name:'Réparation câble / cosse batterie',price:25.00,parts:[
+        {desc:'Cosse(s) batterie',price:0}
+    ]},
+
+    // --- Pneus / Roues ---
+    {id:'op229',type:'T8',name:'Changement roue sur place (roue de secours)',price:35.00,parts:[]},
+    {id:'op230',type:'T8',name:'Réparation pneu sur place (mèche)',price:25.00,parts:[
+        {desc:'Kit mèche réparation',price:0}
+    ]},
+    {id:'op231',type:'T8',name:'Réparation pneu atelier (champignon intérieur)',price:30.00,parts:[
+        {desc:'Champignon réparation pneu',price:0}
+    ]},
+    {id:'op232',type:'T8',name:'Gonflage pneu(s) + vérification pression',price:5.00,parts:[]},
+    {id:'op233',type:'T8',name:'Déblocage écrou de roue antivol',price:25.00,parts:[]},
+    {id:'op234',type:'T8',name:'Déblocage roue grippée / oxydée',price:20.00,parts:[]},
+
+    // --- Serrurerie / Ouverture ---
+    {id:'op235',type:'T8',name:'Ouverture véhicule fermé (clé oubliée intérieur)',price:65.00,parts:[]},
+    {id:'op236',type:'T8',name:'Ouverture coffre bloqué',price:45.00,parts:[]},
+    {id:'op237',type:'T8',name:'Ouverture capot câble cassé',price:35.00,parts:[
+        {desc:'Câble capot',price:0}
+    ]},
+    {id:'op238',type:'T8',name:'Remplacement barillet de porte (MO)',price:40.00,parts:[
+        {desc:'Barillet de porte',price:0}
+    ]},
+    {id:'op239',type:'T8',name:'Remplacement barillet Neiman (MO)',price:45.00,parts:[
+        {desc:'Barillet Neiman',price:0}
+    ]},
+    {id:'op240',type:'T8',name:'Programmation / duplication clé / télécommande',price:80.00,parts:[
+        {desc:'Clé / télécommande vierge',price:0}
+    ]},
+    {id:'op241',type:'T8',name:'Programmation transpondeur clé (IMMO)',price:60.00,parts:[]},
+    {id:'op242',type:'T8',name:'Remplacement pile clé / télécommande',price:10.00,parts:[
+        {desc:'Pile clé',price:0}
+    ]},
+
+    // --- Carburant ---
+    {id:'op243',type:'T8',name:'Erreur carburant : vidange réservoir + purge circuit',price:180.00,parts:[]},
+    {id:'op244',type:'T8',name:'Apport carburant sur place (panne sèche)',price:45.00,parts:[
+        {desc:'Carburant (5L)',price:0}
+    ]},
+    {id:'op245',type:'T8',name:'Purge circuit carburant diesel (prise d\'air)',price:45.00,parts:[]},
+    {id:'op246',type:'T8',name:'Remplacement tuyau / durite carburant percé(e)',price:35.00,parts:[
+        {desc:'Durite / tuyau carburant',price:0}
+    ]},
+
+    // --- Refroidissement ---
+    {id:'op247',type:'T8',name:'Dépannage surchauffe moteur sur place (diagnostic)',price:45.00,parts:[]},
+    {id:'op248',type:'T8',name:'Remplacement durite de refroidissement percée (dépannage)',price:35.00,parts:[
+        {desc:'Durite refroidissement',price:0}
+    ]},
+    {id:'op249',type:'T8',name:'Appoint liquide de refroidissement sur place',price:20.00,parts:[
+        {desc:'Liquide de refroidissement (1L)',price:0}
+    ]},
+    {id:'op250',type:'T8',name:'Remplacement thermostat (dépannage)',price:40.00,parts:[
+        {desc:'Thermostat',price:0}
+    ]},
+
+    // --- Courroie / Chaîne ---
+    {id:'op251',type:'T8',name:'Dépannage courroie accessoire cassée (sur place)',price:55.00,parts:[
+        {desc:'Courroie accessoire',price:0}
+    ]},
+    {id:'op252',type:'T8',name:'Dépannage courroie accessoire + galet tendeur',price:70.00,parts:[
+        {desc:'Courroie accessoire + galet',price:0}
+    ]},
+
+    // --- Embrayage / Transmission ---
+    {id:'op253',type:'T8',name:'Dépannage câble embrayage cassé (sur place)',price:40.00,parts:[
+        {desc:'Câble embrayage',price:0}
+    ]},
+    {id:'op254',type:'T8',name:'Purge circuit embrayage hydraulique (dépannage)',price:30.00,parts:[
+        {desc:'Liquide de frein DOT4',price:0}
+    ]},
+    {id:'op255',type:'T8',name:'Remplacement cardan / soufflet déchiré (dépannage)',price:65.00,parts:[
+        {desc:'Soufflet cardan',price:0}
+    ]},
+
+    // --- Éclairage ---
+    {id:'op256',type:'T8',name:'Remplacement ampoule phare AV (sur place)',price:15.00,parts:[
+        {desc:'Ampoule phare H1/H4/H7',price:0}
+    ]},
+    {id:'op257',type:'T8',name:'Remplacement ampoule feu AR / stop / clignotant',price:10.00,parts:[
+        {desc:'Ampoule feu AR',price:0}
+    ]},
+    {id:'op258',type:'T8',name:'Réparation feux de détresse / warning',price:20.00,parts:[]},
+    {id:'op259',type:'T8',name:'Réparation / remplacement fiche / prise remorque',price:25.00,parts:[
+        {desc:'Prise remorque 7/13 broches',price:0}
+    ]},
+
+    // --- Freins ---
+    {id:'op260',type:'T8',name:'Dépannage frein à main bloqué',price:35.00,parts:[]},
+    {id:'op261',type:'T8',name:'Déblocage étrier de frein grippé (sur place)',price:40.00,parts:[]},
+    {id:'op262',type:'T8',name:'Remplacement flexible de frein percé (dépannage)',price:35.00,parts:[
+        {desc:'Flexible de frein',price:0}
+    ]},
+    {id:'op263',type:'T8',name:'Purge circuit de frein (dépannage)',price:30.00,parts:[
+        {desc:'Liquide de frein DOT4',price:0}
+    ]},
+
+    // --- Démarrage / Moteur ---
+    {id:'op264',type:'T8',name:'Dépannage démarreur HS (percussion / démarrage poussé)',price:30.00,parts:[]},
+    {id:'op265',type:'T8',name:'Remplacement démarreur sur place (si accessible)',price:65.00,parts:[
+        {desc:'Démarreur',price:0}
+    ]},
+    {id:'op266',type:'T8',name:'Remplacement alternateur sur place (si accessible)',price:65.00,parts:[
+        {desc:'Alternateur',price:0}
+    ]},
+    {id:'op267',type:'T8',name:'Dépannage électrique rapide (diagnostic + réparation)',price:50.00,parts:[]},
+    {id:'op268',type:'T8',name:'Réparation / remplacement relais (diagnostic inclus)',price:25.00,parts:[
+        {desc:'Relais',price:0}
+    ]},
+    {id:'op269',type:'T8',name:'Recherche panne électrique complexe (au temps passé / h)',price:55.00,parts:[]},
+
+    // --- Divers dépannage ---
+    {id:'op270',type:'T8',name:'Remplacement essuie-glace(s) sur place',price:10.00,parts:[
+        {desc:'Balai(s) essuie-glace',price:0}
+    ]},
+    {id:'op271',type:'T8',name:'Réparation pare-brise impact (résine)',price:45.00,parts:[
+        {desc:'Kit résine réparation',price:0}
+    ]},
+    {id:'op272',type:'T8',name:'Désembourbement / sortie de fossé (treuillage)',price:80.00,parts:[]},
+    {id:'op273',type:'T8',name:'Dépannage véhicule accidenté (mise en sécurité)',price:60.00,parts:[]},
+    {id:'op274',type:'T8',name:'Forfait main d\'œuvre dépannage (heure)',price:55.00,parts:[]},
+    {id:'op275',type:'T8',name:'Forfait main d\'œuvre dépannage nuit / week-end (heure)',price:80.00,parts:[]},
+    {id:'op276',type:'T8',name:'Forfait main d\'œuvre dépannage jour férié (heure)',price:95.00,parts:[]},
+    {id:'op277',type:'T8',name:'Supplément intervention urgente (< 1h)',price:30.00,parts:[]},
+    {id:'op278',type:'T8',name:'Constat véhicule / état des lieux (contrôle visuel complet)',price:25.00,parts:[]},
+    {id:'op279',type:'T8',name:'Prêt véhicule de courtoisie (par jour)',price:25.00,parts:[]}
 ];
 
 // ============================================================
@@ -2879,6 +3475,7 @@ function applyMigrations() {
     }
     if (!data.settings.regime) data.settings.regime = 'auto';
     if (!data.settings.tauxURSSAF) data.settings.tauxURSSAF = 23.1;
+    if (!data.occasions) data.occasions = [];
 }
 
 function updateUI() {
@@ -2954,6 +3551,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 // ============================================================
 function renderAll() {
     renderDashboard();
+    renderOccasions();
     loadSettings();
 }
 
@@ -4564,6 +5162,384 @@ function addSelectedOps() {
     });
     closeModal('opPickerModal');
     renderInvoiceLines();
+}
+
+// ============================================================
+// VEHICULES OCCASIONS (VO)
+// ============================================================
+function renderOccasions() {
+    if (!data.occasions) data.occasions = [];
+    const filter = document.getElementById('voFilterStatus') ? document.getElementById('voFilterStatus').value : 'all';
+    const list = filter === 'all' ? data.occasions : data.occasions.filter(v => v.statut === filter);
+
+    const enStock = data.occasions.filter(v => v.statut === 'stock').length;
+    const reserves = data.occasions.filter(v => v.statut === 'reserve').length;
+    const vendus = data.occasions.filter(v => v.statut === 'vendu').length;
+    const caVO = data.occasions.filter(v => v.statut === 'vendu').reduce((s,v) => s + (parseFloat(v.prixVente)||0), 0);
+    const margeVO = data.occasions.filter(v => v.statut === 'vendu').reduce((s,v) => {
+        const achat = (parseFloat(v.prixAchat)||0) + (parseFloat(v.frais)||0);
+        return s + ((parseFloat(v.prixVente)||0) - achat);
+    }, 0);
+
+    const statsEl = document.getElementById('voStats');
+    if (statsEl) {
+        statsEl.innerHTML = `
+            <div class="stat-card"><div class="stat-value">${enStock}</div><div class="stat-label">En stock</div></div>
+            <div class="stat-card"><div class="stat-value">${reserves}</div><div class="stat-label">Réservés</div></div>
+            <div class="stat-card"><div class="stat-value">${vendus}</div><div class="stat-label">Vendus</div></div>
+            <div class="stat-card"><div class="stat-value">${caVO.toFixed(2)} €</div><div class="stat-label">CA Ventes VO</div></div>
+            <div class="stat-card"><div class="stat-value" style="color:${margeVO>=0?'var(--success)':'var(--danger)'}">${margeVO.toFixed(2)} €</div><div class="stat-label">Marge VO</div></div>
+        `;
+    }
+
+    const tbody = document.getElementById('voTableBody');
+    if (!tbody) return;
+    if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text-light)">Aucun véhicule occasion enregistré</td></tr>';
+        return;
+    }
+    tbody.innerHTML = list.map(v => {
+        const statusBadge = v.statut === 'vendu' ? '<span style="background:#d4edda;color:#155724;padding:3px 10px;border-radius:12px;font-size:0.8em;font-weight:600">Vendu</span>'
+            : v.statut === 'reserve' ? '<span style="background:#fff3cd;color:#856404;padding:3px 10px;border-radius:12px;font-size:0.8em;font-weight:600">Réservé</span>'
+            : '<span style="background:#cce5ff;color:#004085;padding:3px 10px;border-radius:12px;font-size:0.8em;font-weight:600">En stock</span>';
+        return `<tr>
+            <td style="font-weight:600">${v.plaque||'-'}</td>
+            <td>${v.marque||''} ${v.modele||''} ${v.version?'<br><small style="color:var(--text-light)">'+v.version+'</small>':''}</td>
+            <td>${v.dateMEC ? new Date(v.dateMEC).getFullYear() : '-'}</td>
+            <td>${v.km ? parseInt(v.km).toLocaleString('fr-FR')+' km' : '-'}</td>
+            <td>${v.energie||'-'}</td>
+            <td style="font-weight:700;color:var(--blue)">${v.prixVente ? parseFloat(v.prixVente).toFixed(2)+' €' : '-'}</td>
+            <td>${statusBadge}</td>
+            <td style="white-space:nowrap">
+                <button class="btn btn-sm btn-outline" onclick="editVO('${v.id}')" title="Modifier">✏️</button>
+                <button class="btn btn-sm btn-outline" onclick="printVO_Annonce('${v.id}')" title="Fiche annonce">📄</button>
+                <button class="btn btn-sm btn-outline" onclick="printVO_Cession('${v.id}')" title="Déclaration cession">📋</button>
+                <button class="btn btn-sm btn-outline" onclick="printVO_Facture('${v.id}')" title="Facture de vente">🧾</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteVO('${v.id}')" title="Supprimer">🗑️</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function openVOModal(id) {
+    editingVOId = id || null;
+    document.getElementById('voModalTitle').textContent = id ? 'Modifier Véhicule Occasion' : 'Nouveau Véhicule Occasion';
+    // Remplir la liste clients
+    const sel = document.getElementById('voClientId');
+    sel.innerHTML = '<option value="">-- Sélectionner --</option>' + data.clients.map(c => `<option value="${c.id}">${c.nom} ${c.prenom||''}</option>`).join('');
+
+    const fields = ['voPlaque','voVin','voMarque','voModele','voVersion','voMotorisation','voCarrosserie','voCouleur',
+        'voEnergie','voBoite','voTransmission','voDateMEC','voKm','voPortes','voPlaces','voPuisFiscale','voPuisDin',
+        'voPrixAchat','voFrais','voPrixVente','voEtat','voCT','voDateCT','voEquipements','voObs',
+        'voStatut','voDateMiseEnVente','voDateVente','voClientId','voPaiement','voGarantie'];
+
+    if (id) {
+        const v = data.occasions.find(x => x.id === id);
+        if (v) {
+            const map = {voPlaque:'plaque',voVin:'vin',voMarque:'marque',voModele:'modele',voVersion:'version',
+                voMotorisation:'motorisation',voCarrosserie:'carrosserie',voCouleur:'couleur',voEnergie:'energie',
+                voBoite:'boite',voTransmission:'transmission',voDateMEC:'dateMEC',voKm:'km',voPortes:'portes',
+                voPlaces:'places',voPuisFiscale:'puisFiscale',voPuisDin:'puisDin',voPrixAchat:'prixAchat',
+                voFrais:'frais',voPrixVente:'prixVente',voEtat:'etat',voCT:'ct',voDateCT:'dateCT',
+                voEquipements:'equipements',voObs:'obs',voStatut:'statut',voDateMiseEnVente:'dateMiseEnVente',
+                voDateVente:'dateVente',voClientId:'clientId',voPaiement:'paiement',voGarantie:'garantie'};
+            fields.forEach(f => { const el = document.getElementById(f); if(el) el.value = v[map[f]] || ''; });
+        }
+    } else {
+        fields.forEach(f => { const el = document.getElementById(f); if(el) el.value = ''; });
+        document.getElementById('voStatut').value = 'stock';
+        document.getElementById('voDateMiseEnVente').value = new Date().toISOString().split('T')[0];
+    }
+    openModal('voModal');
+}
+
+function editVO(id) { openVOModal(id); }
+
+function saveVO() {
+    const marque = document.getElementById('voMarque').value.trim();
+    const modele = document.getElementById('voModele').value.trim();
+    if (!marque || !modele) return toast('Marque et Modèle obligatoires', 'error');
+
+    const vo = {
+        id: editingVOId || 'vo_' + Date.now(),
+        plaque: document.getElementById('voPlaque').value.trim().toUpperCase(),
+        vin: document.getElementById('voVin').value.trim().toUpperCase(),
+        marque: marque, modele: modele,
+        version: document.getElementById('voVersion').value.trim(),
+        motorisation: document.getElementById('voMotorisation').value.trim(),
+        carrosserie: document.getElementById('voCarrosserie').value,
+        couleur: document.getElementById('voCouleur').value.trim(),
+        energie: document.getElementById('voEnergie').value,
+        boite: document.getElementById('voBoite').value,
+        transmission: document.getElementById('voTransmission').value,
+        dateMEC: document.getElementById('voDateMEC').value,
+        km: document.getElementById('voKm').value,
+        portes: document.getElementById('voPortes').value,
+        places: document.getElementById('voPlaces').value,
+        puisFiscale: document.getElementById('voPuisFiscale').value,
+        puisDin: document.getElementById('voPuisDin').value,
+        prixAchat: document.getElementById('voPrixAchat').value,
+        frais: document.getElementById('voFrais').value,
+        prixVente: document.getElementById('voPrixVente').value,
+        etat: document.getElementById('voEtat').value,
+        ct: document.getElementById('voCT').value,
+        dateCT: document.getElementById('voDateCT').value,
+        equipements: document.getElementById('voEquipements').value.trim(),
+        obs: document.getElementById('voObs').value.trim(),
+        statut: document.getElementById('voStatut').value,
+        dateMiseEnVente: document.getElementById('voDateMiseEnVente').value,
+        dateVente: document.getElementById('voDateVente').value,
+        clientId: document.getElementById('voClientId').value,
+        paiement: document.getElementById('voPaiement').value,
+        garantie: document.getElementById('voGarantie').value.trim()
+    };
+
+    if (!data.occasions) data.occasions = [];
+    if (editingVOId) {
+        const idx = data.occasions.findIndex(x => x.id === editingVOId);
+        if (idx >= 0) data.occasions[idx] = vo;
+    } else {
+        data.occasions.push(vo);
+    }
+    saveData();
+    closeModal('voModal');
+    renderAll();
+    toast(editingVOId ? 'Véhicule modifié' : 'Véhicule ajouté', 'success');
+}
+
+function deleteVO(id) {
+    if (!confirm('Supprimer ce véhicule occasion ?')) return;
+    data.occasions = data.occasions.filter(x => x.id !== id);
+    saveData();
+    renderAll();
+    toast('Véhicule supprimé', 'success');
+}
+
+// ============================================================
+// IMPRESSION DOCUMENTS VO
+// ============================================================
+function getVOPrintHeader(title) {
+    const s = data.settings;
+    const logo = s.logo || (typeof DEFAULT_LOGO !== 'undefined' ? DEFAULT_LOGO : '');
+    return `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:15px;border-bottom:3px solid #1a3a7a">
+        <div style="display:flex;align-items:center;gap:12px">
+            ${logo ? '<img src="'+logo+'" style="height:60px">' : ''}
+            <div>
+                <div style="font-size:1.3em;font-weight:700;color:#1a3a7a">${s.companyName||'HVO'}</div>
+                <div style="font-size:0.8em;color:#555">${s.address||''} ${s.zip||''} ${s.city||''}</div>
+                <div style="font-size:0.8em;color:#555">Tél: ${s.phone||'-'} | Email: ${s.email||'-'}</div>
+                <div style="font-size:0.8em;color:#555">SIRET: ${s.siret||'-'} ${s.tva?'| TVA: '+s.tva:''} ${s.rcs?'| RCS: '+s.rcs:''}</div>
+            </div>
+        </div>
+        <div style="text-align:right">
+            <div style="font-size:1.2em;font-weight:700;color:#1a3a7a">${title}</div>
+            <div style="font-size:0.8em;color:#555">Date: ${new Date().toLocaleDateString('fr-FR')}</div>
+        </div>
+    </div>`;
+}
+
+function voFieldRow(label, value) {
+    return value ? `<tr><td style="padding:4px 10px;font-weight:600;color:#333;width:200px;border-bottom:1px solid #eee">${label}</td><td style="padding:4px 10px;border-bottom:1px solid #eee">${value}</td></tr>` : '';
+}
+
+function getVODetailsTable(v) {
+    return `<table style="width:100%;border-collapse:collapse;font-size:0.9em">
+        ${voFieldRow('Plaque immat.', v.plaque)}
+        ${voFieldRow('VIN', v.vin)}
+        ${voFieldRow('Marque', v.marque)}
+        ${voFieldRow('Modèle', v.modele)}
+        ${voFieldRow('Version / Finition', v.version)}
+        ${voFieldRow('Motorisation', v.motorisation)}
+        ${voFieldRow('Carrosserie', v.carrosserie)}
+        ${voFieldRow('Couleur', v.couleur)}
+        ${voFieldRow('Énergie', v.energie)}
+        ${voFieldRow('Boîte de vitesses', v.boite)}
+        ${voFieldRow('Transmission', v.transmission)}
+        ${voFieldRow('1ère mise en circulation', v.dateMEC ? new Date(v.dateMEC).toLocaleDateString('fr-FR') : '')}
+        ${voFieldRow('Kilométrage', v.km ? parseInt(v.km).toLocaleString('fr-FR')+' km' : '')}
+        ${voFieldRow('Portes / Places', (v.portes||'-') + ' / ' + (v.places||'-'))}
+        ${voFieldRow('Puissance fiscale', v.puisFiscale ? v.puisFiscale+' CV' : '')}
+        ${voFieldRow('Puissance DIN', v.puisDin ? v.puisDin+' ch' : '')}
+        ${voFieldRow('État général', v.etat)}
+        ${voFieldRow('Contrôle technique', v.ct)}
+        ${voFieldRow('Date CT', v.dateCT ? new Date(v.dateCT).toLocaleDateString('fr-FR') : '')}
+        ${voFieldRow('Garantie', v.garantie)}
+    </table>`;
+}
+
+function openPrintWindow(html) {
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Impression</title>
+    <style>
+        @page { margin: 15mm; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #222; margin: 0; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        .sig-zone { display: inline-block; width: 45%; text-align: center; padding-top: 60px; border-top: 1px solid #999; margin-top: 30px; }
+    </style></head><body>${html}</body></html>`);
+    w.document.close();
+    setTimeout(() => { w.print(); }, 500);
+}
+
+// 📄 Fiche Annonce
+function printVO_Annonce(id) {
+    const v = data.occasions.find(x => x.id === id);
+    if (!v) return toast('Véhicule introuvable', 'error');
+    const prix = v.prixVente ? parseFloat(v.prixVente).toFixed(2) + ' €' : '-';
+    let html = getVOPrintHeader('FICHE VÉHICULE OCCASION');
+    html += `<div style="text-align:center;margin:20px 0">
+        <div style="font-size:1.6em;font-weight:700;color:#1a3a7a">${v.marque} ${v.modele} ${v.version||''}</div>
+        <div style="font-size:1.1em;color:#555;margin-top:4px">${v.motorisation||''} ${v.carrosserie?'— '+v.carrosserie:''} ${v.couleur?'— '+v.couleur:''}</div>
+        <div style="font-size:2em;font-weight:700;color:#c41e1e;margin-top:10px">${prix}</div>
+    </div>`;
+    html += `<div style="margin:15px 0;padding:15px;background:#f8f9fa;border-radius:8px">`;
+    html += getVODetailsTable(v);
+    html += `</div>`;
+    if (v.equipements) {
+        html += `<div style="margin:15px 0"><strong style="color:#1a3a7a">Équipements :</strong><p style="margin:6px 0;white-space:pre-wrap">${v.equipements}</p></div>`;
+    }
+    if (v.obs) {
+        html += `<div style="margin:15px 0"><strong style="color:#1a3a7a">Observations :</strong><p style="margin:6px 0;white-space:pre-wrap">${v.obs}</p></div>`;
+    }
+    html += `<div style="text-align:center;margin-top:30px;padding:12px;background:#1a3a7a;color:#fff;border-radius:8px;font-size:1.1em">
+        ${data.settings.companyName||'HVO'} — ${data.settings.phone||''} — ${data.settings.email||''}
+    </div>`;
+    openPrintWindow(html);
+}
+
+// 📋 Déclaration de cession (Cerfa 15776)
+function printVO_Cession(id) {
+    const v = data.occasions.find(x => x.id === id);
+    if (!v) return toast('Véhicule introuvable', 'error');
+    const client = v.clientId ? data.clients.find(c => c.id === v.clientId) : null;
+    const s = data.settings;
+
+    let html = getVOPrintHeader('DÉCLARATION DE CESSION D\'UN VÉHICULE');
+    html += `<p style="font-size:0.85em;color:#555;margin-bottom:15px;font-style:italic">Conformément à l'article R.322-4 du Code de la Route — Cerfa n° 15776*02</p>`;
+
+    // VENDEUR
+    html += `<div style="border:2px solid #1a3a7a;border-radius:8px;padding:15px;margin-bottom:15px">
+        <h3 style="color:#1a3a7a;margin:0 0 10px">I — LE VENDEUR (cédant)</h3>
+        <table style="width:100%;font-size:0.9em">
+            <tr><td style="width:150px;font-weight:600;padding:4px">Raison sociale :</td><td style="border-bottom:1px dotted #999;padding:4px">${s.companyName||''}</td></tr>
+            <tr><td style="font-weight:600;padding:4px">SIRET :</td><td style="border-bottom:1px dotted #999;padding:4px">${s.siret||''}</td></tr>
+            <tr><td style="font-weight:600;padding:4px">Adresse :</td><td style="border-bottom:1px dotted #999;padding:4px">${s.address||''} ${s.zip||''} ${s.city||''}</td></tr>
+            <tr><td style="font-weight:600;padding:4px">Téléphone :</td><td style="border-bottom:1px dotted #999;padding:4px">${s.phone||''}</td></tr>
+        </table>
+    </div>`;
+
+    // ACHETEUR
+    html += `<div style="border:2px solid #1a3a7a;border-radius:8px;padding:15px;margin-bottom:15px">
+        <h3 style="color:#1a3a7a;margin:0 0 10px">II — L'ACQUÉREUR (cessionnaire)</h3>
+        <table style="width:100%;font-size:0.9em">
+            <tr><td style="width:150px;font-weight:600;padding:4px">Nom :</td><td style="border-bottom:1px dotted #999;padding:4px">${client ? client.nom + ' ' + (client.prenom||'') : '.........................................'}</td></tr>
+            <tr><td style="font-weight:600;padding:4px">Adresse :</td><td style="border-bottom:1px dotted #999;padding:4px">${client ? (client.address||'') + ' ' + (client.zip||'') + ' ' + (client.city||'') : '.........................................'}</td></tr>
+            <tr><td style="font-weight:600;padding:4px">Téléphone :</td><td style="border-bottom:1px dotted #999;padding:4px">${client ? (client.phone||'') : '.........................................'}</td></tr>
+        </table>
+    </div>`;
+
+    // VEHICULE
+    html += `<div style="border:2px solid #1a3a7a;border-radius:8px;padding:15px;margin-bottom:15px">
+        <h3 style="color:#1a3a7a;margin:0 0 10px">III — LE VÉHICULE</h3>
+        <table style="width:100%;font-size:0.9em">
+            ${voFieldRow('N° d\'immatriculation', v.plaque)}
+            ${voFieldRow('Marque', v.marque)}
+            ${voFieldRow('Modèle / Type', v.modele + (v.version?' '+v.version:''))}
+            ${voFieldRow('N° VIN', v.vin)}
+            ${voFieldRow('Date 1ère mise en circulation', v.dateMEC ? new Date(v.dateMEC).toLocaleDateString('fr-FR') : '')}
+            ${voFieldRow('Kilométrage au compteur', v.km ? parseInt(v.km).toLocaleString('fr-FR')+' km' : '')}
+        </table>
+    </div>`;
+
+    // CONDITIONS
+    html += `<div style="border:2px solid #1a3a7a;border-radius:8px;padding:15px;margin-bottom:15px">
+        <h3 style="color:#1a3a7a;margin:0 0 10px">IV — CONDITIONS DE LA CESSION</h3>
+        <table style="width:100%;font-size:0.9em">
+            <tr><td style="width:150px;font-weight:600;padding:4px">Date de cession :</td><td style="border-bottom:1px dotted #999;padding:4px">${v.dateVente ? new Date(v.dateVente).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR')}</td></tr>
+            <tr><td style="font-weight:600;padding:4px">Heure de cession :</td><td style="border-bottom:1px dotted #999;padding:4px">........... h ...........</td></tr>
+            <tr><td style="font-weight:600;padding:4px">Prix de vente TTC :</td><td style="border-bottom:1px dotted #999;padding:4px;font-weight:700">${v.prixVente ? parseFloat(v.prixVente).toFixed(2)+' €' : '...........................'}</td></tr>
+            <tr><td style="font-weight:600;padding:4px">Mode de paiement :</td><td style="border-bottom:1px dotted #999;padding:4px">${v.paiement||'...........................'}</td></tr>
+        </table>
+    </div>`;
+
+    // SIGNATURES
+    html += `<div style="display:flex;justify-content:space-between;margin-top:30px">
+        <div class="sig-zone">Le vendeur<br><small>Signature précédée de "Lu et approuvé"</small></div>
+        <div class="sig-zone">L'acquéreur<br><small>Signature précédée de "Lu et approuvé"</small></div>
+    </div>`;
+    html += `<p style="font-size:0.75em;color:#888;margin-top:20px;text-align:center">Le vendeur doit déclarer la cession dans les 15 jours sur le site de l'ANTS (ants.gouv.fr).</p>`;
+    openPrintWindow(html);
+}
+
+// 🧾 Facture de vente VO
+function printVO_Facture(id) {
+    const v = data.occasions.find(x => x.id === id);
+    if (!v) return toast('Véhicule introuvable', 'error');
+    const client = v.clientId ? data.clients.find(c => c.id === v.clientId) : null;
+    const s = data.settings;
+    const isAuto = (s.regime || 'auto') === 'auto';
+    const dateVente = v.dateVente ? new Date(v.dateVente).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR');
+    const numFact = (s.prefix||'HVO-') + 'VO-' + (v.id.replace('vo_','').slice(-6));
+    const prixVente = parseFloat(v.prixVente) || 0;
+
+    let html = getVOPrintHeader('FACTURE DE VENTE VÉHICULE');
+
+    // Num facture + date
+    html += `<div style="display:flex;justify-content:space-between;margin-bottom:15px">
+        <div><strong>Facture N° :</strong> ${numFact}</div>
+        <div><strong>Date :</strong> ${dateVente}</div>
+    </div>`;
+
+    // Client
+    html += `<div style="border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:15px;background:#f8f9fa">
+        <strong>Client :</strong><br>
+        ${client ? client.nom + ' ' + (client.prenom||'') + '<br>' + (client.address||'') + ' ' + (client.zip||'') + ' ' + (client.city||'') + '<br>Tél: ' + (client.phone||'-') : '<em>Non renseigné</em>'}
+    </div>`;
+
+    // Détail véhicule
+    html += `<div style="margin-bottom:15px"><strong style="color:#1a3a7a">Véhicule vendu :</strong></div>`;
+    html += `<div style="padding:10px;background:#f8f9fa;border-radius:8px;margin-bottom:15px">`;
+    html += getVODetailsTable(v);
+    html += `</div>`;
+
+    // Ligne facture
+    html += `<table style="width:100%;border-collapse:collapse;margin:20px 0">
+        <thead><tr style="background:#1a3a7a;color:#fff">
+            <th style="padding:10px;text-align:left">Désignation</th>
+            <th style="padding:10px;text-align:right;width:150px">Montant TTC</th>
+        </tr></thead>
+        <tbody>
+            <tr style="border-bottom:1px solid #ddd">
+                <td style="padding:10px">Vente véhicule ${v.marque} ${v.modele} ${v.version||''}<br><small style="color:#555">Immat: ${v.plaque||'-'} | VIN: ${v.vin||'-'} | ${v.km ? parseInt(v.km).toLocaleString('fr-FR')+' km':'?'}</small></td>
+                <td style="padding:10px;text-align:right;font-weight:700;font-size:1.1em">${prixVente.toFixed(2)} €</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr style="border-top:2px solid #1a3a7a">
+                <td style="padding:10px;text-align:right;font-weight:700;font-size:1.1em">TOTAL TTC :</td>
+                <td style="padding:10px;text-align:right;font-weight:700;font-size:1.3em;color:#c41e1e">${prixVente.toFixed(2)} €</td>
+            </tr>
+        </tfoot>
+    </table>`;
+
+    if (isAuto) {
+        html += `<p style="font-size:0.85em;color:#555;margin:10px 0">TVA non applicable, art. 293 B du CGI (auto-entrepreneur).</p>`;
+    }
+
+    html += `<div style="margin:15px 0"><strong>Mode de paiement :</strong> ${v.paiement||'-'}</div>`;
+    if (v.garantie) html += `<div style="margin:10px 0"><strong>Garantie :</strong> ${v.garantie}</div>`;
+
+    // Mentions légales
+    if (s.mentions) {
+        html += `<div style="margin-top:20px;padding:10px;background:#f8f9fa;border-radius:8px;font-size:0.8em;color:#555;white-space:pre-wrap">${s.mentions}</div>`;
+    }
+
+    // Signatures
+    html += `<div style="display:flex;justify-content:space-between;margin-top:30px">
+        <div class="sig-zone">Le vendeur</div>
+        <div class="sig-zone">L'acquéreur<br><small>"Bon pour accord"</small></div>
+    </div>`;
+    openPrintWindow(html);
 }
 
 // ============================================================
