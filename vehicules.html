@@ -9,49 +9,81 @@
 <div class="app-content">
   <div class="card">
     <div class="card-title">🚗 Gestion des Véhicules <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openVehicleModal()">+ Nouveau véhicule</button></div>
-    <div class="search-box"><input id="vehicleSearch" placeholder="Rechercher par plaque, marque..." oninput="renderVehicles()"></div>
-    <div class="table-wrap"><table><thead><tr><th>Plaque</th><th>Marque</th><th>Modèle</th><th>Énergie</th><th>Année</th><th>Client</th><th>Actions</th></tr></thead><tbody id="vehiclesTable"></tbody></table></div>
+    <div class="search-box"><input id="vehicleSearch" placeholder="Rechercher par plaque, marque, modèle..." oninput="renderVehicles()"></div>
+    <div class="table-wrap"><table><thead><tr><th>Plaque</th><th>Marque</th><th>Modèle</th><th>Énergie</th><th>Année</th><th>Km</th><th>Client</th><th>Actions</th></tr></thead><tbody id="vehiclesTable"></tbody></table></div>
   </div>
 </div></div>
 
 <!-- VEHICLE MODAL -->
 <div class="modal-overlay" id="vehicleModal">
-  <div class="modal" style="max-width:750px">
+  <div class="modal" style="max-width:800px">
     <div class="modal-header"><h3 id="vehicleModalTitle">Nouveau véhicule</h3><button class="modal-close" onclick="closeModal('vehicleModal')">&times;</button></div>
     <div class="modal-body">
-      <div class="card" style="background:var(--silver-light);margin-bottom:16px">
-        <div style="display:flex;gap:8px;align-items:end">
-          <div class="form-group" style="flex:1;margin:0"><label>🔍 Recherche par plaque</label><input id="vPlateSearch" placeholder="AA-123-BB" style="text-transform:uppercase;font-weight:700;font-size:1.1em"></div>
-          <button class="btn btn-primary" onclick="searchPlate()" style="height:44px">Rechercher</button>
+      <!-- PLAQUE + RECHERCHE + CLIENT -->
+      <div class="form-row">
+        <div class="form-group"><label>Plaque d'immatriculation *</label>
+          <div style="display:flex;gap:6px"><input id="vPlaque" placeholder="AA-123-BB" style="text-transform:uppercase;font-weight:700;font-size:1.1em;flex:1"><button class="btn btn-primary" onclick="searchPlate()" style="height:44px;padding:0 14px">🔍</button></div>
+          <div id="plateResult" style="margin-top:4px;font-size:.82em;color:var(--text-light)"></div>
         </div>
-        <div id="plateResult" style="margin-top:8px;font-size:.85em;color:var(--text-light)"></div>
+        <div class="form-group"><label>Client *</label><select id="vClient"><option value="">-- Sélectionner --</option></select></div>
       </div>
-      <div style="margin-bottom:12px"><button class="btn btn-secondary btn-sm" onclick="toggleAutodoc('veh')">📋 Coller depuis Auto-Doc.fr</button></div>
+      <!-- MARQUE / MODELE -->
+      <div class="form-row">
+        <div class="form-group"><label>Marque *</label><select id="vMarque" onchange="updateModels('v')"><option value="">-- Sélectionner --</option></select><input id="vMarqueSearch" placeholder="🔍 Recherche marque..." oninput="filterCombo('vMarque','vMarqueSearch')" style="margin-top:4px;font-size:.85em"></div>
+        <div class="form-group"><label>Modèle *</label><select id="vModele" onchange="updateMotors('v')"><option value="">-- Sélectionner marque --</option></select><input id="vModeleSearch" placeholder="🔍 Recherche modèle..." oninput="filterCombo('vModele','vModeleSearch')" style="margin-top:4px;font-size:.85em"></div>
+      </div>
+      <!-- MOTORISATION / CARROSSERIE -->
+      <div class="form-row">
+        <div class="form-group"><label>Motorisation</label><select id="vMotorisation" onchange="autoFillMotor('v')"><option value="">-- Pas de motorisations dispo --</option></select><input id="vMotorSearch" placeholder="🔍 Recherche ou saisie libre..." oninput="filterCombo('vMotorisation','vMotorSearch')" style="margin-top:4px;font-size:.85em"></div>
+        <div class="form-group"><label>Carrosserie</label><select id="vCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>Cabriolet</option><option>Citadine</option><option>Coupé</option><option>Fourgon</option><option>Monospace</option><option>Pick-up</option><option>SUV</option><option>Utilitaire</option></select></div>
+      </div>
+      <!-- TYPE MINE / ANNEE / ENERGIE -->
+      <div class="form-row-3">
+        <div class="form-group"><label>Type Mine</label><input id="vTypeMine" placeholder="EX: 3BG, 3B6"></div>
+        <div class="form-group"><label>Année de construction</label><input id="vAnnee"></div>
+        <div class="form-group"><label>Énergie</label><select id="vEnergie"><option value="">--</option><option>Diesel</option><option>Essence</option><option>Électrique</option><option>Hybride</option><option>GPL</option><option>Hydrogène</option></select></div>
+      </div>
+      <!-- KM / TRANSMISSION -->
+      <div class="form-row">
+        <div class="form-group"><label>Kilométrage</label><input id="vKm" type="number"></div>
+        <div class="form-group"><label>Transmission</label><select id="vTransmission"><option value="">--</option><option>Traction (FWD)</option><option>Propulsion (RWD)</option><option>4x4 / AWD</option></select></div>
+      </div>
+      <!-- CYLINDREE / CV / KW -->
+      <div class="form-row-3">
+        <div class="form-group"><label>Cylindrée (cm³)</label><input id="vCylindree" type="number" placeholder="ex: 1896"></div>
+        <div class="form-group"><label>Puissance (CV)</label><input id="vCV" type="number" placeholder="ex: 130"></div>
+        <div class="form-group"><label>Puissance (KW)</label><input id="vKW" type="number" placeholder="ex: 96"></div>
+      </div>
+      <!-- CYLINDRES / SOUPAPES / CODE MOTEUR -->
+      <div class="form-row-3">
+        <div class="form-group"><label>Cylindres</label><input id="vCylindres" placeholder="ex: 4"></div>
+        <div class="form-group"><label>Soupapes / cylindre</label><input id="vSoupapes" placeholder="ex: 2"></div>
+        <div class="form-group"><label>Code moteur</label><input id="vCodeMoteur" placeholder="EX: AVF"></div>
+      </div>
+      <!-- BOITE / CODE BOITE -->
+      <div class="form-row">
+        <div class="form-group"><label>Boîte de vitesses</label><select id="vBoite"><option value="">--</option><option>Manuelle</option><option>Automatique</option><option>Robotisée</option></select></div>
+        <div class="form-group"><label>Code boîte</label><input id="vCodeBoite" placeholder="ex: FCP 01ES"></div>
+      </div>
+      <!-- GESTION CARBURANT / SYSTEME FREINAGE -->
+      <div class="form-row">
+        <div class="form-group"><label>Gestion carburant</label><input id="vGestionCarburant" placeholder="ex: Injection directe"></div>
+        <div class="form-group"><label>Système de freinage</label><input id="vFreinage" placeholder="ex: hydraulique"></div>
+      </div>
+      <!-- VIN / COULEUR -->
+      <div class="form-row">
+        <div class="form-group"><label>VIN</label><input id="vVin" maxlength="17" style="text-transform:uppercase"></div>
+        <div class="form-group"><label>Couleur</label><input id="vCouleur"></div>
+      </div>
+      <!-- AUTODOC -->
+      <div style="margin:12px 0"><button class="btn btn-secondary btn-sm" onclick="toggleAutodoc('veh')">📋 Coller depuis Auto-Doc.fr</button></div>
       <div class="autodoc-panel" id="autodocPanel_veh">
         <p style="font-size:.82em;color:var(--text-light);margin-bottom:8px">Collez le bloc texte copié depuis Auto-Doc.fr :</p>
         <textarea id="autodocText_veh" placeholder="Collez ici..."></textarea>
         <button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="parseAutodoc('veh')">✅ Remplir</button>
       </div>
-      <div class="form-row"><div class="form-group"><label>Immatriculation *</label><input id="vPlaque" style="text-transform:uppercase;font-weight:700"></div><div class="form-group"><label>VIN</label><input id="vVin" maxlength="17" style="text-transform:uppercase"></div></div>
-      <div class="form-row-3">
-        <div class="form-group"><label>Marque</label><select id="vMarque" onchange="updateModels('v')"><option value="">--</option></select><input id="vMarqueSearch" placeholder="Filtrer..." oninput="filterCombo('vMarque','vMarqueSearch')" style="margin-top:4px"></div>
-        <div class="form-group"><label>Modèle</label><select id="vModele" onchange="updateMotors('v')"><option value="">--</option></select><input id="vModeleSearch" placeholder="Filtrer..." oninput="filterCombo('vModele','vModeleSearch')" style="margin-top:4px"></div>
-        <div class="form-group"><label>Motorisation</label><select id="vMotorisation" onchange="autoFillMotor('v')"><option value="">--</option></select></div>
-      </div>
-      <div class="form-row-4">
-        <div class="form-group"><label>Carrosserie</label><input id="vCarrosserie"></div>
-        <div class="form-group"><label>Couleur</label><input id="vCouleur"></div>
-        <div class="form-group"><label>Énergie</label><select id="vEnergie"><option value="">--</option><option>Diesel</option><option>Essence</option><option>Électrique</option><option>Hybride</option><option>GPL</option><option>Hydrogène</option></select></div>
-        <div class="form-group"><label>Boîte</label><select id="vBoite"><option value="">--</option><option>Manuelle</option><option>Automatique</option><option>Robotisée</option></select></div>
-      </div>
-      <div class="form-row-4">
-        <div class="form-group"><label>Année / 1ère MEC</label><input id="vAnnee"></div>
-        <div class="form-group"><label>Cylindrée (cc)</label><input id="vCylindree" type="number"></div>
-        <div class="form-group"><label>Puissance CV</label><input id="vCV" type="number"></div>
-        <div class="form-group"><label>Puissance KW</label><input id="vKW" type="number"></div>
-      </div>
-      <div class="form-row"><div class="form-group"><label>Kilométrage</label><input id="vKm" type="number"></div><div class="form-group"><label>Client</label><select id="vClient"><option value="">--</option></select></div></div>
-      <div class="form-group"><label>Observations</label><textarea id="vObs" rows="2"></textarea></div>
+      <!-- OBSERVATIONS -->
+      <div class="form-group"><label>Observations véhicule</label><textarea id="vObs" rows="3" placeholder="Remarques, accessoires, particularités..."></textarea></div>
     </div>
     <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('vehicleModal')">Annuler</button><button class="btn btn-primary" onclick="saveVehicle()">💾 Enregistrer</button></div>
   </div>
@@ -70,33 +102,41 @@ function renderVehicles(){
     return !s||(v.plaque+' '+v.marque+' '+v.modele+' '+(cl?cl.nom:'')).toLowerCase().includes(s);
   }).map(v=>{
     const cl=data.clients.find(c=>c.id===v.clientId);
-    return '<tr><td><strong>'+v.plaque+'</strong></td><td>'+v.marque+'</td><td>'+v.modele+'</td><td>'+(v.energie||'')+'</td><td>'+(v.annee||'')+'</td><td>'+(cl?cl.nom+' '+(cl.prenom||''):'-')+'</td>'
+    return '<tr><td><strong>'+v.plaque+'</strong></td><td>'+v.marque+'</td><td>'+v.modele+'</td><td>'+(v.energie||'')+'</td><td>'+(v.annee||'')+'</td><td>'+(v.km||'-')+'</td><td>'+(cl?cl.nom+' '+(cl.prenom||''):'-')+'</td>'
       +'<td><button class="btn btn-primary btn-sm" onclick="editVehicle(\''+v.id+'\')">✏️</button> <button class="btn btn-danger btn-sm" onclick="deleteVehicle(\''+v.id+'\')">🗑️</button></td></tr>';
   }).join('');
 }
+
 function openVehicleModal(id){
   editingVehicleId=id||null;
   document.getElementById('vehicleModalTitle').textContent=id?'Modifier véhicule':'Nouveau véhicule';
   const cSel=document.getElementById('vClient');
-  cSel.innerHTML='<option value="">--</option>'+data.clients.map(c=>'<option value="'+c.id+'">'+c.nom+' '+(c.prenom||'')+'</option>').join('');
+  cSel.innerHTML='<option value="">-- Sélectionner --</option>'+data.clients.map(c=>'<option value="'+c.id+'">'+c.nom+' '+(c.prenom||'')+'</option>').join('');
+  const allFields=['vPlaque','vVin','vTypeMine','vAnnee','vCylindree','vCV','vKW','vCylindres','vSoupapes','vCodeMoteur','vCodeBoite','vGestionCarburant','vFreinage','vCouleur','vKm','vObs'];
   if(id){
     const v=data.vehicles.find(x=>x.id===id);if(v){
       document.getElementById('vPlaque').value=v.plaque||'';document.getElementById('vVin').value=v.vin||'';
-      setSelectByText('vMarque',v.marque||'');
-      setTimeout(()=>{setSelectByText('vModele',v.modele||'');setTimeout(()=>setSelectByText('vMotorisation',v.motorisation||''),100);},100);
-      document.getElementById('vCarrosserie').value=v.carrosserie||'';document.getElementById('vCouleur').value=v.couleur||'';
-      if(v.energie){for(let o of document.getElementById('vEnergie').options)if(o.text===v.energie)document.getElementById('vEnergie').value=o.value;}
-      if(v.boite){for(let o of document.getElementById('vBoite').options)if(o.text===v.boite)document.getElementById('vBoite').value=o.value;}
+      document.getElementById('vTypeMine').value=v.typeMine||'';document.getElementById('vCouleur').value=v.couleur||'';
       document.getElementById('vAnnee').value=v.annee||'';document.getElementById('vCylindree').value=v.cylindree||'';
       document.getElementById('vCV').value=v.cv||'';document.getElementById('vKW').value=v.kw||'';
-      document.getElementById('vKm').value=v.km||'';document.getElementById('vClient').value=v.clientId||'';
-      document.getElementById('vObs').value=v.observations||'';
+      document.getElementById('vCylindres').value=v.cylindres||'';document.getElementById('vSoupapes').value=v.soupapes||'';
+      document.getElementById('vCodeMoteur').value=v.codeMoteur||'';document.getElementById('vCodeBoite').value=v.codeBoite||'';
+      document.getElementById('vGestionCarburant').value=v.gestionCarburant||'';document.getElementById('vFreinage').value=v.freinage||'';
+      document.getElementById('vKm').value=v.km||'';document.getElementById('vObs').value=v.observations||'';
+      document.getElementById('vClient').value=v.clientId||'';
+      setSelectByText('vMarque',v.marque||'');
+      setTimeout(()=>{setSelectByText('vModele',v.modele||'');setTimeout(()=>setSelectByText('vMotorisation',v.motorisation||''),100);},100);
+      if(v.energie){for(let o of document.getElementById('vEnergie').options)if(o.text===v.energie)document.getElementById('vEnergie').value=o.value;}
+      if(v.boite){for(let o of document.getElementById('vBoite').options)if(o.text===v.boite)document.getElementById('vBoite').value=o.value;}
+      if(v.transmission){for(let o of document.getElementById('vTransmission').options)if(o.text===v.transmission||o.value===v.transmission)document.getElementById('vTransmission').value=o.value;}
+      if(v.carrosserie){for(let o of document.getElementById('vCarrosserie').options)if(o.text===v.carrosserie||o.value===v.carrosserie)document.getElementById('vCarrosserie').value=o.value;}
     }
   } else {
-    ['vPlaque','vVin','vCarrosserie','vCouleur','vAnnee','vCylindree','vCV','vKW','vKm','vObs','vPlateSearch'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
-    document.getElementById('vMarque').value='';document.getElementById('vModele').innerHTML='<option value="">--</option>';
-    document.getElementById('vMotorisation').innerHTML='<option value="">--</option>';
+    allFields.forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+    document.getElementById('vMarque').value='';document.getElementById('vModele').innerHTML='<option value="">-- Sélectionner marque --</option>';
+    document.getElementById('vMotorisation').innerHTML='<option value="">-- Pas de motorisations dispo --</option>';
     document.getElementById('vEnergie').value='';document.getElementById('vBoite').value='';document.getElementById('vClient').value='';
+    document.getElementById('vTransmission').value='';document.getElementById('vCarrosserie').value='';
     if(document.getElementById('plateResult'))document.getElementById('plateResult').textContent='';
   }
   openModal('vehicleModal');
@@ -104,7 +144,20 @@ function openVehicleModal(id){
 function editVehicle(id){openVehicleModal(id);}
 function saveVehicle(){
   const plaque=document.getElementById('vPlaque').value.trim().toUpperCase();if(!plaque){toast('❌ Plaque obligatoire');return;}
-  const obj={plaque,vin:document.getElementById('vVin').value.trim().toUpperCase(),marque:document.getElementById('vMarque').value,modele:document.getElementById('vModele').value,motorisation:document.getElementById('vMotorisation').value,carrosserie:document.getElementById('vCarrosserie').value.trim(),couleur:document.getElementById('vCouleur').value.trim(),energie:document.getElementById('vEnergie').selectedOptions[0]?.text||'',boite:document.getElementById('vBoite').selectedOptions[0]?.text||'',annee:document.getElementById('vAnnee').value.trim(),cylindree:document.getElementById('vCylindree').value,cv:document.getElementById('vCV').value,kw:document.getElementById('vKW').value,km:document.getElementById('vKm').value,clientId:document.getElementById('vClient').value,observations:document.getElementById('vObs').value.trim()};
+  const gs=(id)=>{const el=document.getElementById(id);return el?.selectedOptions?.[0]?.text||el?.value||'';};
+  const obj={plaque,vin:document.getElementById('vVin').value.trim().toUpperCase(),
+    marque:document.getElementById('vMarque').value,modele:document.getElementById('vModele').value,
+    motorisation:document.getElementById('vMotorisation').value,
+    carrosserie:gs('vCarrosserie'),couleur:document.getElementById('vCouleur').value.trim(),
+    energie:gs('vEnergie'),boite:gs('vBoite'),transmission:gs('vTransmission'),
+    typeMine:document.getElementById('vTypeMine').value.trim(),
+    annee:document.getElementById('vAnnee').value.trim(),
+    cylindree:document.getElementById('vCylindree').value,cv:document.getElementById('vCV').value,kw:document.getElementById('vKW').value,
+    cylindres:document.getElementById('vCylindres').value.trim(),soupapes:document.getElementById('vSoupapes').value.trim(),
+    codeMoteur:document.getElementById('vCodeMoteur').value.trim(),codeBoite:document.getElementById('vCodeBoite').value.trim(),
+    gestionCarburant:document.getElementById('vGestionCarburant').value.trim(),freinage:document.getElementById('vFreinage').value.trim(),
+    km:document.getElementById('vKm').value,clientId:document.getElementById('vClient').value,
+    observations:document.getElementById('vObs').value.trim()};
   if(editingVehicleId){const idx=data.vehicles.findIndex(v=>v.id===editingVehicleId);if(idx>=0)data.vehicles[idx]={...data.vehicles[idx],...obj};}
   else{obj.id=genId('veh_');data.vehicles.push(obj);}
   saveData();closeModal('vehicleModal');renderVehicles();toast('✅ Véhicule enregistré');

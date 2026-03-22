@@ -137,7 +137,7 @@ function initData(callback){
 // ============================================================
 function buildNav(activePage){
   const pages = [
-    {id:'index',icon:'📊',label:'Dashboard',file:'index.html'},
+    {id:'index',icon:'🏠',label:'Tableau de bord',file:'index.html'},
     {id:'clients',icon:'👥',label:'Clients',file:'clients.html'},
     {id:'vehicules',icon:'🚗',label:'Véhicules',file:'vehicules.html'},
     {id:'factures',icon:'📄',label:'Factures',file:'factures.html'},
@@ -150,7 +150,7 @@ function buildNav(activePage){
   const logo = data.settings.logo || '';
   let hdr = `<div class="app-header">`;
   if(logo) hdr += `<img src="${logo}" alt="HVO">`;
-  hdr += `<h1>HVO - Facturier</h1><span class="header-badge">v2.1</span><span id="firebaseStatus">⏳</span></div>`;
+  hdr += `<div style="flex:1"><h1 style="margin:0;line-height:1.1">HVO — FACTURIER</h1><div style="font-size:.75em;opacity:.7;font-weight:400">Helmer Véhicule Occasion</div></div><span id="firebaseStatus">⏳</span><button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;font-size:.75em" onclick="sessionStorage.removeItem('hvo_auth');window.location.href='index.html'">⏻ Déconnexion</button></div>`;
   // Tab bar
   hdr += `<div class="tab-bar">`;
   pages.forEach(p=>{
@@ -283,7 +283,15 @@ function parseAutodoc(prefix){
       else if(key.includes('carrosserie')) fm.carrosserie=val;
       else if(key.includes('kw')||key.includes('puissance kw')) fm.kw=val.replace(/[^\d]/g,'');
       else if(key.includes('cv')||key.includes('puissance cv')||key.includes('ch')) fm.cv=val.replace(/[^\d]/g,'');
-      else if(key.includes('cylindr')) fm.cylindree=val.replace(/[^\d]/g,'');
+      else if(key.includes('cylindr') && !key.includes('cylindre')) fm.cylindree=val.replace(/[^\d]/g,'');
+      else if(key.includes('cylindre') && !key.includes('cylindré')) fm.cylindres=val.replace(/[^\d]/g,'');
+      else if(key.includes('soupape')) fm.soupapes=val.replace(/[^\d]/g,'');
+      else if(key.includes('code moteur')) fm.codeMoteur=val;
+      else if(key.includes('code bo') || key.includes('code boite') || key.includes('code boîte')) fm.codeBoite=val;
+      else if(key.includes('gestion') || key.includes('injection')) fm.gestionCarburant=val;
+      else if(key.includes('freinage') || key.includes('frein')) fm.freinage=val;
+      else if(key.includes('transmission')) fm.transmission=val;
+      else if(key.includes('type mine') || key.includes('type') && key.includes('mine')) fm.typeMine=val;
       else if(key.includes('énergie')||key.includes('energie')||key.includes('carburant')) fm.energie=val;
       else if(key.includes('boîte')||key.includes('boite')||key.includes('vitesse')) fm.boite=val;
     }
@@ -296,13 +304,16 @@ function parseAutodoc(prefix){
     const modSel=document.getElementById(p+'Modele');
     if(fm.model&&modSel){const ml=fm.model.toLowerCase();for(let o of modSel.options){if(o.text.toLowerCase().includes(ml)){modSel.value=o.value;modSel.dispatchEvent(new Event('change'));break;}}}
   },100);
-  sv(p+(prefix==='vo'?'AnneeVeh':'Annee'),fm.annee);
-  sv(p+'Carrosserie',fm.carrosserie);
-  sv(p+'Cylindree',fm.cylindree);
-  sv(p+'CV',fm.cv);
-  sv(p+'KW',fm.kw);
-  ss(p+'Energie',fm.energie);
-  ss(p+'Boite',fm.boite);
+  if(prefix==='veh'){
+    sv('vAnnee',fm.annee);sv('vCarrosserie',fm.carrosserie);sv('vCylindree',fm.cylindree);
+    sv('vCV',fm.cv);sv('vKW',fm.kw);ss('vEnergie',fm.energie);ss('vBoite',fm.boite);
+    sv('vCylindres',fm.cylindres);sv('vSoupapes',fm.soupapes);sv('vCodeMoteur',fm.codeMoteur);
+    sv('vCodeBoite',fm.codeBoite);sv('vGestionCarburant',fm.gestionCarburant);
+    sv('vFreinage',fm.freinage);sv('vTypeMine',fm.typeMine);ss('vTransmission',fm.transmission);
+  } else {
+    sv(p+'AnneeVeh',fm.annee);sv(p+'Carrosserie',fm.carrosserie);sv(p+'Cylindree',fm.cylindree);
+    sv(p+'CV',fm.cv);sv(p+'KW',fm.kw);ss(p+'Energie',fm.energie);ss(p+'Boite',fm.boite);
+  }
   toast('✅ Champs remplis depuis Auto-Doc');
 }
 
