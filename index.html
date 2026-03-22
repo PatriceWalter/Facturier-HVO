@@ -215,6 +215,11 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
 .suggestions-dropdown { display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid var(--border); border-top:none; border-radius:0 0 8px 8px; max-height:200px; overflow-y:auto; z-index:100; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
 .suggestions-dropdown.active { display:block; }
 .suggestions-dropdown .sugg-item { padding:8px 12px; cursor:pointer; font-size:0.85em; border-bottom:1px solid #f0f0f0; }
+.combo-dropdown { display:none; position:absolute; top:100%; left:0; right:0; background:#fff; border:2px solid var(--blue); border-top:none; border-radius:0 0 8px 8px; max-height:180px; overflow-y:auto; z-index:200; box-shadow:0 6px 16px rgba(0,0,0,0.15); }
+.combo-dropdown.show { display:block; }
+.combo-dropdown .combo-item { padding:8px 12px; cursor:pointer; font-size:0.9em; border-bottom:1px solid #f0f0f0; transition:background 0.15s; }
+.combo-dropdown .combo-item:hover { background:var(--blue); color:#fff; }
+.combo-dropdown .combo-item b { font-weight:700; }
 .suggestions-dropdown .sugg-item:hover { background:var(--blue); color:#fff; }
 .suggestions-dropdown .sugg-item strong { font-weight:700; }
 .search-bar::before {
@@ -589,14 +594,16 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                     <div class="form-group">
                         <label>Marque *</label>
                         <select id="cvMarque" onchange="updateModelsStep2()"><option value="">-- Sélectionner --</option></select>
+                        <div style="position:relative"><input id="cvMarqueSearch" placeholder="🔍 Recherche marque..." oninput="comboSearch(this,'cvMarque','brand')" autocomplete="off" style="margin-top:4px"><div id="cvMarqueDropdown" class="combo-dropdown"></div></div>
                     </div>
                     <div class="form-group">
                         <label>Modèle *</label>
                         <select id="cvModele" onchange="updateMotorList('cv')"><option value="">-- Sélectionner marque --</option></select>
+                        <div style="position:relative"><input id="cvModeleSearch" placeholder="🔍 Recherche modèle..." oninput="comboSearch(this,'cvModele','model')" autocomplete="off" style="margin-top:4px"><div id="cvModeleDropdown" class="combo-dropdown"></div></div>
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Motorisation</label><select id="cvMotorSelect" onchange="applyMotorSelection('cv')" style="margin-bottom:4px"><option value="">-- Sélectionner modèle d'abord --</option></select><input id="cvMotorisation" placeholder="ou saisie libre / Autodoc"></div>
+                    <div class="form-group"><label>Motorisation</label><select id="cvMotorSelect" onchange="applyMotorSelection('cv')" style="margin-bottom:4px"><option value="">-- Sélectionner modèle d'abord --</option></select><div style="position:relative"><input id="cvMotorisation" placeholder="🔍 Recherche ou saisie libre" oninput="comboSearchMotor(this,'cv')" autocomplete="off"><div id="cvMotorDropdown" class="combo-dropdown"></div></div></div>
                     <div class="form-group"><label>Carrosserie</label><select id="cvCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>SUV / Crossover</option><option>Coupé</option><option>Cabriolet</option><option>Monospace</option><option>Utilitaire</option><option>Pick-up</option><option>Citadine</option><option>Compact</option></select></div>
                 </div>
                 <div class="form-row">
@@ -658,14 +665,16 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                 <div class="form-group">
                     <label>Marque *</label>
                     <select id="vMarque" onchange="updateModels()"><option value="">-- Sélectionner --</option></select>
+                    <div style="position:relative"><input id="vMarqueSearch" placeholder="🔍 Recherche marque..." oninput="comboSearch(this,'vMarque','brand')" autocomplete="off" style="margin-top:4px"><div id="vMarqueDropdown" class="combo-dropdown"></div></div>
                 </div>
                 <div class="form-group">
                     <label>Modèle *</label>
                     <select id="vModele" onchange="updateMotorList('v');"><option value="">-- Sélectionner marque --</option></select>
+                    <div style="position:relative"><input id="vModeleSearch" placeholder="🔍 Recherche modèle..." oninput="comboSearch(this,'vModele','model')" autocomplete="off" style="margin-top:4px"><div id="vModeleDropdown" class="combo-dropdown"></div></div>
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Motorisation</label><select id="vMotorSelect" onchange="applyMotorSelection('v')" style="margin-bottom:4px"><option value="">-- Sélectionner modèle d'abord --</option></select><input id="vMotorisation" placeholder="ou saisie libre / Autodoc"></div>
+                <div class="form-group"><label>Motorisation</label><select id="vMotorSelect" onchange="applyMotorSelection('v')" style="margin-bottom:4px"><option value="">-- Sélectionner modèle d'abord --</option></select><div style="position:relative"><input id="vMotorisation" placeholder="🔍 Recherche ou saisie libre" oninput="comboSearchMotor(this,'v')" autocomplete="off"><div id="vMotorDropdown" class="combo-dropdown"></div></div></div>
                 <div class="form-group"><label>Carrosserie</label><select id="vCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>SUV / Crossover</option><option>Coupé</option><option>Cabriolet</option><option>Monospace</option><option>Utilitaire</option><option>Pick-up</option><option>Citadine</option><option>Compact</option></select></div>
             </div>
             <div class="form-row">
@@ -3045,7 +3054,7 @@ function openClientModal(id) {
             <button class="btn btn-primary" onclick="saveClientOnly()">💾 Enregistrer</button>`;
     } else {
         ['cNom','cPrenom','cTel','cEmail','cAdresse','cCp','cVille','cNotes'].forEach(id => document.getElementById(id).value = '');
-        ['cvPlaque','cvAnnee','cvKm','cvCylindree','cvPuissance','cvPuissanceKW','cvCylindres','cvSoupapes','cvCodeMoteur','cvCodeBoite','cvGestionCarburant','cvFreinage','cvTypeMine','cvNotes','cvMotorisation'].forEach(id => document.getElementById(id).value = '');
+        ['cvPlaque','cvAnnee','cvKm','cvCylindree','cvPuissance','cvPuissanceKW','cvCylindres','cvSoupapes','cvCodeMoteur','cvCodeBoite','cvGestionCarburant','cvFreinage','cvTypeMine','cvNotes','cvMotorisation','cvMarqueSearch','cvModeleSearch'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('cvEnergie').value = 'Diesel';
         document.getElementById('cvBoite').value = 'Manuelle';
         document.getElementById('cvCarrosserie').value = '';
@@ -3777,6 +3786,140 @@ function detectEnergie(motor) {
     return 'Essence';
 }
 
+// ============================================================
+// COMBO SEARCH — recherche dans les dropdowns marque/modèle/motorisation
+// ============================================================
+function comboSearch(input, selectId, type) {
+    const query = input.value.trim().toLowerCase();
+    const dropdown = input.parentElement.querySelector('.combo-dropdown');
+    if (!dropdown) return;
+
+    if (query.length < 2) { dropdown.classList.remove('show'); dropdown.innerHTML = ''; return; }
+
+    const sel = document.getElementById(selectId);
+    let items = [];
+
+    if (type === 'brand') {
+        // Chercher dans toutes les marques BRANDS_MODELS
+        items = Object.keys(BRANDS_MODELS).filter(b => b.toLowerCase().includes(query)).slice(0, 10);
+    } else if (type === 'model') {
+        // Chercher dans les options actuelles du select modèle
+        for (const opt of sel.options) {
+            if (opt.value && opt.value.toLowerCase().includes(query)) items.push(opt.value);
+        }
+        // Si rien trouvé dans le select, chercher dans TOUS les modèles de toutes les marques
+        if (items.length === 0) {
+            for (const [brand, models] of Object.entries(BRANDS_MODELS)) {
+                for (const m of models) {
+                    if (m.toLowerCase().includes(query)) items.push(brand + ' → ' + m);
+                }
+            }
+            items = items.slice(0, 10);
+        }
+    }
+
+    if (items.length === 0) {
+        dropdown.innerHTML = '<div class="combo-item" style="color:#999;font-style:italic">Aucun résultat — la saisie libre sera utilisée</div>';
+        dropdown.classList.add('show');
+        return;
+    }
+
+    dropdown.innerHTML = items.map(item => {
+        // Surligner le texte recherché
+        const display = item.replace(new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi'), '<b>$1</b>');
+        return '<div class="combo-item" data-value="' + item.replace(/"/g,'&quot;') + '">' + display + '</div>';
+    }).join('');
+    dropdown.classList.add('show');
+
+    // Click handler
+    dropdown.querySelectorAll('.combo-item').forEach(el => {
+        el.addEventListener('click', function() {
+            let val = this.dataset.value;
+            // Si c'est "MARQUE → Modèle", séparer
+            if (type === 'model' && val.includes(' → ')) {
+                const parts = val.split(' → ');
+                // Sélectionner d'abord la marque
+                const prefix = selectId.startsWith('cv') ? 'cv' : 'v';
+                const marqueSel = document.getElementById(prefix + 'Marque');
+                if (marqueSel) {
+                    marqueSel.value = parts[0];
+                    // Trigger le changement de marque
+                    if (prefix === 'cv') updateModelsStep2();
+                    else updateModels();
+                }
+                val = parts[1];
+            }
+
+            if (type === 'brand') {
+                sel.value = val;
+                sel.dispatchEvent(new Event('change'));
+                input.value = '';
+            } else if (type === 'model') {
+                // Essayer de sélectionner dans le dropdown
+                let found = false;
+                for (const opt of sel.options) {
+                    if (opt.value === val) { sel.value = val; found = true; break; }
+                }
+                if (!found) {
+                    // Ajouter comme option custom
+                    const o = document.createElement('option'); o.value = val; o.textContent = val + ' (manuel)';
+                    sel.appendChild(o); sel.value = val;
+                }
+                sel.dispatchEvent(new Event('change'));
+                input.value = '';
+            }
+            dropdown.classList.remove('show');
+            dropdown.innerHTML = '';
+        });
+    });
+}
+
+function comboSearchMotor(input, prefix) {
+    const query = input.value.trim().toLowerCase();
+    const dropdown = document.getElementById(prefix + 'MotorDropdown');
+    if (!dropdown) return;
+
+    if (query.length < 2) { dropdown.classList.remove('show'); dropdown.innerHTML = ''; return; }
+
+    const sel = document.getElementById(prefix + 'MotorSelect');
+    let items = [];
+    if (sel) {
+        for (const opt of sel.options) {
+            if (opt.value && opt.value.toLowerCase().includes(query)) items.push(opt.value);
+        }
+    }
+
+    if (items.length === 0) {
+        dropdown.innerHTML = '<div class="combo-item" style="color:#999;font-style:italic">Aucun résultat — saisie libre OK</div>';
+        dropdown.classList.add('show');
+        return;
+    }
+
+    dropdown.innerHTML = items.slice(0, 10).map(item => {
+        const display = item.replace(new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + ')', 'gi'), '<b>$1</b>');
+        return '<div class="combo-item" data-value="' + item.replace(/"/g,'&quot;') + '">' + display + '</div>';
+    }).join('');
+    dropdown.classList.add('show');
+
+    dropdown.querySelectorAll('.combo-item').forEach(el => {
+        el.addEventListener('click', function() {
+            if (!this.dataset.value) return;
+            // Sélectionner dans le dropdown motorisation
+            sel.value = this.dataset.value;
+            applyMotorSelection(prefix);
+            dropdown.classList.remove('show');
+            dropdown.innerHTML = '';
+        });
+    });
+}
+
+// Fermer les combo-dropdown au clic extérieur
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.combo-dropdown') && !e.target.matches('[id$="Search"]')) {
+        document.querySelectorAll('.combo-dropdown.show').forEach(d => { d.classList.remove('show'); d.innerHTML = ''; });
+    }
+});
+
 function applyMotorSelection(prefix) {
     const sel = document.getElementById(prefix + 'MotorSelect');
     if (!sel || !sel.value) return;
@@ -3878,7 +4021,7 @@ function openVehicleModal(id) {
             document.getElementById('vCarrosserie').value = v.carrosserie || '';
         }
     } else {
-        ['vPlaque','vAnnee','vKm','vCylindree','vPuissance','vPuissanceKW','vCylindres','vSoupapes','vCodeMoteur','vCodeBoite','vGestionCarburant','vFreinage','vTypeMine','vNotesVeh','vMotorisation'].forEach(id => document.getElementById(id).value = '');
+        ['vPlaque','vAnnee','vKm','vCylindree','vPuissance','vPuissanceKW','vCylindres','vSoupapes','vCodeMoteur','vCodeBoite','vGestionCarburant','vFreinage','vTypeMine','vNotesVeh','vMotorisation','vMarqueSearch','vModeleSearch'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('vClient').value = '';
         document.getElementById('vMarque').value = '';
         updateModels();
