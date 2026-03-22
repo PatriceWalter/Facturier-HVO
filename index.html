@@ -596,7 +596,7 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Motorisation</label><select id="cvMotorSelect" onchange="if(this.value){document.getElementById('cvMotorisation').value=this.value}" style="margin-bottom:4px"><option value="">-- Sélectionner modèle d'abord --</option></select><input id="cvMotorisation" placeholder="ou saisie libre / Autodoc"></div>
+                    <div class="form-group"><label>Motorisation</label><select id="cvMotorSelect" onchange="applyMotorSelection('cv')" style="margin-bottom:4px"><option value="">-- Sélectionner modèle d'abord --</option></select><input id="cvMotorisation" placeholder="ou saisie libre / Autodoc"></div>
                     <div class="form-group"><label>Carrosserie</label><select id="cvCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>SUV / Crossover</option><option>Coupé</option><option>Cabriolet</option><option>Monospace</option><option>Utilitaire</option><option>Pick-up</option><option>Citadine</option><option>Compact</option></select></div>
                 </div>
                 <div class="form-row">
@@ -665,7 +665,7 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group"><label>Motorisation</label><select id="vMotorSelect" onchange="if(this.value){document.getElementById('vMotorisation').value=this.value}" style="margin-bottom:4px"><option value="">-- Sélectionner modèle d'abord --</option></select><input id="vMotorisation" placeholder="ou saisie libre / Autodoc"></div>
+                <div class="form-group"><label>Motorisation</label><select id="vMotorSelect" onchange="applyMotorSelection('v')" style="margin-bottom:4px"><option value="">-- Sélectionner modèle d'abord --</option></select><input id="vMotorisation" placeholder="ou saisie libre / Autodoc"></div>
                 <div class="form-group"><label>Carrosserie</label><select id="vCarrosserie"><option value="">--</option><option>Berline</option><option>Break</option><option>SUV / Crossover</option><option>Coupé</option><option>Cabriolet</option><option>Monospace</option><option>Utilitaire</option><option>Pick-up</option><option>Citadine</option><option>Compact</option></select></div>
             </div>
             <div class="form-row">
@@ -3763,6 +3763,57 @@ function updateMotorList(prefix) {
     sel.style.borderColor = '#28a745';
     sel.style.background = '#f0fff0';
     console.log('[MOTOR] OK: ' + motors.length + ' motorisations chargées');
+}
+
+function detectEnergie(motor) {
+    const m = motor.toUpperCase();
+    const mo = motor; // original case
+    if (/ELECTRIQUE|ELECTR|E-POWER|\bEV\d|KWH|EDRIVE/.test(m) || /^e-/i.test(mo) || /-e\b/i.test(mo) || /\be\s?\d+/i.test(mo)) return 'Électrique';
+    if (/HYBRID|PHEV|E-TECH|EHYBRID|GTE\b|TWIN ENGINE|RECHARGE|FHEV|DM-I|DM-P|EREV/.test(m)) return 'Hybride';
+    if (/\bGPL\b|ECO-G|BIPOWER|GNV/.test(m)) return 'GPL';
+    if (/HYDROG/.test(m)) return 'Hydrogène';
+    if (/TDI|HDI|BLUEHDI|DCI|CDTI|JTDM|MULTIJET|CRDI|D-4D|D4D|DDI|DIESEL|\bD\s?\d|DTI|SDI|CDI|MZRCD|MJET|SKYACTIV-D|ECOBLUE|BLUE\s?DCI|TD\b|TDS\b|TDCI/.test(m)) return 'Diesel';
+    if (/\d{3}D\b/.test(m)) return 'Diesel'; // BMW/Mercedes: 316d, 520d, 200d
+    return 'Essence';
+}
+
+function applyMotorSelection(prefix) {
+    const sel = document.getElementById(prefix + 'MotorSelect');
+    if (!sel || !sel.value) return;
+    const motor = sel.value;
+    // Remplir le champ motorisation
+    document.getElementById(prefix + 'Motorisation').value = motor;
+
+    // Détecter et remplir l'énergie
+    const energie = detectEnergie(motor);
+    const eSel = document.getElementById(prefix + 'Energie');
+    if (eSel) {
+        for (const opt of eSel.options) {
+            if (opt.value === energie || opt.text === energie) { eSel.value = opt.value; break; }
+        }
+    }
+
+    // Extraire la cylindrée (premier nombre décimal ex: 1.9 → 1900, 2.0 → 2000)
+    const cylMatch = motor.match(/(\d+\.\d+)/);
+    if (cylMatch && energie !== 'Électrique') {
+        const litres = parseFloat(cylMatch[1]);
+        const cc = Math.round(litres * 1000);
+        const cylEl = document.getElementById(prefix + 'Cylindree');
+        if (cylEl) cylEl.value = cc;
+    }
+
+    // Extraire la puissance CV (dernier nombre dans la chaîne)
+    const nums = motor.match(/\d+/g);
+    if (nums && nums.length > 0) {
+        const cv = parseInt(nums[nums.length - 1]);
+        if (cv > 10 && cv < 3000) { // filtre valeurs aberrantes
+            const cvEl = document.getElementById(prefix + 'Puissance');
+            if (cvEl) cvEl.value = cv;
+            // Calculer KW (1 CV = 0.7355 KW)
+            const kwEl = document.getElementById(prefix + 'PuissanceKW');
+            if (kwEl) kwEl.value = Math.round(cv * 0.7355);
+        }
+    }
 }
 
 function renderVehicles() {
