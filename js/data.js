@@ -1676,7 +1676,6 @@ const MOTORIZATIONS = {
 // ============================================================
 // DEFAULT OPERATIONS (48 templates)
 // ============================================================
-
 const DEFAULT_OPERATIONS = [
     // ======= T1 - ENTRETIEN COURANT =======
     {id:'op1',type:'T1',name:'Vidange simple',price:30.00,parts:[
@@ -2429,3 +2428,4 @@ const DEFAULT_OPERATIONS = [
     {id:'op278',type:'T8',name:'Constat véhicule / état des lieux (contrôle visuel complet)',price:25.00,parts:[]},
     {id:'op279',type:'T8',name:'Prêt véhicule de courtoisie (par jour)',price:25.00,parts:[]}
 ];
+

@@ -341,10 +341,3 @@ tbody tr:hover { background:rgba(26,58,122,0.03); }
 .vo-print-bar { display:flex; justify-content:center; gap:12px; margin-top:20px; padding-top:16px; border-top:2px solid var(--border); }
 .vo-print-bar .btn { padding:12px 30px; font-size:1.05em; }
 @media (max-width:768px) { .vo-subtab { padding:10px 14px; font-size:0.85em; } }
-
-/* ===== OP TYPE COLORS T4-T8 ===== */
-.op-card .op-type.t4 { background:#cce5ff; color:#004085; }
-.op-card .op-type.t5 { background:#e2d5f1; color:#4a1d8e; }
-.op-card .op-type.t6 { background:#ffecd2; color:#8a4500; }
-.op-card .op-type.t7 { background:#d5e8d4; color:#1b5e20; }
-.op-card .op-type.t8 { background:#ffe0e0; color:#b71c1c; }
