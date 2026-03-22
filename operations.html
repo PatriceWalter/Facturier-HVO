@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>HVO - Opérations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head><body>
+<div id="app"><div id="navContainer"></div>
+<div class="app-content">
+  <div class="card">
+    <div class="card-title">🔧 Catalogue d'opérations <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openOpModal()">+ Nouvelle</button></div>
+    <div class="filter-bar" id="opFilterBar">
+      <button class="filter-btn active" data-filter="all" onclick="filterOps('all')">Toutes</button>
+      <button class="filter-btn" data-filter="T1" onclick="filterOps('T1')">T1 Entretien</button>
+      <button class="filter-btn" data-filter="T2" onclick="filterOps('T2')">T2 Mécanique</button>
+      <button class="filter-btn" data-filter="T3" onclick="filterOps('T3')">T3 Diagnostic</button>
+      <button class="filter-btn" data-filter="T4" onclick="filterOps('T4')">T4 Électronique</button>
+      <button class="filter-btn" data-filter="T5" onclick="filterOps('T5')">T5 Reprog</button>
+      <button class="filter-btn" data-filter="T6" onclick="filterOps('T6')">T6 Prépa moteur</button>
+      <button class="filter-btn" data-filter="T7" onclick="filterOps('T7')">T7 Échappement</button>
+      <button class="filter-btn" data-filter="T8" onclick="filterOps('T8')">T8 Dépannage</button>
+    </div>
+    <div class="search-box"><input id="opSearch" placeholder="Rechercher..." oninput="renderOps()"></div>
+    <div class="table-wrap"><table><thead><tr><th>Type</th><th>Désignation</th><th>Prix MO</th><th>TVA</th><th>Pièces</th><th>Actions</th></tr></thead><tbody id="opsTable"></tbody></table></div>
+  </div>
+</div></div>
+<div class="modal-overlay" id="opModal">
+  <div class="modal" style="max-width:550px">
+    <div class="modal-header"><h3 id="opModalTitle">Nouvelle opération</h3><button class="modal-close" onclick="closeModal('opModal')">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Type</label><select id="opType"><option value="T1">T1</option><option value="T2">T2</option><option value="T3">T3</option><option value="T4">T4</option><option value="T5">T5</option><option value="T6">T6</option><option value="T7">T7</option><option value="T8">T8</option></select></div>
+      <div class="form-group"><label>Désignation *</label><input id="opName"></div>
+      <div class="form-row"><div class="form-group"><label>Prix MO HT (€)</label><input id="opPrice" type="number" step="0.01"></div><div class="form-group"><label>TVA (%)</label><input id="opTVA" type="number" value="20"></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('opModal')">Annuler</button><button class="btn btn-primary" onclick="saveOp()">💾 Enregistrer</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="js/data.js"></script><script src="js/shared.js"></script>
+<script>
+if(!isLoggedIn()){window.location.href='index.html';}
+let editingOpId=null,curFilter='all';
+initData(function(){buildNav('operations');renderOps();});
+function renderOps(){
+  const s=(document.getElementById('opSearch')?.value||'').toLowerCase();
+  document.getElementById('opsTable').innerHTML=data.operations.filter(o=>(curFilter==='all'||o.type===curFilter)&&(!s||o.name.toLowerCase().includes(s))).map(o=>
+    '<tr><td><span class="badge badge-'+o.type.toLowerCase()+'">'+o.type+'</span></td><td>'+o.name+'</td><td>'+(o.price||0).toFixed(2)+'</td><td>'+(o.tva||20)+'%</td>'
+    +'<td>'+(o.parts&&o.parts.length?o.parts.map(p=>p.desc).join(', '):'-')+'</td>'
+    +'<td><button class="btn btn-primary btn-sm" onclick="editOp(\''+o.id+'\')">✏️</button> <button class="btn btn-danger btn-sm" onclick="delOp(\''+o.id+'\')">🗑️</button></td></tr>'
+  ).join('');
+}
+function filterOps(t){curFilter=t;document.querySelectorAll('#opFilterBar .filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===t));renderOps();}
+function openOpModal(id){editingOpId=id||null;document.getElementById('opModalTitle').textContent=id?'Modifier':'Nouvelle opération';
+  if(id){const o=data.operations.find(x=>x.id===id);if(o){document.getElementById('opType').value=o.type;document.getElementById('opName').value=o.name;document.getElementById('opPrice').value=o.price;document.getElementById('opTVA').value=o.tva||20;}}
+  else{document.getElementById('opType').value='T1';document.getElementById('opName').value='';document.getElementById('opPrice').value='';document.getElementById('opTVA').value=20;}
+  openModal('opModal');
+}
+function editOp(id){openOpModal(id);}
+function saveOp(){const n=document.getElementById('opName').value.trim();if(!n){toast('❌ Désignation obligatoire');return;}
+  const obj={type:document.getElementById('opType').value,name:n,price:parseFloat(document.getElementById('opPrice').value)||0,tva:parseFloat(document.getElementById('opTVA').value)||20};
+  if(editingOpId){const idx=data.operations.findIndex(o=>o.id===editingOpId);if(idx>=0)data.operations[idx]={...data.operations[idx],...obj};}
+  else{obj.id=genId('op_');obj.parts=[];data.operations.push(obj);}
+  saveData();closeModal('opModal');renderOps();toast('✅ Enregistrée');
+}
+function delOp(id){if(!confirm('Supprimer ?'))return;data.operations=data.operations.filter(o=>o.id!==id);saveData();renderOps();toast('🗑️ Supprimée');}
+</script></body></html>
