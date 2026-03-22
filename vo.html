@@ -197,6 +197,11 @@
 <script src="js/data.js"></script>
 <script src="js/shared.js"></script>
 <script>
+// Session immédiate - pas de login si déjà connecté
+if(sessionStorage.getItem('hvo_logged')==='true'){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='block';
+}
 fetch('modals.html').then(r=>r.text()).then(h=>{
     document.getElementById('modalsContainer').innerHTML=h;
     document.querySelectorAll('.modal-overlay').forEach(m=>{
