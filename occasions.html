@@ -1,0 +1,121 @@
+            <div class="stats-grid" id="voStats"></div>
+
+            <!-- SOUS-ONGLETS VO -->
+            <div class="vo-subtabs" id="voSubtabs">
+                <button class="vo-subtab active" data-vosub="voStock">📦 Stock VO</button>
+                <button class="vo-subtab" data-vosub="voAnnonce">📄 Fiche Annonce</button>
+                <button class="vo-subtab" data-vosub="voCession">📋 Cession (ANTS)</button>
+                <button class="vo-subtab" data-vosub="voFacture">🧾 Facture de Vente</button>
+                <button class="vo-subtab" data-vosub="voBonCmd">📝 Bon de Commande</button>
+            </div>
+
+            <!-- SUB: STOCK -->
+            <div class="vo-sub active" id="voStock">
+                <div class="card">
+                    <div class="card-title">📦 Stock Véhicules Occasions
+                        <span style="margin-left:auto;display:flex;gap:8px;align-items:center">
+                            <select id="voFilterStatus" onchange="renderVOStock()" style="padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:0.85em">
+                                <option value="all">Tous</option><option value="stock">En stock</option><option value="reserve">Réservé</option><option value="vendu">Vendu</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="openVOModal()">+ Ajouter un VO</button>
+                        </span>
+                    </div>
+                    <div class="table-wrap">
+                        <table><thead><tr><th>Plaque</th><th>Marque / Modèle</th><th>Année</th><th>Km</th><th>Énergie</th><th>Prix vente</th><th>Statut</th><th>Actions</th></tr></thead>
+                        <tbody id="voTableBody"></tbody></table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB: FICHE ANNONCE -->
+            <div class="vo-sub" id="voAnnonce">
+                <div class="card">
+                    <div class="card-title">📄 Fiche Annonce Véhicule</div>
+                    <div class="form-group"><label>Sélectionner un véhicule</label><select id="voSelAnnonce" onchange="prefillAnnonce()" style="font-size:1em;padding:10px"></select></div>
+                    <div class="vo-doc-section"><h4>🚗 Description véhicule</h4>
+                        <div class="form-row"><div class="form-group"><label>Marque</label><input id="annMarque"></div><div class="form-group"><label>Modèle</label><input id="annModele"></div><div class="form-group"><label>Version</label><input id="annVersion"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Motorisation</label><input id="annMotorisation"></div><div class="form-group"><label>Carrosserie</label><input id="annCarrosserie"></div><div class="form-group"><label>Couleur</label><input id="annCouleur"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Énergie</label><input id="annEnergie"></div><div class="form-group"><label>Boîte</label><input id="annBoite"></div><div class="form-group"><label>Année</label><input id="annAnnee"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Kilométrage</label><input id="annKm"></div><div class="form-group"><label>Puissance CV</label><input id="annCV"></div><div class="form-group"><label>Puissance ch</label><input id="annCh"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Contrôle technique</label><input id="annCT"></div><div class="form-group"><label>Garantie</label><input id="annGarantie"></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>💰 Prix & équipements</h4>
+                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC</label><input id="annPrix" type="number" step="0.01" style="font-size:1.2em;font-weight:700"></div><div class="form-group"><label>État général</label><input id="annEtat"></div></div>
+                        <div class="form-group"><label>Équipements</label><textarea id="annEquipements" rows="3"></textarea></div>
+                        <div class="form-group"><label>Observations</label><textarea id="annObs" rows="2"></textarea></div>
+                    </div>
+                    <div class="vo-print-bar"><button class="btn btn-primary" onclick="printAnnonce()">🖨️ Imprimer la fiche annonce</button></div>
+                </div>
+            </div>
+
+            <!-- SUB: CESSION (ANTS) -->
+            <div class="vo-sub" id="voCession">
+                <div class="card">
+                    <div class="card-title">📋 Déclaration de Cession</div>
+                    <div style="background:#f0f7ff;border:2px solid var(--blue);border-radius:var(--radius);padding:24px 20px;text-align:center">
+                        <p style="margin-bottom:16px;font-size:1.05em">La déclaration de cession doit être effectuée sur le <strong>document officiel CERFA</strong> directement sur le site de l'ANTS.</p>
+                        <a href="https://immatriculation.ants.gouv.fr/" target="_blank" class="btn btn-primary" style="text-decoration:none;font-size:1.1em;padding:14px 32px">🔗 Accéder au site ANTS</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB: FACTURE VENTE -->
+            <div class="vo-sub" id="voFacture">
+                <div class="card">
+                    <div class="card-title">🧾 Facture de Vente Véhicule d'Occasion</div>
+                    <div class="form-group"><label>Sélectionner un véhicule</label><select id="voSelFacture" onchange="prefillFacture()" style="font-size:1em;padding:10px"></select></div>
+                    <div class="vo-doc-section"><h4>📋 Informations facture</h4>
+                        <div class="form-row"><div class="form-group"><label>N° de facture</label><input id="facNumero"></div><div class="form-group"><label>Date de facture</label><input id="facDate" type="date"></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>👤 Client (acquéreur)</h4>
+                        <div class="form-group"><label>Sélectionner un client</label><select id="facClientSel" onchange="prefillFactureClient()" style="padding:8px"></select></div>
+                        <div class="form-row"><div class="form-group"><label>Nom</label><input id="facClientNom"></div><div class="form-group"><label>Prénom</label><input id="facClientPrenom"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Adresse</label><input id="facClientAdresse"></div><div class="form-group"><label>CP</label><input id="facClientCP"></div><div class="form-group"><label>Ville</label><input id="facClientVille"></div></div>
+                        <div class="form-group"><label>Téléphone</label><input id="facClientTel"></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>🚗 Véhicule d'occasion vendu</h4>
+                        <div class="form-row"><div class="form-group"><label>Plaque</label><input id="facPlaque"></div><div class="form-group"><label>VIN (n° châssis)</label><input id="facVin"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Marque</label><input id="facMarque"></div><div class="form-group"><label>Modèle</label><input id="facModele"></div><div class="form-group"><label>Version</label><input id="facVersion"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Année</label><input id="facAnnee"></div><div class="form-group"><label>Date 1ère MEC</label><input id="facDateMEC" type="date"></div><div class="form-group"><label>Km compteur</label><input id="facKm"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Énergie</label><input id="facEnergie"></div><div class="form-group"><label>Couleur</label><input id="facCouleur"></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>💰 Montant & paiement</h4>
+                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC (€)</label><input id="facPrix" type="number" step="0.01" style="font-weight:700;font-size:1.2em"></div><div class="form-group"><label>Mode de paiement</label><select id="facPaiement"><option value="">--</option><option>Espèces</option><option>Chèque</option><option>Virement</option><option>Carte bancaire</option><option>Crédit</option><option>Mixte</option></select></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>🛡️ Garanties (mentions légales obligatoires)</h4>
+                        <div class="form-row">
+                            <div class="form-group"><label>Garantie légale de conformité</label><select id="facGarantieLegale"><option value="2 ans">2 ans (obligatoire par la loi)</option><option value="1 an (véhicule +5 ans ou +100 000 km)">1 an (véhicule de plus de 5 ans ou +100 000 km)</option></select></div>
+                            <div class="form-group"><label>Garantie commerciale (optionnelle)</label><input id="facGarantie" placeholder="Ex: 6 mois / 10 000 km"></div>
+                        </div>
+                        <div class="form-group"><label>Observations / état du véhicule</label><textarea id="facObs" rows="2" placeholder="Remarques sur l'état, défauts signalés..."></textarea></div>
+                    </div>
+                    <div class="vo-print-bar"><button class="btn btn-primary" onclick="printFactureVO()">🖨️ Imprimer la facture de vente</button></div>
+                </div>
+            </div>
+
+            <!-- SUB: BON DE COMMANDE -->
+            <div class="vo-sub" id="voBonCmd">
+                <div class="card">
+                    <div class="card-title">📝 Bon de Commande Véhicule</div>
+                    <div class="form-group"><label>Sélectionner un véhicule</label><select id="voSelBonCmd" onchange="prefillBonCmd()" style="font-size:1em;padding:10px"></select></div>
+                    <div class="vo-doc-section"><h4>🚗 Véhicule commandé</h4>
+                        <div class="form-row"><div class="form-group"><label>Marque</label><input id="bcMarque"></div><div class="form-group"><label>Modèle</label><input id="bcModele"></div><div class="form-group"><label>Version</label><input id="bcVersion"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Plaque</label><input id="bcPlaque"></div><div class="form-group"><label>VIN</label><input id="bcVin"></div><div class="form-group"><label>Km</label><input id="bcKm"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Couleur</label><input id="bcCouleur"></div><div class="form-group"><label>Énergie</label><input id="bcEnergie"></div><div class="form-group"><label>Année</label><input id="bcAnnee"></div></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>👤 Acheteur</h4>
+                        <div class="form-group"><label>Sélectionner un client</label><select id="bcClientSel" onchange="prefillBonCmdClient()" style="padding:8px"></select></div>
+                        <div class="form-row"><div class="form-group"><label>Nom</label><input id="bcClientNom"></div><div class="form-group"><label>Prénom</label><input id="bcClientPrenom"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Adresse</label><input id="bcClientAdresse"></div><div class="form-group"><label>CP</label><input id="bcClientCP"></div><div class="form-group"><label>Ville</label><input id="bcClientVille"></div></div>
+                        <div class="form-group"><label>Téléphone</label><input id="bcClientTel"></div>
+                    </div>
+                    <div class="vo-doc-section"><h4>💰 Conditions financières</h4>
+                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC (€)</label><input id="bcPrix" type="number" step="0.01" style="font-weight:700;font-size:1.1em"></div><div class="form-group"><label>Acompte versé (€)</label><input id="bcAcompte" type="number" step="0.01"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Solde restant (€)</label><input id="bcSolde" type="number" step="0.01"></div><div class="form-group"><label>Mode de paiement</label><input id="bcPaiement"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Date de livraison prévue</label><input id="bcDateLivraison" type="date"></div><div class="form-group"><label>Garantie</label><input id="bcGarantie"></div></div>
+                        <div class="form-group"><label>Conditions particulières</label><textarea id="bcConditions" rows="2" placeholder="Reprise ancien véhicule, travaux prévus..."></textarea></div>
+                    </div>
+                    <div class="vo-print-bar"><button class="btn btn-primary" onclick="printBonCmd()">🖨️ Imprimer le bon de commande</button></div>
+                </div>
+            </div>
+

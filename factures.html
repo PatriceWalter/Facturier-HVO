@@ -1,0 +1,8 @@
+            <div class="card">
+                <div class="card-title">🧾 Factures <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openInvoiceModal()">+ Nouvelle facture</button></div>
+                <div class="search-bar" style="position:relative">
+                    <input type="text" id="invoiceSearch" placeholder="Rechercher par n° facture, client, plaque..." oninput="renderInvoices();showSuggestions('invoice')" onfocus="showSuggestions('invoice')" autocomplete="off">
+                    <div id="invoiceSuggestions" class="suggestions-dropdown"></div>
+                </div>
+                <div class="table-wrap"><table><thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Véhicule</th><th>Remise</th><th>Total</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="invoicesTable"></tbody></table></div>
+            </div>

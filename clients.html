@@ -1,0 +1,8 @@
+            <div class="card">
+                <div class="card-title">👥 Gestion des clients <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openClientModal()">+ Nouveau client</button></div>
+                <div class="search-bar" style="position:relative">
+                    <input type="text" id="clientSearch" placeholder="Rechercher par nom, prénom ou plaque..." oninput="renderClients();showSuggestions('client')" onfocus="showSuggestions('client')" autocomplete="off">
+                    <div id="clientSuggestions" class="suggestions-dropdown"></div>
+                </div>
+                <div class="table-wrap"><table><thead><tr><th>N°</th><th>Nom</th><th>Prénom</th><th>Téléphone</th><th>Email</th><th>Ville</th><th>Véhicules</th><th>Actions</th></tr></thead><tbody id="clientsTable"></tbody></table></div>
+            </div>

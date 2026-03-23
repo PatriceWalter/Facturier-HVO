@@ -1,0 +1,15 @@
+            <div class="card">
+                <div class="card-title">🔧 Catalogue d'opérations <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openOperationModal()">+ Nouvelle opération</button></div>
+                <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="opFilters">
+                    <button class="btn btn-sm btn-primary" onclick="filterOps('all')">Toutes</button>
+                    <button class="btn btn-sm btn-outline" onclick="filterOps('T1')">T1 - Entretien courant</button>
+                    <button class="btn btn-sm btn-outline" onclick="filterOps('T2')">T2 - Mécanique</button>
+                    <button class="btn btn-sm btn-outline" onclick="filterOps('T3')">T3 - Diagnostic / Spécifique</button>
+                    <button class="btn btn-sm btn-outline" onclick="filterOps('T4')">T4 - Électronique</button>
+                    <button class="btn btn-sm btn-outline" onclick="filterOps('T5')">T5 - Reprogrammation</button>
+                    <button class="btn btn-sm btn-outline" onclick="filterOps('T6')">T6 - Prépa moteur</button>
+                    <button class="btn btn-sm btn-outline" onclick="filterOps('T7')">T7 - Échappement</button>
+                    <button class="btn btn-sm btn-outline" onclick="filterOps('T8')">T8 - Dépannage</button>
+                </div>
+                <div class="table-wrap"><table><thead><tr><th>Type</th><th>Désignation</th><th>Prix TTC</th><th>Actions</th></tr></thead><tbody id="operationsTable"></tbody></table></div>
+            </div>
