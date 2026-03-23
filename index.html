@@ -2285,12 +2285,12 @@ const DEFAULT_OPERATIONS = [
     {id:'op30',type:'T2',name:'Remplacement étrier de frein',price:45.00,parts:[
         {desc:'Étrier de frein (reconditionné ou neuf)',price:0}
     ]},
-    {id:'op31',type:'T2',name:'Remplacement amortisseurs AV (MO paire)',price:65.00,parts:[
+    {id:'op31',type:'T2',name:'Remplacement amortisseurs AV (MO paire)',price:65.00,note:'⚠️ Géométrie AV recommandée après remplacement',parts:[
         {desc:'Amortisseurs AV (x2)',price:0},
         {desc:'Coupelles d\'amortisseur AV (x2)',price:0},
         {desc:'Butées d\'amortisseur AV (x2)',price:0}
     ]},
-    {id:'op32',type:'T2',name:'Remplacement amortisseurs AR (MO paire)',price:50.00,parts:[
+    {id:'op32',type:'T2',name:'Remplacement amortisseurs AR (MO paire)',price:50.00,note:'ℹ️ Contrôle géométrie AR recommandé',parts:[
         {desc:'Amortisseurs AR (x2)',price:0}
     ]},
     {id:'op33',type:'T2',name:'Remplacement kit de distribution (MO)',price:195.00,parts:[
@@ -2334,22 +2334,22 @@ const DEFAULT_OPERATIONS = [
         {desc:'Thermostat + joint',price:0},
         {desc:'Liquide de refroidissement (2L)',price:0}
     ]},
-    {id:'op44',type:'T2',name:'Remplacement rotules de direction (MO paire)',price:50.00,parts:[
+    {id:'op44',type:'T2',name:'Remplacement rotules de direction (MO paire)',price:50.00,note:'⚠️ GÉOMÉTRIE OBLIGATOIRE après remplacement — Choisir : Géométrie AV seule ou AV+AR selon véhicule',parts:[
         {desc:'Rotules de direction (x2)',price:0}
     ]},
-    {id:'op45',type:'T2',name:'Remplacement biellettes barre stabilisatrice (MO paire)',price:30.00,parts:[
+    {id:'op45',type:'T2',name:'Remplacement biellettes barre stabilisatrice (MO paire)',price:30.00,note:'ℹ️ Géométrie AV recommandée',parts:[
         {desc:'Biellettes de barre stabilisatrice (x2)',price:0}
     ]},
-    {id:'op46',type:'T2',name:'Remplacement roulement de roue (MO unitaire)',price:50.00,parts:[
+    {id:'op46',type:'T2',name:'Remplacement roulement de roue (MO unitaire)',price:50.00,note:'ℹ️ Contrôle géométrie recommandé',parts:[
         {desc:'Roulement de roue',price:0}
     ]},
-    {id:'op47',type:'T2',name:'Remplacement silentblocs triangle AV (MO paire)',price:65.00,parts:[
+    {id:'op47',type:'T2',name:'Remplacement silentblocs triangle AV (MO paire)',price:65.00,note:'⚠️ Géométrie AV recommandée après remplacement',parts:[
         {desc:'Silentblocs de triangle AV (x2)',price:0}
     ]},
-    {id:'op48',type:'T2',name:'Remplacement triangle de suspension complet (MO)',price:50.00,parts:[
+    {id:'op48',type:'T2',name:'Remplacement triangle de suspension complet (MO)',price:50.00,note:'⚠️ GÉOMÉTRIE OBLIGATOIRE après remplacement — Choisir : AV seule ou AV+AR',parts:[
         {desc:'Triangle de suspension complet',price:0}
     ]},
-    {id:'op49',type:'T2',name:'Remplacement cardan / transmission (MO)',price:65.00,parts:[
+    {id:'op49',type:'T2',name:'Remplacement cardan / transmission (MO)',price:65.00,note:'ℹ️ Contrôle géométrie + essai routier recommandés',parts:[
         {desc:'Cardan / transmission (échange standard ou neuf)',price:0}
     ]},
     {id:'op50',type:'T2',name:'Remplacement soufflet de cardan (MO)',price:40.00,parts:[
@@ -2370,11 +2370,11 @@ const DEFAULT_OPERATIONS = [
         {desc:'Filtre à particules (FAP)',price:0},
         {desc:'Joints d\'échappement',price:0}
     ]},
-    {id:'op55',type:'T2',name:'Remplacement vanne EGR (MO)',price:65.00,parts:[
+    {id:'op55',type:'T2',name:'Remplacement vanne EGR (MO)',price:65.00,note:'ℹ️ Nettoyage collecteur admission recommandé',parts:[
         {desc:'Vanne EGR',price:0},
         {desc:'Joint vanne EGR',price:0}
     ]},
-    {id:'op56',type:'T2',name:'Remplacement turbo (MO)',price:195.00,parts:[
+    {id:'op56',type:'T2',name:'Remplacement turbo (MO)',price:195.00,note:'ℹ️ Vidange moteur obligatoire après remplacement turbo — Vérifier durites huile',parts:[
         {desc:'Turbocompresseur (échange standard)',price:0},
         {desc:'Kit joints turbo (huile + échappement)',price:0},
         {desc:'Durites d\'huile turbo',price:0}
@@ -2926,7 +2926,231 @@ const DEFAULT_OPERATIONS = [
     {id:'op276',type:'T8',name:'Forfait main d\'œuvre dépannage jour férié (heure)',price:95.00,parts:[]},
     {id:'op277',type:'T8',name:'Supplément intervention urgente (< 1h)',price:30.00,parts:[]},
     {id:'op278',type:'T8',name:'Constat véhicule / état des lieux (contrôle visuel complet)',price:25.00,parts:[]},
-    {id:'op279',type:'T8',name:'Prêt véhicule de courtoisie (par jour)',price:25.00,parts:[]}
+    {id:'op279',type:'T8',name:'Prêt véhicule de courtoisie (par jour)',price:25.00,parts:[]},
+
+    // ======================================================================
+    // OPÉRATIONS AJOUTÉES — Catalogue complet garage français
+    // ======================================================================
+    {id:'op280',type:'T2',name:'Remplacement rotule de suspension inférieure (MO unitaire)',price:40.00,parts:[{desc:'Rotule de suspension inférieure',price:0}],note:'⚠️ GÉOMÉTRIE OBLIGATOIRE après remplacement — Choisir : AV seule ou AV+AR'},
+    {id:'op281',type:'T2',name:'Remplacement rotule de suspension supérieure (MO unitaire)',price:45.00,parts:[{desc:'Rotule de suspension supérieure',price:0}],note:'⚠️ GÉOMÉTRIE OBLIGATOIRE après remplacement — Choisir : AV seule ou AV+AR'},
+    {id:'op282',type:'T2',name:'Remplacement biellette de direction intérieure (MO unitaire)',price:40.00,parts:[{desc:'Biellette de direction intérieure',price:0}],note:'⚠️ GÉOMÉTRIE OBLIGATOIRE après remplacement'},
+    {id:'op283',type:'T2',name:'Remplacement bielle de direction extérieure (MO unitaire)',price:35.00,parts:[{desc:'Bielle de direction extérieure (rotule axiale)',price:0}],note:'⚠️ GÉOMÉTRIE OBLIGATOIRE après remplacement'},
+    {id:'op284',type:'T2',name:'Remplacement soufflet de crémaillère (MO unitaire)',price:40.00,parts:[{desc:'Soufflet de crémaillère + colliers',price:0}]},
+    {id:'op285',type:'T2',name:'Remplacement crémaillère de direction complète (MO)',price:150.00,parts:[{desc:'Crémaillère de direction',price:0},{desc:'Biellettes neuves (x2)',price:0}],note:'⚠️ GÉOMÉTRIE OBLIGATOIRE après remplacement — AV+AR recommandé'},
+    {id:'op286',type:'T2',name:'Remplacement crémaillère direction assistée hydraulique (MO)',price:180.00,parts:[{desc:'Crémaillère direction assistée hydraulique',price:0},{desc:'Biellettes neuves (x2)',price:0},{desc:'Fluide direction assistée',price:0}],note:'⚠️ GÉOMÉTRIE OBLIGATOIRE + Purge circuit DA après remplacement'},
+    {id:'op287',type:'T2',name:'Remplacement crémaillère direction assistée électrique (MO)',price:195.00,parts:[{desc:'Crémaillère direction assistée électrique',price:0},{desc:'Biellettes neuves (x2)',price:0}],note:'⚠️ GÉOMÉTRIE OBLIGATOIRE + Calibration capteur angle volant après remplacement'},
+    {id:'op288',type:'T2',name:'Remplacement pompe direction assistée hydraulique (MO)',price:75.00,parts:[{desc:'Pompe direction assistée hydraulique',price:0},{desc:'Courroie pompe DA (si applicable)',price:0},{desc:'Fluide direction assistée (1L)',price:0}]},
+    {id:'op289',type:'T2',name:'Purge + remplissage fluide direction assistée',price:35.00,parts:[{desc:'Fluide direction assistée (1L)',price:0}]},
+    {id:'op290',type:'T2',name:'Remplacement durite direction assistée haute pression (MO)',price:45.00,parts:[{desc:'Durite DA haute pression',price:0},{desc:'Fluide direction assistée',price:0}]},
+    {id:'op291',type:'T2',name:'Remplacement durite direction assistée basse pression (MO)',price:30.00,parts:[{desc:'Durite DA basse pression / retour',price:0}]},
+    {id:'op292',type:'T2',name:'Remplacement butée de direction (MO unitaire)',price:20.00,parts:[{desc:'Butée de direction',price:0}]},
+    {id:'op293',type:'T2',name:'Remplacement bras de suspension AR (MO paire)',price:65.00,parts:[{desc:'Bras de suspension AR (x2)',price:0}],note:'⚠️ Géométrie AR obligatoire après remplacement'},
+    {id:'op294',type:'T2',name:'Remplacement bras oscillant AV (MO unitaire)',price:55.00,parts:[{desc:'Bras oscillant AV',price:0}],note:'⚠️ Géométrie AV obligatoire après remplacement'},
+    {id:'op295',type:'T2',name:'Remplacement silent bloc de bras AR (MO paire)',price:45.00,parts:[{desc:'Silent blocs de bras AR (x2)',price:0}],note:'⚠️ Géométrie AR recommandée après remplacement'},
+    {id:'op296',type:'T2',name:'Remplacement tirant de chasse AV (MO unitaire)',price:45.00,parts:[{desc:'Tirant de chasse AV',price:0}],note:'⚠️ Géométrie AV obligatoire après remplacement'},
+    {id:'op297',type:'T2',name:'Remplacement ressort hélicoïdal AV (MO paire)',price:55.00,parts:[{desc:'Ressorts hélicoïdaux AV (x2)',price:0}],note:'ℹ️ Géométrie AV recommandée'},
+    {id:'op298',type:'T2',name:'Remplacement ressort hélicoïdal AR (MO paire)',price:45.00,parts:[{desc:'Ressorts hélicoïdaux AR (x2)',price:0}]},
+    {id:'op299',type:'T2',name:'Remplacement barre de torsion AR (MO)',price:55.00,parts:[{desc:'Barre de torsion AR',price:0}],note:'⚠️ Géométrie AR obligatoire après remplacement'},
+    {id:'op300',type:'T2',name:'Remplacement barre stabilisatrice AV (MO)',price:55.00,parts:[{desc:'Barre stabilisatrice AV',price:0}],note:'ℹ️ Géométrie AV recommandée'},
+    {id:'op301',type:'T2',name:'Remplacement barre stabilisatrice AR (MO)',price:45.00,parts:[{desc:'Barre stabilisatrice AR',price:0}]},
+    {id:'op302',type:'T2',name:'Remplacement biellettes barre stabilisatrice AR (MO paire)',price:25.00,parts:[{desc:'Biellettes barre stabilisatrice AR (x2)',price:0}]},
+    {id:'op303',type:'T2',name:'Remplacement coupelle d\'amortisseur AV (MO paire)',price:45.00,parts:[{desc:'Coupelles d\'amortisseur AV (x2)',price:0},{desc:'Butées d\'amortisseur AV (x2)',price:0}]},
+    {id:'op304',type:'T2',name:'Remplacement coupelle d\'amortisseur AR (MO paire)',price:35.00,parts:[{desc:'Coupelles d\'amortisseur AR (x2)',price:0}]},
+    {id:'op305',type:'T2',name:'Remplacement pivot / fusée AV (MO unitaire)',price:75.00,parts:[{desc:'Pivot / fusée AV',price:0}],note:'⚠️ GÉOMÉTRIE OBLIGATOIRE + Roulement à vérifier'},
+    {id:'op306',type:'T2',name:'Remplacement moyeu de roue AV (MO unitaire)',price:55.00,parts:[{desc:'Moyeu de roue AV',price:0}]},
+    {id:'op307',type:'T2',name:'Remplacement moyeu de roue AR (MO unitaire)',price:45.00,parts:[{desc:'Moyeu de roue AR',price:0}]},
+    {id:'op308',type:'T2',name:'Remplacement roulement de roue AR (MO unitaire)',price:45.00,parts:[{desc:'Roulement de roue AR',price:0}]},
+    {id:'op309',type:'T2',name:'Remplacement silent bloc berceau AV (MO jeu)',price:85.00,parts:[{desc:'Silent blocs berceau AV (jeu)',price:0}],note:'⚠️ Géométrie AV obligatoire après remplacement'},
+    {id:'op310',type:'T2',name:'Dépose/repose berceau moteur AV (MO)',price:120.00,parts:[],note:'ℹ️ Nécessaire pour accès silent blocs / crémaillère / triangle'},
+    {id:'op311',type:'T2',name:'Remplacement support moteur supérieur (MO)',price:35.00,parts:[{desc:'Support moteur supérieur (silent bloc)',price:0}]},
+    {id:'op312',type:'T2',name:'Remplacement support moteur inférieur (MO)',price:45.00,parts:[{desc:'Support moteur inférieur (silent bloc)',price:0}]},
+    {id:'op313',type:'T2',name:'Remplacement support moteur AR / anti-couple (MO)',price:40.00,parts:[{desc:'Support moteur AR / biellette anti-couple',price:0}]},
+    {id:'op314',type:'T2',name:'Remplacement support boîte de vitesses (MO)',price:45.00,parts:[{desc:'Support boîte de vitesses',price:0}]},
+    {id:'op315',type:'T2',name:'Remplacement jeu complet silent blocs moteur + boîte (MO)',price:95.00,parts:[{desc:'Silent blocs moteur (jeu complet)',price:0},{desc:'Support boîte',price:0}]},
+    {id:'op316',type:'T2',name:'Remplacement mâchoires de frein AR (MO paire — tambour)',price:35.00,parts:[{desc:'Jeu mâchoires de frein AR',price:0}]},
+    {id:'op317',type:'T2',name:'Remplacement tambours de frein AR (MO paire)',price:40.00,parts:[{desc:'Tambours de frein AR (x2)',price:0}]},
+    {id:'op318',type:'T2',name:'Remplacement kit frein tambour AR complet (MO)',price:55.00,parts:[{desc:'Tambours AR (x2)',price:0},{desc:'Mâchoires AR (jeu)',price:0},{desc:'Kit ressorts frein tambour',price:0}]},
+    {id:'op319',type:'T2',name:'Remplacement cylindre de roue AR (MO unitaire)',price:35.00,parts:[{desc:'Cylindre de roue AR',price:0}]},
+    {id:'op320',type:'T2',name:'Réglage frein tambour AR',price:15.00,parts:[]},
+    {id:'op321',type:'T2',name:'Remplacement kit ressorts frein tambour AR',price:15.00,parts:[{desc:'Kit ressorts frein tambour AR',price:0}]},
+    {id:'op322',type:'T2',name:'Remplacement maître-cylindre de frein (MO)',price:65.00,parts:[{desc:'Maître-cylindre de frein',price:0},{desc:'Liquide de frein DOT4 (1L)',price:0}],note:'⚠️ Purge complète circuit de frein obligatoire'},
+    {id:'op323',type:'T2',name:'Remplacement servo-frein / assistance de freinage (MO)',price:85.00,parts:[{desc:'Servo-frein',price:0}]},
+    {id:'op324',type:'T2',name:'Remplacement pompe à vide frein (MO)',price:55.00,parts:[{desc:'Pompe à vide frein',price:0}]},
+    {id:'op325',type:'T2',name:'Remplacement correcteur / compensateur de freinage (MO)',price:35.00,parts:[{desc:'Correcteur de freinage',price:0}]},
+    {id:'op326',type:'T2',name:'Remplacement durite servo-frein (MO)',price:20.00,parts:[{desc:'Durite servo-frein',price:0}]},
+    {id:'op327',type:'T2',name:'Remplacement récepteur hydraulique embrayage (MO)',price:40.00,parts:[{desc:'Récepteur hydraulique embrayage',price:0},{desc:'Liquide de frein DOT4',price:0}]},
+    {id:'op328',type:'T2',name:'Remplacement émetteur embrayage hydraulique (MO)',price:35.00,parts:[{desc:'Émetteur embrayage',price:0},{desc:'Liquide de frein DOT4',price:0}]},
+    {id:'op329',type:'T2',name:'Remplacement câble embrayage (MO)',price:25.00,parts:[{desc:'Câble embrayage',price:0}]},
+    {id:'op330',type:'T2',name:'Purge circuit embrayage hydraulique',price:20.00,parts:[{desc:'Liquide de frein DOT4',price:0}]},
+    {id:'op331',type:'T2',name:'Remplacement butée d\'embrayage (MO — sans kit)',price:180.00,parts:[{desc:'Butée d\'embrayage',price:0}],note:'ℹ️ Kit embrayage complet recommandé tant que boîte déposée'},
+    {id:'op332',type:'T2',name:'Remplacement joint de culasse (MO)',price:350.00,parts:[{desc:'Joint de culasse',price:0},{desc:'Kit vis de culasse',price:0},{desc:'Joints annexes (admission, échappement, eau)',price:0},{desc:'Liquide de refroidissement (5L)',price:0},{desc:'Huile moteur (5L)',price:0}],note:'⚠️ Planéité culasse à vérifier — Surfaçage si nécessaire'},
+    {id:'op333',type:'T2',name:'Remplacement joint couvre-culasse / cache culbuteurs (MO)',price:25.00,parts:[{desc:'Joint couvre-culasse',price:0}]},
+    {id:'op334',type:'T2',name:'Remplacement joint carter huile moteur (MO)',price:55.00,parts:[{desc:'Joint carter huile',price:0},{desc:'Huile moteur (5L)',price:0}]},
+    {id:'op335',type:'T2',name:'Remplacement joint spi vilebrequin AV (MO)',price:65.00,parts:[{desc:'Joint spi vilebrequin côté distribution',price:0}],note:'ℹ️ Distribution à déposer — Kit distribution recommandé'},
+    {id:'op336',type:'T2',name:'Remplacement joint spi vilebrequin AR (MO)',price:120.00,parts:[{desc:'Joint spi vilebrequin côté volant moteur',price:0}],note:'ℹ️ Boîte de vitesses à déposer — Embrayage à vérifier'},
+    {id:'op337',type:'T2',name:'Remplacement joints queue de soupape (MO jeu)',price:180.00,parts:[{desc:'Joints queue de soupape (jeu)',price:0}]},
+    {id:'op338',type:'T2',name:'Remplacement joint collecteur admission (MO)',price:35.00,parts:[{desc:'Joint collecteur admission',price:0}]},
+    {id:'op339',type:'T2',name:'Remplacement joint collecteur échappement (MO)',price:35.00,parts:[{desc:'Joint collecteur échappement',price:0}]},
+    {id:'op340',type:'T2',name:'Réglage jeu aux soupapes (MO)',price:65.00,parts:[{desc:'Pastilles de réglage (si nécessaire)',price:0}]},
+    {id:'op341',type:'T2',name:'Surfaçage culasse (travail atelier — hors dépose)',price:120.00,parts:[]},
+    {id:'op342',type:'T2',name:'Remplacement chaîne de distribution (MO)',price:250.00,parts:[{desc:'Kit chaîne distribution (chaîne + tendeurs + patins + guides)',price:0}]},
+    {id:'op343',type:'T2',name:'Remplacement chaîne + tendeurs + patins distribution (MO)',price:280.00,parts:[{desc:'Kit chaîne complet (chaîne + tendeurs + patins + guides + joints)',price:0},{desc:'Huile moteur (5L)',price:0}]},
+    {id:'op344',type:'T2',name:'Remplacement galet enrouleur distribution (MO unitaire)',price:35.00,parts:[{desc:'Galet enrouleur',price:0}]},
+    {id:'op345',type:'T2',name:'Remplacement galet tendeur distribution (MO unitaire)',price:35.00,parts:[{desc:'Galet tendeur',price:0}]},
+    {id:'op346',type:'T2',name:'Calage distribution (MO — après intervention)',price:45.00,parts:[]},
+    {id:'op347',type:'T2',name:'Remplacement poulie damper vilebrequin (MO)',price:45.00,parts:[{desc:'Poulie damper vilebrequin',price:0}]},
+    {id:'op348',type:'T2',name:'Remplacement vase d\'expansion (MO)',price:20.00,parts:[{desc:'Vase d\'expansion',price:0},{desc:'Bouchon vase',price:0}]},
+    {id:'op349',type:'T2',name:'Remplacement bouchon vase d\'expansion / radiateur',price:8.00,parts:[{desc:'Bouchon vase d\'expansion',price:0}]},
+    {id:'op350',type:'T2',name:'Remplacement durite de chauffage habitacle (MO)',price:30.00,parts:[{desc:'Durite de chauffage',price:0}]},
+    {id:'op351',type:'T2',name:'Remplacement radiateur de chauffage (MO)',price:180.00,parts:[{desc:'Radiateur de chauffage',price:0},{desc:'Liquide de refroidissement (2L)',price:0}],note:'ℹ️ Dépose tableau de bord nécessaire sur la plupart des véhicules'},
+    {id:'op352',type:'T2',name:'Remplacement robinet de chauffage (MO)',price:35.00,parts:[{desc:'Robinet de chauffage',price:0}]},
+    {id:'op353',type:'T2',name:'Remplacement durite turbo / intercooler (MO unitaire)',price:30.00,parts:[{desc:'Durite turbo / intercooler',price:0}]},
+    {id:'op354',type:'T2',name:'Remplacement échangeur air-air / intercooler (MO)',price:55.00,parts:[{desc:'Échangeur air-air / intercooler',price:0}]},
+    {id:'op355',type:'T2',name:'Remplacement actuateur wastegate turbo (MO)',price:45.00,parts:[{desc:'Actuateur wastegate',price:0}]},
+    {id:'op356',type:'T2',name:'Remplacement actuateur turbo géométrie variable VNT (MO)',price:55.00,parts:[{desc:'Actuateur VNT / géométrie variable',price:0}]},
+    {id:'op357',type:'T2',name:'Remplacement soupape wastegate (MO)',price:40.00,parts:[{desc:'Soupape wastegate',price:0}]},
+    {id:'op358',type:'T2',name:'Remplacement refroidisseur EGR / échangeur EGR (MO)',price:55.00,parts:[{desc:'Refroidisseur / échangeur EGR',price:0}]},
+    {id:'op359',type:'T2',name:'Nettoyage collecteur admission (décalaminage manuel)',price:85.00,parts:[],note:'ℹ️ Recommandé lors remplacement vanne EGR / nettoyage FAP'},
+    {id:'op360',type:'T2',name:'Remplacement collecteur admission (MO)',price:65.00,parts:[{desc:'Collecteur admission',price:0},{desc:'Joints collecteur admission',price:0}]},
+    {id:'op361',type:'T2',name:'Remplacement collecteur échappement (MO)',price:75.00,parts:[{desc:'Collecteur échappement',price:0},{desc:'Joints collecteur échappement + goujons',price:0}]},
+    {id:'op362',type:'T2',name:'Remplacement pompe haute pression injection diesel (MO)',price:130.00,parts:[{desc:'Pompe haute pression diesel',price:0}]},
+    {id:'op363',type:'T2',name:'Remplacement rampe d\'injection common rail (MO)',price:65.00,parts:[{desc:'Rampe d\'injection common rail',price:0}]},
+    {id:'op364',type:'T2',name:'Remplacement injecteur piézo-électrique (MO unitaire)',price:65.00,parts:[{desc:'Injecteur piézo-électrique',price:0},{desc:'Joint cuivre injecteur',price:0}]},
+    {id:'op365',type:'T2',name:'Remplacement jeu 4 injecteurs diesel (MO)',price:150.00,parts:[{desc:'Injecteurs diesel (x4)',price:0},{desc:'Joints cuivre injecteurs (x4)',price:0}]},
+    {id:'op366',type:'T2',name:'Remplacement bague d\'étanchéité injecteur diesel (MO unitaire)',price:25.00,parts:[{desc:'Bague d\'étanchéité injecteur',price:0},{desc:'Joint cuivre',price:0}]},
+    {id:'op367',type:'T2',name:'Remplacement régulateur pression rampe common rail (MO)',price:35.00,parts:[{desc:'Régulateur pression rampe',price:0}]},
+    {id:'op368',type:'T2',name:'Nettoyage / décrassage injecteurs (ultrasons)',price:65.00,parts:[]},
+    {id:'op369',type:'T2',name:'Remplacement soupape PCV / membrane reniflard (MO)',price:25.00,parts:[{desc:'Soupape PCV / membrane reniflard',price:0}]},
+    {id:'op370',type:'T2',name:'Remplacement séparateur d\'huile / déshuileur (MO)',price:35.00,parts:[{desc:'Séparateur d\'huile',price:0}]},
+    {id:'op371',type:'T2',name:'Remplacement tube de reniflard (MO)',price:20.00,parts:[{desc:'Tube reniflard',price:0}]},
+    {id:'op372',type:'T2',name:'Remplacement palier intermédiaire de transmission (MO)',price:40.00,parts:[{desc:'Palier intermédiaire transmission',price:0}]},
+    {id:'op373',type:'T2',name:'Remplacement arbre de transmission (MO)',price:85.00,parts:[{desc:'Arbre de transmission',price:0}]},
+    {id:'op374',type:'T2',name:'Remplacement croisillon de transmission (MO)',price:45.00,parts:[{desc:'Croisillon de transmission',price:0}]},
+    {id:'op375',type:'T2',name:'Remplacement flector de transmission (MO)',price:40.00,parts:[{desc:'Flector de transmission',price:0}]},
+    {id:'op376',type:'T2',name:'Remplacement joint homocinétique (MO — sans dépose cardan)',price:55.00,parts:[{desc:'Joint homocinétique + graisse + soufflet',price:0}]},
+    {id:'op377',type:'T2',name:'Remplacement bride de cardan côté boîte (MO)',price:35.00,parts:[{desc:'Bride de cardan',price:0}]},
+    {id:'op378',type:'T2',name:'Vidange pont / différentiel',price:35.00,parts:[{desc:'Huile pont / différentiel (1-2L)',price:0}]},
+    {id:'op379',type:'T2',name:'Remplacement joint spy de pont / différentiel (MO)',price:45.00,parts:[{desc:'Joint spy différentiel',price:0},{desc:'Huile pont (1L)',price:0}]},
+    {id:'op380',type:'T2',name:'Remplacement câble / tringlerie sélecteur de vitesse (MO)',price:30.00,parts:[{desc:'Câble / tringlerie sélecteur',price:0}]},
+    {id:'op381',type:'T2',name:'Remplacement joint spy de boîte de vitesses (MO)',price:55.00,parts:[{desc:'Joint spy boîte de vitesses',price:0}],note:'ℹ️ Cardan à déposer'},
+    {id:'op382',type:'T2',name:'Remplacement joint de carter de boîte (MO)',price:45.00,parts:[{desc:'Joint carter boîte',price:0},{desc:'Huile de boîte',price:0}]},
+    {id:'op383',type:'T2',name:'Remplacement durite de dépression / vacuum (MO)',price:20.00,parts:[{desc:'Durite de dépression',price:0}]},
+    {id:'op384',type:'T2',name:'Remplacement clapet anti-retour dépression (MO)',price:15.00,parts:[{desc:'Clapet anti-retour',price:0}]},
+    {id:'op385',type:'T4',name:'Remplacement capteur NOx / sonde NOx (MO)',price:55.00,parts:[{desc:'Capteur NOx / sonde NOx',price:0}],note:'ℹ️ Calibration par valise après remplacement — Contrôler système SCR/AdBlue'},
+    {id:'op386',type:'T4',name:'Remplacement sonde température échappement EGT 1 (amont turbo)',price:35.00,parts:[{desc:'Sonde EGT 1 (pré-turbo)',price:0}]},
+    {id:'op387',type:'T4',name:'Remplacement sonde température échappement EGT 2 (aval turbo)',price:35.00,parts:[{desc:'Sonde EGT 2 (post-turbo)',price:0}]},
+    {id:'op388',type:'T4',name:'Remplacement sonde température échappement EGT 3 (amont FAP)',price:35.00,parts:[{desc:'Sonde EGT 3 (pré-FAP)',price:0}]},
+    {id:'op389',type:'T4',name:'Remplacement sonde température échappement EGT 4 (aval FAP)',price:35.00,parts:[{desc:'Sonde EGT 4 (post-FAP)',price:0}]},
+    {id:'op390',type:'T4',name:'Remplacement capteur pression différentielle FAP (MO)',price:30.00,parts:[{desc:'Capteur pression différentielle FAP',price:0}],note:'ℹ️ Calibration par valise + effacement défauts FAP'},
+    {id:'op391',type:'T4',name:'Remplacement capteur de cliquetis / knock sensor (MO)',price:30.00,parts:[{desc:'Capteur de cliquetis',price:0}]},
+    {id:'op392',type:'T4',name:'Remplacement capteur position papillon TPS (MO)',price:25.00,parts:[{desc:'Capteur TPS',price:0}]},
+    {id:'op393',type:'T4',name:'Remplacement régulateur de ralenti IAC/ICV (MO)',price:30.00,parts:[{desc:'Régulateur de ralenti',price:0}]},
+    {id:'op394',type:'T4',name:'Remplacement module pompe AdBlue (MO)',price:75.00,parts:[{desc:'Module pompe AdBlue',price:0}],note:'ℹ️ Calibration par valise obligatoire après remplacement'},
+    {id:'op395',type:'T4',name:'Remplacement injecteur AdBlue (MO)',price:40.00,parts:[{desc:'Injecteur AdBlue',price:0}],note:'ℹ️ Calibration par valise + effacement défauts SCR'},
+    {id:'op396',type:'T4',name:'Remplacement réservoir AdBlue (MO)',price:55.00,parts:[{desc:'Réservoir AdBlue',price:0},{desc:'AdBlue (10L)',price:0}]},
+    {id:'op397',type:'T4',name:'Remplacement capteur niveau AdBlue (MO)',price:30.00,parts:[{desc:'Capteur niveau AdBlue',price:0}]},
+    {id:'op398',type:'T4',name:'Remplacement capteur qualité / température AdBlue (MO)',price:30.00,parts:[{desc:'Capteur qualité AdBlue',price:0}]},
+    {id:'op399',type:'T4',name:'Remplacement catalyseur SCR (MO)',price:95.00,parts:[{desc:'Catalyseur SCR (AdBlue)',price:0},{desc:'Joints échappement',price:0}],note:'⚠️ Calibration SCR + effacement défauts obligatoire'},
+    {id:'op400',type:'T4',name:'Purge / réamorçage circuit AdBlue',price:25.00,parts:[{desc:'AdBlue (5L)',price:0}]},
+    {id:'op401',type:'T4',name:'Remplacement durite / tuyau chauffant AdBlue (MO)',price:30.00,parts:[{desc:'Durite chauffante AdBlue',price:0}]},
+    {id:'op402',type:'T4',name:'Remplacement électrovanne de géométrie variable turbo (MO)',price:30.00,parts:[{desc:'Électrovanne géométrie variable turbo',price:0}]},
+    {id:'op403',type:'T4',name:'Remplacement capteur pression turbo / boost (MO)',price:25.00,parts:[{desc:'Capteur pression turbo',price:0}]},
+    {id:'op404',type:'T4',name:'Remplacement électrovanne canister / purge EVAP (MO)',price:25.00,parts:[{desc:'Électrovanne canister EVAP',price:0}]},
+    {id:'op405',type:'T4',name:'Remplacement contacteur tournant airbag / ressort (MO)',price:40.00,parts:[{desc:'Contacteur tournant airbag',price:0}],note:'⚠️ Batterie à débrancher 15 min avant intervention — Effacement défaut airbag'},
+    {id:'op406',type:'T4',name:'Remplacement calculateur airbag (MO)',price:65.00,parts:[{desc:'Calculateur airbag',price:0}],note:'⚠️ Codage / programmation obligatoire après remplacement'},
+    {id:'op407',type:'T4',name:'Remplacement module ESP / ESC (MO)',price:75.00,parts:[{desc:'Module ESP / ESC',price:0}],note:'⚠️ Calibration capteur angle volant + effacement défauts'},
+    {id:'op408',type:'T4',name:'Remplacement capteur lacet / yaw sensor ESP (MO)',price:35.00,parts:[{desc:'Capteur lacet ESP',price:0}]},
+    {id:'op409',type:'T4',name:'Remplacement capteur accélération latérale (MO)',price:30.00,parts:[{desc:'Capteur accélération latérale',price:0}]},
+    {id:'op410',type:'T4',name:'Remplacement prétensionneur ceinture de sécurité (MO)',price:45.00,parts:[{desc:'Prétensionneur ceinture',price:0}]},
+    {id:'op411',type:'T4',name:'Remplacement capteur de pluie (MO)',price:25.00,parts:[{desc:'Capteur de pluie',price:0}]},
+    {id:'op412',type:'T4',name:'Remplacement capteur de luminosité (MO)',price:20.00,parts:[{desc:'Capteur de luminosité',price:0}]},
+    {id:'op413',type:'T4',name:'Remplacement sonde température extérieure (MO)',price:15.00,parts:[{desc:'Sonde température extérieure',price:0}]},
+    {id:'op414',type:'T4',name:'Remplacement sonde température intérieure habitacle (MO)',price:15.00,parts:[{desc:'Sonde température intérieure',price:0}]},
+    {id:'op415',type:'T4',name:'Remplacement condenseur climatisation (MO)',price:65.00,parts:[{desc:'Condenseur climatisation',price:0},{desc:'Gaz réfrigérant',price:0},{desc:'Huile compresseur',price:0}]},
+    {id:'op416',type:'T4',name:'Remplacement détendeur / valve expansion climatisation (MO)',price:45.00,parts:[{desc:'Détendeur climatisation',price:0},{desc:'Gaz réfrigérant',price:0}]},
+    {id:'op417',type:'T4',name:'Remplacement évaporateur climatisation (MO)',price:180.00,parts:[{desc:'Évaporateur climatisation',price:0},{desc:'Gaz réfrigérant',price:0}],note:'ℹ️ Dépose tableau de bord nécessaire'},
+    {id:'op418',type:'T4',name:'Remplacement durite climatisation haute pression (MO)',price:35.00,parts:[{desc:'Durite clim haute pression',price:0},{desc:'Gaz réfrigérant',price:0}]},
+    {id:'op419',type:'T4',name:'Remplacement durite climatisation basse pression (MO)',price:30.00,parts:[{desc:'Durite clim basse pression',price:0},{desc:'Gaz réfrigérant',price:0}]},
+    {id:'op420',type:'T4',name:'Remplacement pressostat climatisation (MO)',price:20.00,parts:[{desc:'Pressostat climatisation',price:0}]},
+    {id:'op421',type:'T4',name:'Remplacement moteur de volet climatisation / servomoteur (MO)',price:35.00,parts:[{desc:'Servomoteur volet climatisation',price:0}]},
+    {id:'op422',type:'T4',name:'Remplacement calculateur boîte robotisée TCM (MO)',price:85.00,parts:[{desc:'Calculateur boîte robotisée',price:0}],note:'⚠️ Programmation / adaptation obligatoire'},
+    {id:'op423',type:'T4',name:'Remplacement actuateur boîte robotisée (MO)',price:75.00,parts:[{desc:'Actuateur boîte robotisée',price:0}]},
+    {id:'op424',type:'T4',name:'Remplacement pompe hydraulique boîte robotisée (MO)',price:85.00,parts:[{desc:'Pompe hydraulique boîte robotisée',price:0}]},
+    {id:'op425',type:'T4',name:'Remplacement module valve body BVA (MO)',price:95.00,parts:[{desc:'Module valve body BVA',price:0}]},
+    {id:'op426',type:'T4',name:'Remplacement capteur de vitesse boîte (input/output)',price:25.00,parts:[{desc:'Capteur de vitesse boîte',price:0}]},
+    {id:'op427',type:'T4',name:'Remplacement sonde température boîte automatique',price:20.00,parts:[{desc:'Sonde température BVA',price:0}]},
+    {id:'op428',type:'T4',name:'Remplacement module de commande bougies préchauffage (MO)',price:30.00,parts:[{desc:'Module de commande préchauffage',price:0}]},
+    {id:'op429',type:'T4',name:'Remplacement relais bougies de préchauffage (MO)',price:20.00,parts:[{desc:'Relais préchauffage',price:0}]},
+    {id:'op430',type:'T4',name:'Remplacement relais pompe à carburant (MO)',price:15.00,parts:[{desc:'Relais pompe carburant',price:0}]},
+    {id:'op431',type:'T4',name:'Remplacement poignée de porte extérieure (MO)',price:30.00,parts:[{desc:'Poignée porte extérieure',price:0}]},
+    {id:'op432',type:'T4',name:'Remplacement serrure de porte complète (MO)',price:40.00,parts:[{desc:'Serrure de porte complète',price:0}]},
+    {id:'op433',type:'T4',name:'Remplacement serrure coffre / hayon (MO)',price:35.00,parts:[{desc:'Serrure coffre / hayon',price:0}]},
+    {id:'op434',type:'T4',name:'Remplacement rétroviseur complet (MO)',price:30.00,parts:[{desc:'Rétroviseur complet',price:0}]},
+    {id:'op435',type:'T4',name:'Remplacement moteur rétroviseur rabattable (MO)',price:25.00,parts:[{desc:'Moteur rétroviseur rabattable',price:0}]},
+    {id:'op436',type:'T4',name:'Remplacement élément chauffant rétroviseur (MO)',price:20.00,parts:[{desc:'Élément chauffant rétroviseur',price:0}]},
+    {id:'op437',type:'T4',name:'Remplacement glace rétroviseur (MO)',price:10.00,parts:[{desc:'Glace rétroviseur',price:0}]},
+    {id:'op438',type:'T4',name:'Remplacement coque rétroviseur (MO)',price:10.00,parts:[{desc:'Coque rétroviseur',price:0}]},
+    {id:'op439',type:'T4',name:'Remplacement module driver LED phare (MO)',price:35.00,parts:[{desc:'Module driver LED',price:0}]},
+    {id:'op440',type:'T4',name:'Remplacement feu diurne DRL (MO unitaire)',price:25.00,parts:[{desc:'Module DRL / feu diurne',price:0}]},
+    {id:'op441',type:'T4',name:'Remplacement bandeau LED feu AR (MO)',price:30.00,parts:[{desc:'Bandeau LED feu AR',price:0}]},
+    {id:'op442',type:'T4',name:'Remplacement troisième feu stop (MO)',price:15.00,parts:[{desc:'Troisième feu stop',price:0}]},
+    {id:'op443',type:'T4',name:'Remplacement éclairage plaque immatriculation (MO)',price:10.00,parts:[{desc:'Éclairage plaque immatriculation',price:0}]},
+    {id:'op444',type:'T4',name:'Remplacement antibrouillard AV (MO unitaire)',price:20.00,parts:[{desc:'Antibrouillard AV',price:0}]},
+    {id:'op445',type:'T4',name:'Remplacement antibrouillard AR (MO)',price:15.00,parts:[{desc:'Antibrouillard AR',price:0}]},
+    {id:'op446',type:'T4',name:'Remplacement clignotant rétroviseur (MO)',price:15.00,parts:[{desc:'Clignotant rétroviseur',price:0}]},
+    {id:'op447',type:'T4',name:'Remplacement répétiteur d\'aile (MO)',price:10.00,parts:[{desc:'Répétiteur d\'aile',price:0}]},
+    {id:'op448',type:'T4',name:'Remplacement élément chauffant siège (MO)',price:45.00,parts:[{desc:'Élément chauffant siège',price:0}]},
+    {id:'op449',type:'T4',name:'Remplacement chauffage additionnel Webasto / Eberspächer (MO)',price:120.00,parts:[{desc:'Chauffage additionnel',price:0}]},
+    {id:'op450',type:'T4',name:'Remplacement pompe lave-phare (MO unitaire)',price:20.00,parts:[{desc:'Pompe lave-phare',price:0}]},
+    {id:'op451',type:'T4',name:'Remplacement résistance chauffante pare-brise (MO)',price:65.00,parts:[{desc:'Résistance chauffante pare-brise',price:0}]},
+    {id:'op452',type:'T4',name:'Remplacement ventilateur additionnel refroidissement (MO)',price:35.00,parts:[{desc:'Ventilateur additionnel',price:0}]},
+    {id:'op453',type:'T4',name:'Remplacement thermostat électronique / cartouche (MO)',price:35.00,parts:[{desc:'Thermostat électronique',price:0}]},
+    {id:'op454',type:'T4',name:'Remplacement calculateur direction assistée électrique (MO)',price:85.00,parts:[{desc:'Calculateur EPAS',price:0}],note:'⚠️ Calibration capteur angle volant obligatoire'},
+    {id:'op455',type:'T4',name:'Remplacement capteur couple direction (MO)',price:45.00,parts:[{desc:'Capteur couple direction',price:0}],note:'⚠️ Calibration obligatoire'},
+    {id:'op456',type:'T4',name:'Remplacement module toit ouvrant (MO)',price:45.00,parts:[{desc:'Module toit ouvrant',price:0}]},
+    {id:'op457',type:'T4',name:'Remplacement moteur toit ouvrant (MO)',price:55.00,parts:[{desc:'Moteur toit ouvrant',price:0}]},
+    {id:'op458',type:'T4',name:'Remplacement module hayon électrique (MO)',price:45.00,parts:[{desc:'Module hayon électrique',price:0}]},
+    {id:'op459',type:'T4',name:'Remplacement vérin hayon électrique (MO unitaire)',price:25.00,parts:[{desc:'Vérin hayon électrique',price:0}]},
+    {id:'op460',type:'T4',name:'Remplacement vérin de coffre / hayon classique (MO paire)',price:15.00,parts:[{desc:'Vérins de coffre (x2)',price:0}]},
+    {id:'op461',type:'T4',name:'Remplacement lot 4 capteurs de recul AR (MO)',price:45.00,parts:[{desc:'Capteurs de recul AR (x4)',price:0}]},
+    {id:'op462',type:'T4',name:'Remplacement lot 4 capteurs stationnement AV (MO)',price:45.00,parts:[{desc:'Capteurs stationnement AV (x4)',price:0}]},
+    {id:'op463',type:'T4',name:'Remplacement module caméra 360° (MO)',price:55.00,parts:[{desc:'Caméra 360°',price:0}]},
+    {id:'op464',type:'T4',name:'Remplacement radar ACC régulateur adaptatif (MO)',price:55.00,parts:[{desc:'Radar ACC',price:0}],note:'⚠️ Calibration obligatoire après remplacement'},
+    {id:'op465',type:'T4',name:'Calibration radar ACC / caméra ADAS (valise + cible)',price:85.00,parts:[]},
+    {id:'op466',type:'T4',name:'Remplacement capteur de vitesse véhicule VSS (MO)',price:25.00,parts:[{desc:'Capteur VSS',price:0}]},
+    {id:'op467',type:'T3',name:'Diagnostic AdBlue / SCR (valise constructeur)',price:49.00,parts:[],note:'ℹ️ Inclut test pompe + injecteur + capteur NOx + reset compteur'},
+    {id:'op468',type:'T3',name:'Diagnostic boîte automatique / robotisée (valise)',price:49.00,parts:[]},
+    {id:'op469',type:'T3',name:'Diagnostic système hybride / électrique HV (valise)',price:69.00,parts:[],note:'⚠️ Habilitation électrique requise'},
+    {id:'op470',type:'T3',name:'Diagnostic direction assistée électrique (valise)',price:39.00,parts:[]},
+    {id:'op471',type:'T3',name:'Diagnostic airbag / SRS (valise)',price:39.00,parts:[]},
+    {id:'op472',type:'T3',name:'Diagnostic suspension pneumatique (valise)',price:49.00,parts:[]},
+    {id:'op473',type:'T3',name:'Test d\'étanchéité circuit de refroidissement (pression)',price:25.00,parts:[]},
+    {id:'op474',type:'T3',name:'Test compression moteur (cylindres)',price:35.00,parts:[]},
+    {id:'op475',type:'T3',name:'Test d\'étanchéité culasse (CO2 / testeur de fuite)',price:25.00,parts:[]},
+    {id:'op476',type:'T3',name:'Contrôle circuit climatisation (détection fuite UV)',price:35.00,parts:[{desc:'Traceur UV',price:0}]},
+    {id:'op477',type:'T3',name:'Test fumigène (recherche fuite admission / dépression)',price:35.00,parts:[]},
+    {id:'op478',type:'T3',name:'Contrôle géométrie AV (mesure sans réglage)',price:25.00,parts:[]},
+    {id:'op479',type:'T3',name:'Contrôle géométrie AV + AR (mesure sans réglage)',price:35.00,parts:[]},
+    {id:'op480',type:'T3',name:'Contrôle épaisseur plaquettes + disques frein (visuel)',price:15.00,parts:[]},
+    {id:'op481',type:'T3',name:'Essai routier + diagnostic comportement',price:25.00,parts:[]},
+    {id:'op482',type:'T3',name:'Forfait contrôle 50 points (pré-achat VO)',price:59.00,parts:[]},
+    {id:'op483',type:'T3',name:'Forfait contrôle 100 points (expertise complète VO)',price:99.00,parts:[]},
+    {id:'op484',type:'T3',name:'Diagnostic fuite huile (recherche UV + nettoyage)',price:35.00,parts:[{desc:'Traceur UV huile',price:0}]},
+    {id:'op485',type:'T3',name:'Nettoyage circuit de refroidissement (produit chimique)',price:35.00,parts:[{desc:'Nettoyant circuit refroidissement',price:0}]},
+    {id:'op486',type:'T3',name:'Traitement anti-bactérien climatisation',price:25.00,parts:[{desc:'Bombe anti-bactérienne clim',price:0}]},
+    {id:'op487',type:'T3',name:'Remplacement filtre déshydratant climatisation (MO)',price:25.00,parts:[{desc:'Filtre déshydratant clim',price:0},{desc:'Gaz réfrigérant',price:0}]},
+    {id:'op488',type:'T1',name:'Appoint AdBlue (10L)',price:15.00,parts:[{desc:'AdBlue (10L)',price:0}]},
+    {id:'op489',type:'T1',name:'Remplacement filtre à carburant essence',price:15.00,parts:[{desc:'Filtre à carburant essence',price:0}]},
+    {id:'op490',type:'T1',name:'Remplacement liquide de frein (purge complète)',price:25.00,parts:[{desc:'Liquide de frein DOT4 (1L)',price:0}]},
+    {id:'op491',type:'T1',name:'Remplacement ampoule antibrouillard AV (unitaire)',price:8.00,parts:[{desc:'Ampoule antibrouillard',price:0}]},
+    {id:'op492',type:'T1',name:'Remplacement ampoule clignotant (unitaire)',price:5.00,parts:[{desc:'Ampoule clignotant',price:0}]},
+    {id:'op493',type:'T1',name:'Remplacement ampoule plaque immatriculation (paire)',price:5.00,parts:[{desc:'Ampoules plaque (x2)',price:0}]},
+    {id:'op494',type:'T1',name:'Remplacement ampoule éclairage intérieur / plafonnier',price:5.00,parts:[{desc:'Ampoule plafonnier',price:0}]},
+    {id:'op495',type:'T1',name:'Remplacement ampoule veilleuse AV (paire)',price:5.00,parts:[{desc:'Ampoules veilleuse (x2)',price:0}]},
+    {id:'op496',type:'T1',name:'Mise à niveau huile moteur (1L)',price:10.00,parts:[{desc:'Huile moteur (1L)',price:0}]},
+    {id:'op497',type:'T1',name:'Remplacement liquide lave-glace (remplissage complet)',price:5.00,parts:[{desc:'Liquide lave-glace (5L)',price:0}]},
+    {id:'op498',type:'T1',name:'Graissage serrures et charnières',price:10.00,parts:[]},
+    {id:'op499',type:'T1',name:'Remplacement ampoule feu de recul',price:5.00,parts:[{desc:'Ampoule feu de recul',price:0}]}
 ];
 
 // ============================================================
@@ -4585,17 +4809,20 @@ function renderOperations(filter) {
     let ops = data.operations;
     if (filter !== 'all') ops = ops.filter(o => o.type === filter);
 
-    document.getElementById('operationsTable').innerHTML = ops.map(o => `
+    document.getElementById('operationsTable').innerHTML = ops.map(o => {
+        const defOp = DEFAULT_OPERATIONS.find(d => d.id === o.id);
+        const note = o.note || (defOp && defOp.note) || '';
+        return `
         <tr>
-            <td><span class="op-type ${o.type.toLowerCase()}" style="display:inline-block;padding:3px 10px;border-radius:10px;font-size:0.75em;font-weight:700;${o.type==='T1'?'background:#d4edda;color:#155724':o.type==='T2'?'background:#fff3cd;color:#856404':'background:#f8d7da;color:#721c24'}">${o.type}</span></td>
-            <td>${escHtml(o.name)}</td>
+            <td><span class="op-type ${o.type.toLowerCase()}" style="display:inline-block;padding:3px 10px;border-radius:10px;font-size:0.75em;font-weight:700;${o.type==='T1'?'background:#d4edda;color:#155724':o.type==='T2'?'background:#fff3cd;color:#856404':o.type==='T3'?'background:#d1ecf1;color:#0c5460':o.type==='T4'?'background:#e2e3f1;color:#383d6e':'background:#f8d7da;color:#721c24'}">${o.type}</span></td>
+            <td>${escHtml(o.name)}${note ? '<div style="font-size:0.75em;color:#dc3545;margin-top:2px;font-weight:600">'+escHtml(note)+'</div>' : ''}</td>
             <td><strong>${(o.price||0).toFixed(2)} €</strong></td>
             <td>
                 <button class="btn btn-sm btn-outline" onclick="editOperation('${o.id}')">✏️</button>
                 <button class="btn btn-sm btn-danger" onclick="deleteOperation('${o.id}')">🗑️</button>
             </td>
-        </tr>
-    `).join('');
+        </tr>`;
+    }).join('');
 }
 
 function filterOps(type) {
@@ -4674,12 +4901,14 @@ function renderOpPicker() {
     document.getElementById('opPickerGrid').innerHTML = ops.map(o => {
         const defOp = DEFAULT_OPERATIONS.find(d => d.id === o.id);
         const nbParts = (o.parts && o.parts.length) || (defOp && defOp.parts ? defOp.parts.length : 0);
+        const note = o.note || (defOp && defOp.note) || '';
         return `
         <div class="op-card ${selectedPickerOps.has(o.id)?'selected':''}" onclick="togglePickerOp('${o.id}')">
             <span class="op-type ${o.type.toLowerCase()}">${o.type}</span>
             <div class="op-name">${escHtml(o.name)}</div>
             <div class="op-price">${(o.price||0).toFixed(2)} € MO</div>
             ${nbParts > 0 ? '<div style="font-size:0.75em;color:#92400e;margin-top:2px">⚙️ '+nbParts+' pièce'+(nbParts>1?'s':'')+' incluse'+(nbParts>1?'s':'')+'</div>' : ''}
+            ${note ? '<div style="font-size:0.7em;color:#dc3545;margin-top:3px;font-weight:600;line-height:1.2">'+escHtml(note)+'</div>' : ''}
         </div>`;
     }).join('');
 }
@@ -4693,9 +4922,9 @@ function togglePickerOp(id) {
 function addSelectedOps() {
     selectedPickerOps.forEach(opId => {
         let op = data.operations.find(o => o.id === opId);
+        const defOp = DEFAULT_OPERATIONS.find(o => o.id === opId);
         // Si pas de parts dans la version data, chercher dans DEFAULT
         if (op && (!op.parts || op.parts.length === 0)) {
-            const defOp = DEFAULT_OPERATIONS.find(o => o.id === opId);
             if (defOp && defOp.parts) op = {...op, parts: defOp.parts};
         }
         if (op) {
@@ -4706,6 +4935,11 @@ function addSelectedOps() {
                 op.parts.forEach(p => {
                     currentInvoiceLines.push({ description: '    ⚙️ ' + p.desc, qty: 1, priceTTC: p.price || 0, remise: 0, lineType: 'part' });
                 });
+            }
+            // Ligne recommandation si note présente
+            const note = op.note || (defOp && defOp.note) || '';
+            if (note) {
+                currentInvoiceLines.push({ description: '    📋 RECOMMANDATION : ' + note, qty: 0, priceTTC: 0, remise: 0, lineType: 'note' });
             }
         }
     });
