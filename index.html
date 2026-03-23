@@ -46,7 +46,7 @@ body { font-family:'Barlow',sans-serif; background:var(--bg); color:var(--text);
     border-top: 4px solid var(--blue);
 }
 .login-box .logo { text-align:center; margin-bottom:24px; }
-.login-box .logo img { width:180px; height:auto; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); }
+.login-box .logo img { width:180px; height:auto; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); display:block; margin:0 auto; }
 .login-box h2 {
     font-family:'Rajdhani',sans-serif; font-weight:700; text-align:center;
     color:var(--blue); font-size:1.3em; margin-bottom:6px; text-transform:uppercase; letter-spacing:2px;
@@ -5482,15 +5482,15 @@ function initApp() {
 
 (function() {
     const sections = [
-        { id: 'sec-dashboard', file: 'sections/dashboard.html' },
-        { id: 'sec-clients', file: 'sections/clients.html' },
-        { id: 'sec-vehicules', file: 'sections/vehicules.html' },
-        { id: 'sec-factures', file: 'sections/factures.html' },
-        { id: 'sec-operations', file: 'sections/operations.html' },
-        { id: 'sec-urssaf', file: 'sections/urssaf.html' },
-        { id: 'sec-occasions', file: 'sections/occasions.html' },
-        { id: 'sec-settings', file: 'sections/settings.html' },
-        { id: 'modals-container', file: 'sections/modals.html' }
+        { id: 'sec-dashboard', file: 'dashboard.html' },
+        { id: 'sec-clients', file: 'clients.html' },
+        { id: 'sec-vehicules', file: 'vehicules.html' },
+        { id: 'sec-factures', file: 'factures.html' },
+        { id: 'sec-operations', file: 'operations.html' },
+        { id: 'sec-urssaf', file: 'urssaf.html' },
+        { id: 'sec-occasions', file: 'occasions.html' },
+        { id: 'sec-settings', file: 'settings.html' },
+        { id: 'modals-container', file: 'modals.html' }
     ];
     let loaded = 0;
     sections.forEach(function(s) {
