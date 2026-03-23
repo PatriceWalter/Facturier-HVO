@@ -2,8 +2,8 @@
             <div class="card">
                 <div class="card-title">🏛️ Cotisations URSSAF <span style="margin-left:auto;font-weight:400;font-size:0.8em">Année : <select id="urssafYear" onchange="renderURSSAF()" style="padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:1em"></select></span></div>
                 <div class="table-wrap">
-                    <table>
-                        <thead><tr><th>Mois</th><th>🔧 Services</th><th>⚙️ Ventes</th><th>CA Total</th><th>Nb Fact.</th><th>Cotisations</th><th></th></tr></thead>
+                    <table style="table-layout:fixed;width:100%">
+                        <thead><tr><th style="width:14%">Mois</th><th style="width:16%;text-align:right">🔧 Services</th><th style="width:16%;text-align:right">⚙️ Ventes</th><th style="width:16%;text-align:right">CA Total</th><th style="width:10%;text-align:center">Nb Fact.</th><th style="width:16%;text-align:right">Cotisations</th><th style="width:12%"></th></tr></thead>
                         <tbody id="urssafMonthly"></tbody>
                         <tfoot id="urssafTotal"></tfoot>
                     </table>
