@@ -4526,6 +4526,22 @@ document.addEventListener('click', function(e) {
     }
 });
 
+// ============================================================
+// AUTO-MAJUSCULE — Première lettre en majuscule dans toutes les recherches
+// ============================================================
+document.addEventListener('input', function(e) {
+    const el = e.target;
+    if (el.tagName !== 'INPUT') return;
+    const id = el.id || '';
+    if (id.endsWith('Search') || id === 'opPickerSearch' || id === 'clientSearch' || id === 'vehicleSearch' || id === 'invoiceSearch') {
+        if (el.value.length === 1) {
+            const pos = el.selectionStart;
+            el.value = el.value.charAt(0).toUpperCase() + el.value.slice(1);
+            el.setSelectionRange(pos, pos);
+        }
+    }
+});
+
 function applyMotorSelection(prefix) {
     const sel = document.getElementById(prefix + 'MotorSelect');
     if (!sel || !sel.value) return;
@@ -5241,11 +5257,66 @@ function togglePickerOp(id) {
     renderOpPicker();
 }
 
+// ============================================================
+// RECOMMANDATIONS → AJOUT DIRECT DES OPÉRATIONS COMPLÉMENTAIRES
+// ============================================================
+const RECOMMENDED_ADDITIONS = {
+    // --- Géométrie obligatoire : choix AV (op58) ou AV+AR (op59) ---
+    'geo_choice': {
+        label: '🔧 Géométrie obligatoire après cette intervention',
+        choices: [
+            { opId: 'op58', label: '📐 Géométrie AV seule' },
+            { opId: 'op59', label: '📐 Géométrie AV + AR' }
+        ],
+        triggers: ['op44','op280','op281','op282','op283','op284','op285','op286','op287','op288','op508',
+                    'op47','op48','op293','op294','op296','op305','op516']
+    },
+    // --- Géométrie AV recommandée (ajout direct op58) ---
+    'geo_av': {
+        label: '📐 Géométrie AV recommandée',
+        autoAdd: 'op58',
+        triggers: ['op31','op45']
+    },
+    // --- Contrôle géométrie recommandé (choix mesure op478 ou AV+AR op479) ---
+    'geo_check': {
+        label: '📐 Contrôle géométrie recommandé',
+        choices: [
+            { opId: 'op478', label: '📐 Contrôle géométrie AV (mesure)' },
+            { opId: 'op479', label: '📐 Contrôle géométrie AV+AR (mesure)' }
+        ],
+        triggers: ['op32','op46','op308','op49','op517']
+    },
+    // --- Vidange moteur obligatoire après remplacement turbo ---
+    'vidange_turbo': {
+        label: '🛢️ Vidange moteur obligatoire après turbo',
+        autoAdd: 'op1',
+        triggers: ['op56']
+    },
+    // --- Nettoyage collecteur admission recommandé après EGR ---
+    'nettoyage_egr': {
+        label: '🧹 Nettoyage collecteur admission recommandé',
+        autoAdd: 'op359',
+        triggers: ['op55','op358']
+    },
+    // --- Passage au marbre obligatoire après réparation structurelle ---
+    'marbre': {
+        label: '🔩 Passage au marbre obligatoire (réparation structurelle)',
+        autoAdd: 'op611',
+        triggers: ['op599','op600','op601','op602','op603','op604','op605','op606','op607','op608','op609',
+                    'op612','op614','op615','op616','op618','op636','op637','op638']
+    }
+};
+
+// Collect pending recommendations after addSelectedOps
+let pendingRecommendations = [];
+
 function addSelectedOps() {
+    pendingRecommendations = [];
+    const alreadyAdded = new Set();
+
     selectedPickerOps.forEach(opId => {
         let op = data.operations.find(o => o.id === opId);
         const defOp = DEFAULT_OPERATIONS.find(o => o.id === opId);
-        // Si pas de parts dans la version data, chercher dans DEFAULT
         if (op && (!op.parts || op.parts.length === 0)) {
             if (defOp && defOp.parts) op = {...op, parts: defOp.parts};
         }
@@ -5258,15 +5329,127 @@ function addSelectedOps() {
                     currentInvoiceLines.push({ description: '    ⚙️ ' + p.desc, qty: 1, priceTTC: p.price || 0, remise: 0, lineType: 'part' });
                 });
             }
-            // Ligne recommandation si note présente
-            const note = op.note || (defOp && defOp.note) || '';
-            if (note) {
-                currentInvoiceLines.push({ description: '    📋 RECOMMANDATION : ' + note, qty: 0, priceTTC: 0, remise: 0, lineType: 'note' });
+            // Vérifier les recommandations
+            for (const [key, rec] of Object.entries(RECOMMENDED_ADDITIONS)) {
+                if (rec.triggers.includes(opId) && !alreadyAdded.has(key)) {
+                    alreadyAdded.add(key);
+                    pendingRecommendations.push({ key, rec, triggerOp: op.name });
+                }
             }
         }
     });
     closeModal('opPickerModal');
     renderInvoiceLines();
+
+    // Si des recommandations existent, afficher le modal de choix
+    if (pendingRecommendations.length > 0) {
+        setTimeout(() => showRecommendationModal(), 300);
+    }
+}
+
+function showRecommendationModal() {
+    let html = '<div style="max-height:70vh;overflow-y:auto">';
+    html += '<p style="margin-bottom:16px;font-size:0.95em;color:#555">Des opérations complémentaires sont recommandées. Cochez celles à ajouter :</p>';
+
+    pendingRecommendations.forEach((pr, idx) => {
+        const rec = pr.rec;
+        html += '<div style="background:#f8f9fa;border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid #1a3a7a">';
+        html += '<div style="font-weight:700;margin-bottom:8px;font-size:0.95em">' + rec.label + '</div>';
+        html += '<div style="font-size:0.8em;color:#888;margin-bottom:8px">Suite à : ' + escHtml(pr.triggerOp) + '</div>';
+
+        if (rec.choices) {
+            // Radio buttons pour choix
+            rec.choices.forEach((c, ci) => {
+                const op = data.operations.find(o => o.id === c.opId);
+                const price = op ? op.price : 0;
+                html += '<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;margin:4px 0;background:#fff;border-radius:8px;cursor:pointer;border:1px solid #ddd;transition:all 0.2s">';
+                html += '<input type="radio" name="rec_' + idx + '" value="' + c.opId + '" ' + (ci === 0 ? 'checked' : '') + ' style="width:18px;height:18px;accent-color:#1a3a7a">';
+                html += '<span style="flex:1;font-weight:600">' + c.label + '</span>';
+                html += '<span style="color:#1a3a7a;font-weight:700">' + price.toFixed(2) + ' €</span>';
+                html += '</label>';
+            });
+            // Option "Ne pas ajouter"
+            html += '<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;margin:4px 0;background:#fff;border-radius:8px;cursor:pointer;border:1px solid #ddd;opacity:0.6">';
+            html += '<input type="radio" name="rec_' + idx + '" value="none" style="width:18px;height:18px">';
+            html += '<span style="flex:1">Ne pas ajouter</span>';
+            html += '</label>';
+        } else if (rec.autoAdd) {
+            // Checkbox simple
+            const op = data.operations.find(o => o.id === rec.autoAdd);
+            const price = op ? op.price : 0;
+            const opName = op ? op.name : rec.autoAdd;
+            html += '<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:#fff;border-radius:8px;cursor:pointer;border:1px solid #ddd">';
+            html += '<input type="checkbox" name="rec_' + idx + '" value="' + rec.autoAdd + '" checked style="width:18px;height:18px;accent-color:#1a3a7a">';
+            html += '<span style="flex:1;font-weight:600">🔧 ' + escHtml(opName) + '</span>';
+            html += '<span style="color:#1a3a7a;font-weight:700">' + price.toFixed(2) + ' €</span>';
+            html += '</label>';
+        }
+        html += '</div>';
+    });
+
+    html += '</div>';
+    html += '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px">';
+    html += '<button class="btn btn-secondary" onclick="closeModal(\'recModal\')">Ignorer tout</button>';
+    html += '<button class="btn btn-primary" onclick="applyRecommendations()" style="font-size:1.05em;padding:10px 24px">✅ Ajouter les sélectionnés</button>';
+    html += '</div>';
+
+    // Créer le modal dynamiquement
+    let modal = document.getElementById('recModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'recModal';
+        modal.className = 'modal-overlay';
+        modal.innerHTML = '<div class="modal" style="max-width:560px"><div class="modal-header"><h2 id="recModalTitle">📋 Opérations complémentaires</h2><button class="modal-close" onclick="closeModal(\'recModal\')">×</button></div><div class="modal-body" id="recModalBody"></div></div>';
+        document.body.appendChild(modal);
+    }
+    document.getElementById('recModalBody').innerHTML = html;
+    openModal('recModal');
+}
+
+function applyRecommendations() {
+    pendingRecommendations.forEach((pr, idx) => {
+        const rec = pr.rec;
+        let opIdToAdd = null;
+
+        if (rec.choices) {
+            // Radio button
+            const selected = document.querySelector('input[name="rec_' + idx + '"]:checked');
+            if (selected && selected.value !== 'none') {
+                opIdToAdd = selected.value;
+            }
+        } else if (rec.autoAdd) {
+            // Checkbox
+            const cb = document.querySelector('input[name="rec_' + idx + '"]');
+            if (cb && cb.checked) {
+                opIdToAdd = rec.autoAdd;
+            }
+        }
+
+        if (opIdToAdd) {
+            let op = data.operations.find(o => o.id === opIdToAdd);
+            const defOp = DEFAULT_OPERATIONS.find(o => o.id === opIdToAdd);
+            if (op && (!op.parts || op.parts.length === 0) && defOp && defOp.parts) {
+                op = {...op, parts: defOp.parts};
+            }
+            if (op) {
+                // Vérifier qu'on ne duplique pas
+                const exists = currentInvoiceLines.some(l => l.description.includes(op.name));
+                if (!exists) {
+                    currentInvoiceLines.push({ description: '🔧 ' + op.name, qty: 1, priceTTC: op.price, remise: 0, lineType: 'mo' });
+                    if (op.parts && op.parts.length > 0) {
+                        op.parts.forEach(p => {
+                            currentInvoiceLines.push({ description: '    ⚙️ ' + p.desc, qty: 1, priceTTC: p.price || 0, remise: 0, lineType: 'part' });
+                        });
+                    }
+                }
+            }
+        }
+    });
+
+    closeModal('recModal');
+    renderInvoiceLines();
+    toast('Opérations complémentaires ajoutées', 'success');
+    pendingRecommendations = [];
 }
 
 // ============================================================
