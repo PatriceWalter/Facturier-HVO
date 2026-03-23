@@ -532,7 +532,8 @@ let data = {
         mentions: "Conditions de règlement : paiement à réception.\nPas d'escompte pour paiement anticipé.\nPénalités de retard : 3 fois le taux d'intérêt légal.\nIndemnité forfaitaire de recouvrement : 40 €.",
         logo: null,
         regime: 'auto',
-        tauxURSSAF: 23.1
+        tauxService: 21.2,
+        tauxVente: 12.3
     }
 };
 
@@ -3471,7 +3472,13 @@ function applyMigrations() {
         data.operations = DEFAULT_OPERATIONS.map(o => ({...o, parts: o.parts ? o.parts.map(p => ({...p})) : []}));
     }
     if (!data.settings.regime) data.settings.regime = 'auto';
-    if (!data.settings.tauxURSSAF) data.settings.tauxURSSAF = 23.1;
+    if (!data.settings.tauxService) data.settings.tauxService = 21.2;
+    if (!data.settings.tauxVente) data.settings.tauxVente = 12.3;
+    // Migration ancien taux unique → deux taux
+    if (data.settings.tauxURSSAF && !data.settings.tauxService) {
+        data.settings.tauxService = data.settings.tauxURSSAF;
+        data.settings.tauxVente = 12.3;
+    }
     if (!data.occasions) data.occasions = [];
     if (!data.devis) data.devis = [];
     if (!data.settings.devisPrefix) data.settings.devisPrefix = 'DEV-';
@@ -4792,7 +4799,7 @@ function openInvoiceModal(id) {
             currentInvoiceLines = inv.lines ? inv.lines.map(l => ({...l})) : [];
         }
     } else {
-        document.getElementById('fNum').value = data.settings.prefix + String(data.settings.nextNum).padStart(5, '0');
+        document.getElementById('fNum').value = genNumber(data.settings.prefix, data.settings.nextNum);
         document.getElementById('fDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('fClient').value = '';
         document.getElementById('fVehicle').innerHTML = '<option value="">-- Sélectionner client --</option>';
@@ -4818,6 +4825,7 @@ function loadClientVehicles() {
 }
 
 function isAuto() { return (data.settings.regime || 'auto') === 'auto'; }
+function genNumber(prefix, num) { return prefix + new Date().getFullYear() + '-' + String(num).padStart(5, '0'); }
 
 function addEmptyLine() {
     currentInvoiceLines.push({ description: '', qty: 1, priceTTC: 0, remise: 0, lineType: 'mo' });
@@ -5538,7 +5546,7 @@ function openDevisModal(id) {
             currentDevisLines = d.lines ? d.lines.map(l => ({...l})) : [];
         }
     } else {
-        document.getElementById('dNum').value = data.settings.devisPrefix + String(data.settings.nextDevisNum || 1).padStart(5, '0');
+        document.getElementById('dNum').value = genNumber(data.settings.devisPrefix, data.settings.nextDevisNum || 1);
         document.getElementById('dDate').value = new Date().toISOString().split('T')[0];
         // Validité 30 jours par défaut
         const valid = new Date();
@@ -5712,7 +5720,7 @@ function convertDevisToInvoice(devisId) {
     // Créer la facture à partir du devis
     const inv = {
         id: 'inv_' + Date.now(),
-        number: data.settings.prefix + String(data.settings.nextNum || 1).padStart(5, '0'),
+        number: genNumber(data.settings.prefix, data.settings.nextNum || 1),
         date: new Date().toISOString().split('T')[0],
         clientId: d.clientId,
         vehicleId: d.vehicleId,
@@ -6232,7 +6240,8 @@ function printBonCmd(){
 function loadSettings() {
     const s = data.settings;
     document.getElementById('setRegime').value = s.regime || 'auto';
-    document.getElementById('setTauxURSSAF').value = s.tauxURSSAF || 23.1;
+    document.getElementById('setTauxService').value = s.tauxService || 21.2;
+    document.getElementById('setTauxVente').value = s.tauxVente || 12.3;
     document.getElementById('setCompanyName').value = s.companyName || '';
     document.getElementById('setSiret').value = s.siret || '';
     document.getElementById('setAddress').value = s.address || '';
@@ -6259,7 +6268,8 @@ function toggleRegimeFields() {
 
 function saveRegime() {
     data.settings.regime = document.getElementById('setRegime').value;
-    data.settings.tauxURSSAF = parseFloat(document.getElementById('setTauxURSSAF').value) || 23.1;
+    data.settings.tauxService = parseFloat(document.getElementById('setTauxService').value) || 21.2;
+    data.settings.tauxVente = parseFloat(document.getElementById('setTauxVente').value) || 12.3;
     saveData();
     toast('Régime fiscal enregistré', 'success');
 }
@@ -6313,91 +6323,123 @@ function resetCGV() {
 // ============================================================
 function renderURSSAF() {
     const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-    const taux = data.settings.tauxURSSAF || 23.1;
+    const tauxService = data.settings.tauxService || 21.2;
+    const tauxVente = data.settings.tauxVente || 12.3;
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    // Year selector — toujours reconstruire avec plage complète
+    // Year selector
     const yearSel = document.getElementById('urssafYear');
     const selectedYear = yearSel.value ? parseInt(yearSel.value) : currentYear;
     const years = new Set();
-    // Ajouter toutes les années des factures
     data.invoices.forEach(inv => { if (inv.date) years.add(new Date(inv.date).getFullYear()); });
-    // Ajouter année courante + année précédente + année suivante
-    years.add(currentYear - 2);
-    years.add(currentYear - 1);
-    years.add(currentYear);
-    years.add(currentYear + 1);
+    years.add(currentYear - 2); years.add(currentYear - 1); years.add(currentYear); years.add(currentYear + 1);
     const sortedYears = [...years].sort((a,b) => b-a);
-    yearSel.innerHTML = sortedYears.map(y => `<option value="${y}" ${y===selectedYear?'selected':''}>${y}</option>`).join('');
+    yearSel.innerHTML = sortedYears.map(y => '<option value="'+y+'" '+(y===selectedYear?'selected':'')+'>'+y+'</option>').join('');
     const year = parseInt(yearSel.value) || currentYear;
 
-    // Calc CA per month (paid invoices only)
+    // Split CA into services (MO) and vente (pièces) per month
     const caParMois = months.map((m, i) => {
         const paid = data.invoices.filter(inv => {
             if (inv.status !== 'paid' || !inv.date) return false;
             const d = new Date(inv.date);
             return d.getFullYear() === year && d.getMonth() === i;
         });
-        const ca = paid.reduce((s, inv) => s + (inv.totalTTC || 0), 0);
-        return { mois: m, ca, nb: paid.length };
+        let caService = 0; let caVente = 0;
+        paid.forEach(inv => {
+            if (inv.lines && inv.lines.length > 0) {
+                inv.lines.forEach(l => {
+                    const prix = l.priceTTC || l.priceHT || 0;
+                    const rem = l.remise || 0;
+                    const lineTotal = (l.qty||1) * prix * (1 - rem/100);
+                    if (l.lineType === 'part') caVente += lineTotal;
+                    else caService += lineTotal;
+                });
+            } else {
+                caService += (inv.totalTTC || 0);
+            }
+        });
+        return { mois: m, caService, caVente, caTotal: caService + caVente, nb: paid.length };
     });
 
-    const totalAnnee = caParMois.reduce((s, m) => s + m.ca, 0);
-    const trimCA = [0,1,2,3].map(q => caParMois.slice(q*3, q*3+3).reduce((s,m) => s + m.ca, 0));
+    const totalService = caParMois.reduce((s, m) => s + m.caService, 0);
+    const totalVente = caParMois.reduce((s, m) => s + m.caVente, 0);
+    const totalAnnee = totalService + totalVente;
+    const cotisService = totalService * tauxService / 100;
+    const cotisVente = totalVente * tauxVente / 100;
+    const cotisTotal = cotisService + cotisVente;
+
+    // Trimestres
+    const trimData = [0,1,2,3].map(q => {
+        const ms = caParMois.slice(q*3, q*3+3);
+        const svc = ms.reduce((s,m) => s + m.caService, 0);
+        const vte = ms.reduce((s,m) => s + m.caVente, 0);
+        return { caService: svc, caVente: vte, caTotal: svc + vte, cotisService: svc*tauxService/100, cotisVente: vte*tauxVente/100, cotisTotal: svc*tauxService/100 + vte*tauxVente/100 };
+    });
     const currentTrim = Math.floor(currentMonth / 3);
-    const trimAnnee = trimCA[currentTrim];
 
     // Stats
-    document.getElementById('urssafStats').innerHTML = `
-        <div class="stat-card"><div class="stat-value">${caParMois[currentMonth].ca.toFixed(2)} €</div><div class="stat-label">CA ${months[currentMonth]}</div></div>
-        <div class="stat-card"><div class="stat-value">${trimAnnee.toFixed(2)} €</div><div class="stat-label">CA T${currentTrim+1}</div></div>
-        <div class="stat-card orange"><div class="stat-value">${(trimAnnee * taux / 100).toFixed(2)} €</div><div class="stat-label">Cotisations T${currentTrim+1}</div></div>
-        <div class="stat-card green"><div class="stat-value">${totalAnnee.toFixed(2)} €</div><div class="stat-label">CA ${year}</div></div>
-        <div class="stat-card red"><div class="stat-value">${(totalAnnee * taux / 100).toFixed(2)} €</div><div class="stat-label">Cotisations ${year}</div></div>
-    `;
+    const moisCurr = caParMois[currentMonth];
+    const trimCurr = trimData[currentTrim];
+    document.getElementById('urssafStats').innerHTML = 
+        '<div class="stat-card"><div class="stat-value">'+moisCurr.caTotal.toFixed(2)+' €</div><div class="stat-label">CA '+months[currentMonth]+'</div></div>' +
+        '<div class="stat-card"><div class="stat-value">'+trimCurr.caTotal.toFixed(2)+' €</div><div class="stat-label">CA T'+(currentTrim+1)+'</div></div>' +
+        '<div class="stat-card orange"><div class="stat-value">'+trimCurr.cotisTotal.toFixed(2)+' €</div><div class="stat-label">Cotisations T'+(currentTrim+1)+'</div></div>' +
+        '<div class="stat-card green"><div class="stat-value">'+totalAnnee.toFixed(2)+' €</div><div class="stat-label">CA '+year+'</div></div>' +
+        '<div class="stat-card red"><div class="stat-value">'+cotisTotal.toFixed(2)+' €</div><div class="stat-label">Cotisations '+year+'</div></div>';
 
-    // Monthly table
+    // Monthly table — avec split service/vente
     document.getElementById('urssafMonthly').innerHTML = caParMois.map((m, i) => {
         const isCurrent = (year === currentYear && i === currentMonth);
-        return `<tr style="${isCurrent ? 'background:rgba(26,58,122,0.06);font-weight:600' : ''}">
-            <td>${isCurrent ? '📍 ' : ''}${m.mois}</td>
-            <td style="text-align:right;font-weight:600">${m.ca.toFixed(2)} €</td>
-            <td style="text-align:center">${m.nb}</td>
-            <td style="text-align:right;color:var(--red)">${(m.ca * taux / 100).toFixed(2)} €</td>
-            <td style="width:120px"><div style="background:var(--silver-light);border-radius:4px;height:8px;overflow:hidden"><div style="background:var(--blue);height:100%;width:${totalAnnee>0?(m.ca/totalAnnee*100):0}%;border-radius:4px"></div></div></td>
-        </tr>`;
+        const bg = isCurrent ? 'background:rgba(26,58,122,0.06);font-weight:600' : '';
+        const cotisM = m.caService * tauxService/100 + m.caVente * tauxVente/100;
+        return '<tr style="'+bg+'">' +
+            '<td>'+(isCurrent?'📍 ':'')+m.mois+'</td>' +
+            '<td style="text-align:right;color:var(--blue)">'+m.caService.toFixed(2)+' €</td>' +
+            '<td style="text-align:right;color:#7c3aed">'+m.caVente.toFixed(2)+' €</td>' +
+            '<td style="text-align:right;font-weight:600">'+m.caTotal.toFixed(2)+' €</td>' +
+            '<td style="text-align:center">'+m.nb+'</td>' +
+            '<td style="text-align:right;color:var(--red)">'+cotisM.toFixed(2)+' €</td>' +
+            '<td style="width:100px"><div style="background:var(--silver-light);border-radius:4px;height:8px;overflow:hidden"><div style="background:var(--blue);height:100%;width:'+(totalAnnee>0?(m.caTotal/totalAnnee*100):0)+'%;border-radius:4px"></div></div></td>' +
+        '</tr>';
     }).join('');
 
-    document.getElementById('urssafTotal').innerHTML = `<tr style="background:#f0f2f5;font-weight:700">
-        <td>TOTAL ${year}</td>
-        <td style="text-align:right">${totalAnnee.toFixed(2)} €</td>
-        <td style="text-align:center">${caParMois.reduce((s,m)=>s+m.nb,0)}</td>
-        <td style="text-align:right;color:var(--red)">${(totalAnnee * taux / 100).toFixed(2)} €</td>
-        <td></td>
-    </tr>`;
+    document.getElementById('urssafTotal').innerHTML = '<tr style="background:#f0f2f5;font-weight:700">' +
+        '<td>TOTAL '+year+'</td>' +
+        '<td style="text-align:right;color:var(--blue)">'+totalService.toFixed(2)+' €</td>' +
+        '<td style="text-align:right;color:#7c3aed">'+totalVente.toFixed(2)+' €</td>' +
+        '<td style="text-align:right">'+totalAnnee.toFixed(2)+' €</td>' +
+        '<td style="text-align:center">'+caParMois.reduce((s,m)=>s+m.nb,0)+'</td>' +
+        '<td style="text-align:right;color:var(--red)">'+cotisTotal.toFixed(2)+' €</td>' +
+        '<td></td></tr>';
 
-    // Quarters
+    // Quarters — avec détail vente/service
     const echeances = ['30 Avril','31 Juillet','31 Octobre','31 Janvier N+1'];
     document.getElementById('urssafTrimestres').innerHTML = [0,1,2,3].map(q => {
+        const t = trimData[q];
         const isCurr = (year === currentYear && q === currentTrim);
-        return `<div style="padding:20px;border-radius:var(--radius);border:2px solid ${isCurr?'var(--blue)':'var(--border)'};background:${isCurr?'rgba(26,58,122,0.04)':'var(--card)'}">
-            <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.1em;color:var(--blue);margin-bottom:8px">${isCurr?'📍 ':''}T${q+1} ${year}</div>
-            <div style="font-size:1.4em;font-weight:700;margin-bottom:4px">${trimCA[q].toFixed(2)} €</div>
-            <div style="font-size:0.9em;color:var(--red);font-weight:600;margin-bottom:8px">Cotisations : ${(trimCA[q]*taux/100).toFixed(2)} €</div>
-            <div style="font-size:0.8em;color:var(--text-light)">Échéance : ${echeances[q]}</div>
-        </div>`;
+        return '<div style="padding:20px;border-radius:var(--radius);border:2px solid '+(isCurr?'var(--blue)':'var(--border)')+';background:'+(isCurr?'rgba(26,58,122,0.04)':'var(--card)')+'">'+
+            '<div style="font-family:Rajdhani,sans-serif;font-weight:700;font-size:1.1em;color:var(--blue);margin-bottom:8px">'+(isCurr?'📍 ':'')+'T'+(q+1)+' '+year+'</div>'+
+            '<div style="font-size:1.4em;font-weight:700;margin-bottom:4px">'+t.caTotal.toFixed(2)+' €</div>'+
+            '<div style="font-size:0.8em;margin-bottom:2px">🔧 Services : '+t.caService.toFixed(2)+' € <span style="color:var(--red)">('+t.cotisService.toFixed(2)+' €)</span></div>'+
+            '<div style="font-size:0.8em;margin-bottom:6px">⚙️ Ventes : '+t.caVente.toFixed(2)+' € <span style="color:var(--red)">('+t.cotisVente.toFixed(2)+' €)</span></div>'+
+            '<div style="font-size:0.95em;color:var(--red);font-weight:700;margin-bottom:8px;padding:6px;background:rgba(196,30,30,0.06);border-radius:4px">Total cotisations : '+t.cotisTotal.toFixed(2)+' €</div>'+
+            '<div style="font-size:0.8em;color:var(--text-light)">Échéance : '+echeances[q]+'</div>'+
+        '</div>';
     }).join('');
 
     // Info
-    document.getElementById('urssafInfo').innerHTML = `
-        • Taux de cotisation appliqué : <strong>${taux}%</strong> (modifiable dans Paramètres → Régime fiscal)<br>
-        • Les calculs se basent sur les <strong>factures payées</strong> uniquement (régime encaissement)<br>
-        • Auto-entrepreneur services : 21.2% | ACRE 1ère année : 10.6%<br>
-        • Les échéances sont trimestrielles, dernier jour du mois suivant le trimestre<br>
-        • Ces estimations sont indicatives — consultez votre expert-comptable
-    `;
+    document.getElementById('urssafInfo').innerHTML = 
+        '• <strong>Activité mixte garage</strong> — deux taux de cotisation :<br>' +
+        '&nbsp;&nbsp;&nbsp;🔧 Prestations de services (main-d\'œuvre) : <strong>'+tauxService+'%</strong><br>' +
+        '&nbsp;&nbsp;&nbsp;⚙️ Vente de marchandises (pièces) : <strong>'+tauxVente+'%</strong><br>' +
+        '• Taux modifiables dans <strong>Paramètres → Régime fiscal</strong><br>' +
+        '• Les calculs se basent sur les <strong>factures payées</strong> uniquement (régime encaissement)<br>' +
+        '• BIC services normal : 21.2% | ACRE 1ère année : 10.6%<br>' +
+        '• BIC achat-revente normal : 12.3% | ACRE 1ère année : 6.2%<br>' +
+        '• Les échéances sont trimestrielles, dernier jour du mois suivant le trimestre<br>' +
+        '• Ces estimations sont indicatives — consultez votre expert-comptable';
 }
 
 function uploadLogo(e) {

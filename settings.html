@@ -8,10 +8,20 @@
                             <option value="entreprise">Entreprise (TVA applicable)</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>Taux URSSAF (%)</label>
-                        <input id="setTauxURSSAF" type="number" step="0.1" min="0" max="100" value="23.1">
-                        <span style="font-size:0.75em;color:var(--text-light)">Auto-entrepreneur services : 21.2% | ACRE 1ère année : 10.6%</span>
+                </div>
+                <div style="margin-top:12px;padding:14px;background:#f0f7ff;border-radius:8px;border:1px solid #d0e3ff">
+                    <div style="font-weight:700;color:var(--blue);margin-bottom:10px">📊 Taux de cotisations URSSAF (activité mixte garage)</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>🔧 Prestations de services (main-d'œuvre) %</label>
+                            <input id="setTauxService" type="number" step="0.1" min="0" max="100" value="21.2">
+                            <span style="font-size:0.75em;color:var(--text-light)">BIC services : 21.2% | ACRE 1ère année : 10.6%</span>
+                        </div>
+                        <div class="form-group">
+                            <label>⚙️ Vente de marchandises (pièces) %</label>
+                            <input id="setTauxVente" type="number" step="0.1" min="0" max="100" value="12.3">
+                            <span style="font-size:0.75em;color:var(--text-light)">BIC achat-revente : 12.3% | ACRE 1ère année : 6.2%</span>
+                        </div>
                     </div>
                 </div>
                 <div style="margin-top:12px"><button class="btn btn-primary" onclick="saveRegime()">💾 Enregistrer</button></div>
