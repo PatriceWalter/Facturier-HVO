@@ -3151,6 +3151,110 @@ const DEFAULT_OPERATIONS = [
     {id:'op497',type:'T1',name:'Remplacement liquide lave-glace (remplissage complet)',price:5.00,parts:[{desc:'Liquide lave-glace (5L)',price:0}]},
     {id:'op498',type:'T1',name:'Graissage serrures et charnières',price:10.00,parts:[]},
     {id:'op499',type:'T1',name:'Remplacement ampoule feu de recul',price:5.00,parts:[{desc:'Ampoule feu de recul',price:0}]}
+,
+
+    // ======================================================================
+    // CATÉGORIES AJOUTÉES — Carrosserie, GPL/GNV/Hybride + compléments
+    // ======================================================================
+    {id:'op500',type:'T1',name:'Remplacement filtre à huile seul (sans vidange)',price:10.00,parts:[{desc:'Filtre à huile',price:0}]},
+    {id:'op501',type:'T1',name:'Remplacement filtre à carburant GPL/GNV',price:15.00,parts:[{desc:'Filtre GPL/GNV',price:0}]},
+    {id:'op502',type:'T1',name:'Contrôle niveau tous fluides (forfait)',price:10.00,parts:[]},
+    {id:'op503',type:'T1',name:'Traitement anti-corrosion bas de caisse',price:45.00,parts:[{desc:'Produit anti-corrosion',price:0}]},
+    {id:'op504',type:'T1',name:'Lustrage / polissage carrosserie (forfait)',price:65.00,parts:[{desc:'Polish + cire',price:0}]},
+    {id:'op505',type:'T1',name:'Rénovation optique phares (ponçage + vernis UV)',price:39.00,parts:[{desc:'Kit rénovation phares',price:0}]},
+    {id:'op506',type:'T1',name:'Nettoyage moteur / dégraissage compartiment moteur',price:25.00,parts:[{desc:'Dégraissant moteur',price:0}]},
+    {id:'op507',type:'T1',name:'Remplacement joint bouchon de vidange',price:3.00,parts:[{desc:'Joint bouchon vidange',price:0}]},
+    {id:'op508',type:'T2',name:'Remplacement crémaillère de direction mécanique (MO)',price:120.00,parts:[{desc:'Crémaillère direction mécanique',price:0},{desc:'Biellettes neuves (x2)',price:0}],note:'⚠️ GÉOMÉTRIE OBLIGATOIRE après remplacement'},
+    {id:'op509',type:'T2',name:'Remplacement pompe de gavage diesel basse pression (MO)',price:45.00,parts:[{desc:'Pompe de gavage diesel',price:0}]},
+    {id:'op510',type:'T2',name:'Remplacement échangeur eau/huile moteur (MO)',price:55.00,parts:[{desc:'Échangeur eau/huile',price:0},{desc:'Joints échangeur',price:0}]},
+    {id:'op511',type:'T2',name:'Remplacement joint carter de distribution (MO)',price:65.00,parts:[{desc:'Joint carter distribution',price:0}],note:'ℹ️ Kit distribution recommandé si kilométrage proche'},
+    {id:'op512',type:'T2',name:'Remplacement canalisation de frein rigide cunifer (MO)',price:35.00,parts:[{desc:'Canalisation frein cunifer',price:0},{desc:'Raccords',price:0}],note:'⚠️ Purge complète circuit de frein obligatoire'},
+    {id:'op513',type:'T2',name:'Remplacement kit chaîne accessoire duplex (MO)',price:45.00,parts:[{desc:'Chaîne accessoire duplex + patin',price:0}]},
+    {id:'op514',type:'T2',name:'Remplacement levier de vitesse / soufflet levier (MO)',price:25.00,parts:[{desc:'Soufflet levier de vitesse',price:0}]},
+    {id:'op515',type:'T2',name:'Remplacement câble de frein à main secondaire (MO)',price:25.00,parts:[{desc:'Câble frein à main secondaire',price:0}]},
+    {id:'op516',type:'T2',name:'Remplacement jambe de force complète AV (MO paire)',price:75.00,parts:[{desc:'Jambes de force AV montées (x2)',price:0}],note:'⚠️ Géométrie AV obligatoire après remplacement'},
+    {id:'op517',type:'T2',name:'Remplacement jambe de force complète AR (MO paire)',price:55.00,parts:[{desc:'Jambes de force AR montées (x2)',price:0}]},
+    {id:'op518',type:'T2',name:'Remplacement tube descente échappement / Y-pipe (MO)',price:45.00,parts:[{desc:'Tube descente échappement',price:0},{desc:'Joints échappement',price:0}]},
+    {id:'op519',type:'T2',name:'Remplacement joint de culasse turbo (MO)',price:380.00,parts:[{desc:'Joint de culasse',price:0},{desc:'Kit vis culasse',price:0},{desc:'Joints annexes turbo (huile + eau)',price:0},{desc:'Liquide refroidissement (5L)',price:0},{desc:'Huile moteur (5L)',price:0}],note:'⚠️ Planéité culasse + inspection turbo obligatoires'},
+    {id:'op520',type:'T2',name:'Remplacement chemises / rechemisage cylindres (atelier)',price:650.00,parts:[{desc:'Jeu chemises',price:0},{desc:'Jeu segments',price:0}]},
+    {id:'op521',type:'T2',name:'Rectification vilebrequin (travail atelier)',price:350.00,parts:[]},
+    {id:'op522',type:'T2',name:'Remplacement segments (MO — moteur déposé)',price:450.00,parts:[{desc:'Jeu segments',price:0},{desc:'Joints complets moteur',price:0}]},
+    {id:'op523',type:'T2',name:'Remplacement joint de pompe à injection (MO)',price:55.00,parts:[{desc:'Joint pompe injection',price:0}]},
+    {id:'op524',type:'T2',name:'Remplacement durite de frein arrière (MO unitaire)',price:25.00,parts:[{desc:'Durite frein AR',price:0}]},
+    {id:'op525',type:'T3',name:'Diagnostic système GPL/GNV (valise)',price:49.00,parts:[]},
+    {id:'op526',type:'T3',name:'Endoscopie moteur (caméra cylindres)',price:45.00,parts:[]},
+    {id:'op527',type:'T3',name:'Contrôle opacité / analyseur de gaz (pré-CT)',price:25.00,parts:[]},
+    {id:'op528',type:'T3',name:'Accompagnement passage contrôle technique',price:35.00,parts:[]},
+    {id:'op529',type:'T3',name:'Diagnostic réseau CAN/LIN (valise + oscilloscope)',price:69.00,parts:[]},
+    {id:'op530',type:'T3',name:'Contrôle jeu de direction (au cric — visuel)',price:15.00,parts:[]},
+    {id:'op531',type:'T3',name:'Test injecteurs au banc (retour gasoil)',price:45.00,parts:[]},
+    {id:'op532',type:'T3',name:'Test pression pompe à carburant',price:25.00,parts:[]},
+    {id:'op533',type:'T3',name:'Contrôle état courroie distribution (visuel)',price:15.00,parts:[]},
+    {id:'op534',type:'T3',name:'Diagnostic fuite climatisation (électronique)',price:35.00,parts:[]},
+    {id:'op535',type:'T4',name:'Remplacement capteur température carburant (MO)',price:20.00,parts:[{desc:'Capteur température carburant',price:0}]},
+    {id:'op536',type:'T4',name:'Remplacement capteur niveau liquide refroidissement (MO)',price:15.00,parts:[{desc:'Capteur niveau LDR',price:0}]},
+    {id:'op537',type:'T4',name:'Remplacement capteur niveau liquide de frein (MO)',price:15.00,parts:[{desc:'Capteur niveau LDF',price:0}]},
+    {id:'op538',type:'T4',name:'Remplacement module commande ventilateur refroidissement (MO)',price:35.00,parts:[{desc:'Module commande ventilateur',price:0}]},
+    {id:'op539',type:'T4',name:'Remplacement module régulateur de vitesse / cruise control (MO)',price:40.00,parts:[{desc:'Module régulateur de vitesse',price:0}]},
+    {id:'op540',type:'T4',name:'Remplacement commutateur feux de détresse / warning (MO)',price:20.00,parts:[{desc:'Commutateur feux de détresse',price:0}]},
+    {id:'op541',type:'T4',name:'Remplacement contacteur de marche arrière (MO)',price:20.00,parts:[{desc:'Contacteur marche arrière',price:0}]},
+    {id:'op542',type:'T4',name:'Remplacement capteur hauteur suspension pneumatique (MO)',price:35.00,parts:[{desc:'Capteur hauteur suspension',price:0}]},
+    {id:'op543',type:'T4',name:'Remplacement compresseur suspension pneumatique (MO)',price:95.00,parts:[{desc:'Compresseur suspension pneumatique',price:0}]},
+    {id:'op544',type:'T4',name:'Remplacement vanne / bloc valve suspension pneumatique (MO)',price:55.00,parts:[{desc:'Bloc valve suspension pneumatique',price:0}]},
+    {id:'op545',type:'T4',name:'Remplacement coussin pneumatique suspension (MO unitaire)',price:65.00,parts:[{desc:'Coussin pneumatique',price:0}]},
+    {id:'op546',type:'T4',name:'Remplacement vérin de capot (MO paire)',price:15.00,parts:[{desc:'Vérins de capot (x2)',price:0}]},
+    {id:'op547',type:'T4',name:'Remplacement moteur trappe à carburant (MO)',price:20.00,parts:[{desc:'Moteur trappe carburant',price:0}]},
+    {id:'op548',type:'T4',name:'Remplacement écran tactile / afficheur multimédia (MO)',price:65.00,parts:[{desc:'Écran tactile / afficheur',price:0}]},
+    {id:'op549',type:'T4',name:'Remplacement combiné d\'instruments / compteur (MO)',price:55.00,parts:[{desc:'Combiné d\'instruments',price:0}],note:'⚠️ Programmation kilométrage obligatoire'},
+    {id:'op550',type:'T4',name:'Installation attelage / crochet d\'attelage + faisceau (MO)',price:85.00,parts:[{desc:'Attelage complet + faisceau',price:0}]},
+    {id:'op551',type:'T4',name:'Installation GPS tracker / traceur antivol (MO + câblage)',price:35.00,parts:[{desc:'Traceur GPS antivol',price:0}]},
+    {id:'op552',type:'T4',name:'Remplacement câble de recharge véhicule électrique/hybride',price:45.00,parts:[{desc:'Câble de recharge',price:0}]},
+    {id:'op553',type:'T4',name:'Remplacement chargeur embarqué OBC véhicule hybride (MO)',price:120.00,parts:[{desc:'Chargeur embarqué OBC',price:0}],note:'⚠️ Habilitation électrique requise — Diagnostic HV obligatoire'},
+    {id:'op554',type:'T4',name:'Remplacement capteur de parking latéral (MO unitaire)',price:20.00,parts:[{desc:'Capteur parking latéral',price:0}]},
+    {id:'op555',type:'T4',name:'Remplacement boîtier de servitude moteur (MO)',price:55.00,parts:[{desc:'Boîtier servitude moteur',price:0}]},
+    {id:'op556',type:'T4',name:'Remplacement résistance de chauffage diesel (MO)',price:25.00,parts:[{desc:'Résistance chauffage diesel',price:0}]},
+    {id:'op557',type:'T8',name:'Dépannage serrure de porte bloquée (sur place)',price:45.00,parts:[]},
+    {id:'op558',type:'T8',name:'Dépannage vitre bloquée en position ouverte (sur place)',price:35.00,parts:[]},
+    {id:'op559',type:'T8',name:'Remplacement pompe lave-glace (dépannage sur place)',price:20.00,parts:[{desc:'Pompe lave-glace',price:0}]},
+    {id:'op560',type:'T8',name:'Dépannage capteur de recul défaillant (sur place)',price:25.00,parts:[{desc:'Capteur de recul',price:0}]},
+    {id:'op561',type:'T8',name:'Remplacement ampoule clignotant (dépannage sur place)',price:8.00,parts:[{desc:'Ampoule clignotant',price:0}]},
+    {id:'op562',type:'T9',name:'Réparation pare-chocs plastique (MO)',price:45.00,parts:[{desc:'Kit réparation plastique',price:0}]},
+    {id:'op563',type:'T9',name:'Peinture / retouche carrosserie (par élément)',price:120.00,parts:[{desc:'Peinture + apprêt + vernis',price:0}]},
+    {id:'op564',type:'T9',name:'Débosselage sans peinture PDR (par impact)',price:55.00,parts:[]},
+    {id:'op565',type:'T9',name:'Remplacement vitre latérale (MO)',price:35.00,parts:[{desc:'Vitre latérale',price:0}]},
+    {id:'op566',type:'T9',name:'Remplacement lunette arrière (MO)',price:45.00,parts:[{desc:'Lunette arrière + joint',price:0}]},
+    {id:'op567',type:'T9',name:'Remplacement joint de porte / joint caoutchouc (MO)',price:25.00,parts:[{desc:'Joint de porte',price:0}]},
+    {id:'op568',type:'T9',name:'Remplacement charnière de porte (MO)',price:35.00,parts:[{desc:'Charnière de porte',price:0}]},
+    {id:'op569',type:'T9',name:'Remplacement gâche de porte (MO)',price:20.00,parts:[{desc:'Gâche de porte',price:0}]},
+    {id:'op570',type:'T9',name:'Remplacement poignée intérieure de porte (MO)',price:20.00,parts:[{desc:'Poignée intérieure porte',price:0}]},
+    {id:'op571',type:'T9',name:'Remplacement pare-chocs AV complet (MO)',price:55.00,parts:[{desc:'Pare-chocs AV',price:0}]},
+    {id:'op572',type:'T9',name:'Remplacement pare-chocs AR complet (MO)',price:55.00,parts:[{desc:'Pare-chocs AR',price:0}]},
+    {id:'op573',type:'T9',name:'Remplacement aile AV (MO)',price:45.00,parts:[{desc:'Aile AV',price:0}]},
+    {id:'op574',type:'T9',name:'Remplacement capot (MO)',price:45.00,parts:[{desc:'Capot',price:0}]},
+    {id:'op575',type:'T9',name:'Remplacement porte complète (MO — hors peinture)',price:65.00,parts:[{desc:'Porte complète',price:0}]},
+    {id:'op576',type:'T9',name:'Remplacement hayon / coffre (MO)',price:55.00,parts:[{desc:'Hayon / coffre',price:0}]},
+    {id:'op577',type:'T9',name:'Traitement anti-rouille / anti-gravillon (par élément)',price:25.00,parts:[{desc:'Produit anti-rouille',price:0}]},
+    {id:'op578',type:'T9',name:'Réparation trou de carrosserie (soudure + mastic)',price:65.00,parts:[{desc:'Tôle + mastic + peinture',price:0}]},
+    {id:'op579',type:'T9',name:'Redressage élément de carrosserie (MO)',price:45.00,parts:[]},
+    {id:'op580',type:'T9',name:'Remplacement becquet / aileron (MO)',price:30.00,parts:[{desc:'Becquet / aileron',price:0}]},
+    {id:'op581',type:'T9',name:'Remplacement grille de calandre (MO)',price:20.00,parts:[{desc:'Grille de calandre',price:0}]},
+    {id:'op582',type:'T9',name:'Remplacement passage de roue / pare-boue (MO)',price:15.00,parts:[{desc:'Passage de roue / pare-boue',price:0}]},
+    {id:'op583',type:'T9',name:'Remplacement bas de caisse / jupe latérale (MO)',price:35.00,parts:[{desc:'Bas de caisse / jupe',price:0}]},
+    {id:'op584',type:'T9',name:'Remplacement baguette de protection de porte (MO)',price:15.00,parts:[{desc:'Baguette protection porte',price:0}]},
+    {id:'op585',type:'T9',name:'Remplacement joint de pare-brise (MO)',price:20.00,parts:[{desc:'Joint pare-brise',price:0}]},
+    {id:'op586',type:'T10',name:'Installation kit GPL séquentiel complet (MO)',price:350.00,parts:[{desc:'Kit GPL séquentiel complet',price:0}],note:'ℹ️ Carte grise à modifier — Contrôle GPL obligatoire'},
+    {id:'op587',type:'T10',name:'Entretien kit GPL (filtre + réglage + contrôle)',price:45.00,parts:[{desc:'Filtre GPL',price:0}]},
+    {id:'op588',type:'T10',name:'Remplacement vaporiseur / détendeur GPL (MO)',price:55.00,parts:[{desc:'Vaporiseur GPL',price:0}]},
+    {id:'op589',type:'T10',name:'Remplacement injecteurs GPL (MO jeu)',price:65.00,parts:[{desc:'Injecteurs GPL (jeu)',price:0}]},
+    {id:'op590',type:'T10',name:'Remplacement réservoir GPL (contrôle décennal)',price:180.00,parts:[{desc:'Réservoir GPL',price:0}],note:'⚠️ Requalification décennale obligatoire'},
+    {id:'op591',type:'T10',name:'Remplacement électrovanne GPL (MO)',price:25.00,parts:[{desc:'Électrovanne GPL',price:0}]},
+    {id:'op592',type:'T10',name:'Remplacement faisceau / câblage GPL (MO)',price:45.00,parts:[{desc:'Faisceau GPL',price:0}]},
+    {id:'op593',type:'T10',name:'Contrôle étanchéité circuit GPL',price:25.00,parts:[]},
+    {id:'op594',type:'T10',name:'Diagnostic système hybride complet (MO)',price:85.00,parts:[],note:'⚠️ Habilitation électrique requise'},
+    {id:'op595',type:'T10',name:'Remplacement batterie haute tension hybride (MO)',price:450.00,parts:[{desc:'Batterie haute tension hybride',price:0}],note:'⚠️ Habilitation électrique HV requise — Dépose sécurisée'},
+    {id:'op596',type:'T10',name:'Remplacement onduleur / convertisseur hybride (MO)',price:180.00,parts:[{desc:'Onduleur / convertisseur',price:0}],note:'⚠️ Habilitation électrique requise'},
+    {id:'op597',type:'T10',name:'Remplacement moteur électrique hybride (MO)',price:350.00,parts:[{desc:'Moteur électrique hybride',price:0}],note:'⚠️ Habilitation électrique requise'},
+    {id:'op598',type:'T10',name:'Remplacement câblage haute tension hybride (MO)',price:120.00,parts:[{desc:'Câblage haute tension',price:0}],note:'⚠️ Habilitation électrique requise'}
 ];
 
 // ============================================================
@@ -4804,6 +4908,22 @@ function printInvoice(id) {
 // ============================================================
 // OPERATIONS
 // ============================================================
+function getOpTypeColor(type) {
+    const colors = {
+        'T1': 'background:#d4edda;color:#155724',
+        'T2': 'background:#fff3cd;color:#856404',
+        'T3': 'background:#d1ecf1;color:#0c5460',
+        'T4': 'background:#e2e3f1;color:#383d6e',
+        'T5': 'background:#f8d7da;color:#721c24',
+        'T6': 'background:#fde2cc;color:#7d4e24',
+        'T7': 'background:#d6d8db;color:#383d41',
+        'T8': 'background:#f5c6cb;color:#721c24',
+        'T9': 'background:#c3e6f3;color:#1a4a6e',
+        'T10': 'background:#d4edda;color:#0d5526'
+    };
+    return colors[type] || 'background:#e9ecef;color:#495057';
+}
+
 function renderOperations(filter) {
     filter = filter || 'all';
     let ops = data.operations;
@@ -4814,7 +4934,7 @@ function renderOperations(filter) {
         const note = o.note || (defOp && defOp.note) || '';
         return `
         <tr>
-            <td><span class="op-type ${o.type.toLowerCase()}" style="display:inline-block;padding:3px 10px;border-radius:10px;font-size:0.75em;font-weight:700;${o.type==='T1'?'background:#d4edda;color:#155724':o.type==='T2'?'background:#fff3cd;color:#856404':o.type==='T3'?'background:#d1ecf1;color:#0c5460':o.type==='T4'?'background:#e2e3f1;color:#383d6e':'background:#f8d7da;color:#721c24'}">${o.type}</span></td>
+            <td><span class="op-type ${o.type.toLowerCase()}" style="display:inline-block;padding:3px 10px;border-radius:10px;font-size:0.75em;font-weight:700;${getOpTypeColor(o.type)}">${o.type}</span></td>
             <td>${escHtml(o.name)}${note ? '<div style="font-size:0.75em;color:#dc3545;margin-top:2px;font-weight:600">'+escHtml(note)+'</div>' : ''}</td>
             <td><strong>${(o.price||0).toFixed(2)} €</strong></td>
             <td>
