@@ -6318,16 +6318,19 @@ function renderURSSAF() {
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
 
-    // Year selector
+    // Year selector — toujours reconstruire avec plage complète
     const yearSel = document.getElementById('urssafYear');
+    const selectedYear = yearSel.value ? parseInt(yearSel.value) : currentYear;
     const years = new Set();
+    // Ajouter toutes les années des factures
     data.invoices.forEach(inv => { if (inv.date) years.add(new Date(inv.date).getFullYear()); });
+    // Ajouter année courante + année précédente + année suivante
+    years.add(currentYear - 2);
+    years.add(currentYear - 1);
     years.add(currentYear);
+    years.add(currentYear + 1);
     const sortedYears = [...years].sort((a,b) => b-a);
-    if (!yearSel.options.length || yearSel.dataset.built !== 'yes') {
-        yearSel.innerHTML = sortedYears.map(y => `<option value="${y}" ${y===currentYear?'selected':''}>${y}</option>`).join('');
-        yearSel.dataset.built = 'yes';
-    }
+    yearSel.innerHTML = sortedYears.map(y => `<option value="${y}" ${y===selectedYear?'selected':''}>${y}</option>`).join('');
     const year = parseInt(yearSel.value) || currentYear;
 
     // Calc CA per month (paid invoices only)
