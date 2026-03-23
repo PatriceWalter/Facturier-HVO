@@ -201,8 +201,23 @@
             <div style="margin-top:16px;text-align:right;background:#f8f9fa;padding:16px;border-radius:8px" id="invoiceTotalsZone"></div>
 
             <div class="form-row" style="margin-top:16px">
-                <div class="form-group"><label>Statut</label><select id="fStatut"><option value="pending">En attente</option><option value="paid">Payée</option><option value="overdue">Impayée</option></select></div>
-                <div class="form-group"><label>Mode de règlement</label><select id="fPayment"><option>Carte bancaire</option><option>Espèces</option><option>Chèque</option><option>Virement</option></select></div>
+                <div class="form-group"><label>Statut</label>
+                    <div id="fStatutBtns" style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button type="button" class="status-btn" data-status="pending" onclick="setInvoiceStatus('pending')" style="padding:10px 18px;border-radius:10px;border:2px solid #ffc107;background:#fff8e1;color:#856404;font-weight:700;font-size:0.95em;cursor:pointer;transition:all 0.2s">⏳ En attente</button>
+                        <button type="button" class="status-btn" data-status="paid" onclick="setInvoiceStatus('paid')" style="padding:10px 18px;border-radius:10px;border:2px solid #28a745;background:#e8f5e9;color:#155724;font-weight:700;font-size:0.95em;cursor:pointer;transition:all 0.2s">✅ Payée</button>
+                        <button type="button" class="status-btn" data-status="overdue" onclick="setInvoiceStatus('overdue')" style="padding:10px 18px;border-radius:10px;border:2px solid #dc3545;background:#fce4ec;color:#721c24;font-weight:700;font-size:0.95em;cursor:pointer;transition:all 0.2s">❌ Impayée</button>
+                    </div>
+                    <input type="hidden" id="fStatut" value="pending">
+                </div>
+                <div class="form-group"><label>Mode de règlement</label>
+                    <div id="fPaymentBtns" style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button type="button" class="payment-btn" data-pay="Carte bancaire" onclick="setPaymentMode('Carte bancaire')" style="padding:10px 16px;border-radius:10px;border:2px solid #1a3a7a;background:#e8eaf6;color:#1a3a7a;font-weight:700;font-size:0.95em;cursor:pointer;transition:all 0.2s">💳 Carte</button>
+                        <button type="button" class="payment-btn" data-pay="Espèces" onclick="setPaymentMode('Espèces')" style="padding:10px 16px;border-radius:10px;border:2px solid #2e7d32;background:#e8f5e9;color:#2e7d32;font-weight:700;font-size:0.95em;cursor:pointer;transition:all 0.2s">💶 Espèces</button>
+                        <button type="button" class="payment-btn" data-pay="Chèque" onclick="setPaymentMode('Chèque')" style="padding:10px 16px;border-radius:10px;border:2px solid #6a1b9a;background:#f3e5f5;color:#6a1b9a;font-weight:700;font-size:0.95em;cursor:pointer;transition:all 0.2s">📝 Chèque</button>
+                        <button type="button" class="payment-btn" data-pay="Virement" onclick="setPaymentMode('Virement')" style="padding:10px 16px;border-radius:10px;border:2px solid #01579b;background:#e1f5fe;color:#01579b;font-weight:700;font-size:0.95em;cursor:pointer;transition:all 0.2s">🏦 Virement</button>
+                    </div>
+                    <input type="hidden" id="fPayment" value="Carte bancaire">
+                </div>
             </div>
             <div class="form-group"><label>Observations</label><textarea id="fNotes" rows="2"></textarea></div>
         </div>

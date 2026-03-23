@@ -67,6 +67,16 @@
             </div>
 
             <div class="card">
+                <div class="card-title">📋 Conditions Générales de Vente (verso facture)</div>
+                <p style="font-size:0.8em;color:var(--text-light);margin-bottom:10px">Ces CGV sont imprimées automatiquement sur la page 2 de chaque facture. Vous pouvez les personnaliser ci-dessous.</p>
+                <div class="form-group"><textarea id="setCGV" rows="18" style="font-size:0.85em;line-height:1.5" placeholder="Vos conditions générales de vente..."></textarea></div>
+                <div style="display:flex;gap:10px;margin-top:12px">
+                    <button class="btn btn-primary" onclick="saveCGV()">💾 Enregistrer les CGV</button>
+                    <button class="btn btn-outline btn-sm" onclick="resetCGV()">🔄 Réinitialiser (CGV par défaut)</button>
+                </div>
+            </div>
+
+            <div class="card">
                 <div class="card-title">💾 Données</div>
                 <div style="display:flex;gap:10px;flex-wrap:wrap">
                     <button class="btn btn-success" onclick="exportData()">📥 Exporter (JSON)</button>

@@ -440,6 +440,48 @@ const STORAGE_KEY = 'hvo_facturier_v2';
 const LOGIN_CODE = '362';
 const PROXY_URL = 'https://script.google.com/macros/s/AKfycbwOcO4Xn_5hZiNTbi4uqk9cBGcvFtie-A7YbANtEzwqod83Lzmwox9sVPBkhsOaMHZHkA/exec';
 
+const DEFAULT_CGV = `Article 1 — Objet et champ d'application
+Les présentes conditions générales de vente (CGV) s'appliquent à toutes les prestations de réparation, entretien et vente de pièces détachées réalisées par l'établissement. Toute commande implique l'acceptation sans réserve des présentes CGV.
+
+Article 2 — Devis et ordre de réparation
+Un devis préalable est établi gratuitement sur demande. L'ordre de réparation signé par le client vaut acceptation des travaux décrits et de leur montant estimatif. Tout travail supplémentaire fait l'objet d'un accord préalable du client, sauf urgence ou nécessité technique imprévisible.
+
+Article 3 — Prix et facturation
+Les prix sont indiqués en euros, toutes taxes comprises (TTC) ou hors taxes (HT) selon le régime fiscal de l'entreprise. La facture détaille la main-d'œuvre, les fournitures et pièces détachées. Le taux horaire de main-d'œuvre est celui affiché dans l'établissement.
+
+Article 4 — Paiement
+Le paiement est exigible à la restitution du véhicule, sauf accord préalable. Les modes de paiement acceptés sont : espèces, carte bancaire, chèque et virement. En cas de retard de paiement, des pénalités de retard au taux de 3 fois le taux d'intérêt légal seront appliquées, ainsi qu'une indemnité forfaitaire de recouvrement de 40 euros (art. L.441-10 du Code de commerce).
+
+Article 5 — Délais d'exécution
+Les délais de réparation communiqués sont donnés à titre indicatif. L'entreprise s'engage à informer le client de tout retard significatif. Un retard ne peut donner lieu à indemnisation ni annulation de la commande.
+
+Article 6 — Garantie des réparations
+Les travaux de réparation sont garantis pour une durée de 3 mois ou 5 000 km (au premier des deux termes atteint), hors pièces d'usure normale. Cette garantie couvre la main-d'œuvre et les pièces fournies par l'établissement. Elle ne s'applique pas en cas de mauvaise utilisation, défaut d'entretien ou modification ultérieure du véhicule.
+
+Article 7 — Pièces détachées
+Sauf demande contraire du client, les pièces remplacées pourront être des pièces d'origine, de qualité équivalente ou échange standard. Le client peut demander la restitution des pièces remplacées lors de la commande des travaux. Les pièces fournies par le client ne sont pas couvertes par la garantie de l'établissement.
+
+Article 8 — Responsabilité
+L'entreprise est responsable des dommages causés au véhicule pendant son séjour dans l'atelier, sauf cas de force majeure. La responsabilité est limitée aux dommages directs et prévisibles. L'entreprise ne peut être tenue responsable des objets personnels laissés dans le véhicule.
+
+Article 9 — Droit de rétention
+Conformément à l'article 2286 du Code civil, l'entreprise dispose d'un droit de rétention sur le véhicule jusqu'au paiement intégral de la facture.
+
+Article 10 — Réclamation
+Toute réclamation doit être formulée par écrit dans un délai de 8 jours suivant la restitution du véhicule. Passé ce délai, les travaux sont réputés acceptés.
+
+Article 11 — Véhicule abandonné
+Conformément à l'article L.325-1 du Code de la route, tout véhicule non retiré dans un délai de 30 jours après notification écrite sera considéré comme abandonné. Des frais de gardiennage de 15 € par jour seront appliqués à compter du 8ème jour suivant la fin des travaux.
+
+Article 12 — Protection des données personnelles
+Les données personnelles collectées sont nécessaires à la gestion de la relation commerciale et sont traitées conformément au RGPD. Le client dispose d'un droit d'accès, de rectification et de suppression de ses données.
+
+Article 13 — Litiges
+En cas de litige, les parties s'engagent à rechercher une solution amiable. Le client peut recourir gratuitement au médiateur de la consommation. À défaut, le tribunal compétent sera celui du lieu de l'établissement.
+
+Article 14 — Essai routier
+Un essai routier peut être nécessaire avant ou après intervention. Il est effectué sous la responsabilité du réparateur, dans le respect du Code de la route. Le client peut accompagner le technicien lors de l'essai.`;
+
 // ============================================================
 // FIREBASE INIT
 // ============================================================
@@ -3436,9 +3478,9 @@ function renderDashboard() {
     document.getElementById('dashLastInvoices').innerHTML = last5.map(inv => {
         const cl = data.clients.find(c => c.id === inv.clientId);
         const vh = data.vehicles.find(v => v.id === inv.vehicleId);
-        const statusBadge = inv.status === 'paid' ? '<span class="badge badge-paid">Payée</span>' :
-            inv.status === 'overdue' ? '<span class="badge badge-overdue">Impayée</span>' :
-            '<span class="badge badge-pending">En attente</span>';
+        const statusBadge = inv.status === 'paid' ? '<span class="badge badge-paid" onclick="toggleInvoiceStatus(\''+inv.id+'\')" style="cursor:pointer;padding:6px 14px;font-size:0.9em" title="Cliquer pour changer">✅ Payée</span>' :
+            inv.status === 'overdue' ? '<span class="badge badge-overdue" onclick="toggleInvoiceStatus(\''+inv.id+'\')" style="cursor:pointer;padding:6px 14px;font-size:0.9em" title="Cliquer pour changer">❌ Impayée</span>' :
+            '<span class="badge badge-pending" onclick="toggleInvoiceStatus(\''+inv.id+'\')" style="cursor:pointer;padding:6px 14px;font-size:0.9em" title="Cliquer pour changer">⏳ En attente</span>';
         return `<tr>
             <td><strong>${inv.number}</strong></td>
             <td>${formatDate(inv.date)}</td>
@@ -4581,9 +4623,9 @@ function renderInvoices() {
     document.getElementById('invoicesTable').innerHTML = filtered.map(inv => {
         const cl = data.clients.find(c => c.id === inv.clientId);
         const vh = data.vehicles.find(v => v.id === inv.vehicleId);
-        const statusBadge = inv.status === 'paid' ? '<span class="badge badge-paid">Payée</span>' :
-            inv.status === 'overdue' ? '<span class="badge badge-overdue">Impayée</span>' :
-            '<span class="badge badge-pending">En attente</span>';
+        const statusBadge = inv.status === 'paid' ? '<span class="badge badge-paid" onclick="toggleInvoiceStatus(\''+inv.id+'\')" style="cursor:pointer;padding:6px 14px;font-size:0.9em" title="Cliquer pour changer le statut">✅ Payée</span>' :
+            inv.status === 'overdue' ? '<span class="badge badge-overdue" onclick="toggleInvoiceStatus(\''+inv.id+'\')" style="cursor:pointer;padding:6px 14px;font-size:0.9em" title="Cliquer pour changer le statut">❌ Impayée</span>' :
+            '<span class="badge badge-pending" onclick="toggleInvoiceStatus(\''+inv.id+'\')" style="cursor:pointer;padding:6px 14px;font-size:0.9em" title="Cliquer pour changer le statut">⏳ En attente</span>';
         return `<tr>
             <td><strong>${inv.number}</strong></td>
             <td>${formatDate(inv.date)}</td>
@@ -4592,10 +4634,10 @@ function renderInvoices() {
             <td>${(inv.totalRemise||0) > 0 ? '<span style="color:var(--red)">- '+(inv.totalRemise).toFixed(2)+' €</span>' : '-'}</td>
             <td><strong>${(inv.totalTTC||0).toFixed(2)} €</strong></td>
             <td>${statusBadge}</td>
-            <td>
-                <button class="btn btn-sm btn-outline" onclick="editInvoice('${inv.id}')">✏️</button>
-                <button class="btn btn-sm btn-secondary" onclick="printInvoice('${inv.id}')">🖨️</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteInvoice('${inv.id}')">🗑️</button>
+            <td style="white-space:nowrap">
+                <button class="btn btn-sm btn-outline" onclick="editInvoice('${inv.id}')" style="font-size:1.3em;padding:6px 12px" title="Modifier">✏️</button>
+                <button class="btn btn-sm btn-secondary" onclick="printInvoice('${inv.id}')" style="font-size:1.3em;padding:6px 12px" title="Imprimer">🖨️</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteInvoice('${inv.id}')" style="font-size:1.3em;padding:6px 12px" title="Supprimer">🗑️</button>
             </td>
         </tr>`;
     }).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-light)">Aucune facture</td></tr>';
@@ -4620,7 +4662,9 @@ function openInvoiceModal(id) {
             document.getElementById('fKmIn').value = inv.kmIn || '';
             document.getElementById('fKmOut').value = inv.kmOut || '';
             document.getElementById('fStatut').value = inv.status;
+            setInvoiceStatus(inv.status);
             document.getElementById('fPayment').value = inv.payment || 'Carte bancaire';
+            setPaymentMode(inv.payment || 'Carte bancaire');
             document.getElementById('fNotes').value = inv.notes || '';
             currentInvoiceLines = inv.lines ? inv.lines.map(l => ({...l})) : [];
         }
@@ -4632,7 +4676,9 @@ function openInvoiceModal(id) {
         document.getElementById('fKmIn').value = '';
         document.getElementById('fKmOut').value = '';
         document.getElementById('fStatut').value = 'pending';
+        setInvoiceStatus('pending');
         document.getElementById('fPayment').value = 'Carte bancaire';
+        setPaymentMode('Carte bancaire');
         document.getElementById('fNotes').value = '';
         currentInvoiceLines = [];
     }
@@ -4899,10 +4945,77 @@ function printInvoice(id) {
     </table>
     <div class="totals">${totalsHtml}</div>
     ${inv.notes ? '<div style="margin-top:16px;padding:10px;background:#f8f9fa;border-radius:4px;font-size:10px"><strong>Observations :</strong> '+escHtml(inv.notes)+'</div>' : ''}
-    <div class="mentions">${escHtml(s.mentions || '')}${auto ? '\\nTVA non applicable, art. 293 B du CGI' : ''}</div>
+    <div class="mentions">${escHtml(s.mentions || '')}${auto ? '\nTVA non applicable, art. 293 B du CGI' : ''}</div>
+    <div style="margin-top:20px;text-align:center;font-size:8px;color:#aaa">Page 1/2 — Facture</div>
+
+    <!-- ========== PAGE 2 : CGV ========== -->
+    <div style="page-break-before:always"></div>
+    <div style="padding:10px 0">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #1a3a7a;padding-bottom:8px;margin-bottom:14px">
+            <strong style="font-size:13px;color:#1a3a7a">CONDITIONS GÉNÉRALES DE VENTE</strong>
+            <span style="font-size:9px;color:#888">${escHtml(s.companyName)} — Facture ${escHtml(inv.number)}</span>
+        </div>
+        <div style="font-size:7.5px;line-height:1.5;color:#333;column-count:2;column-gap:20px;text-align:justify;white-space:pre-wrap">${escHtml(s.cgv || DEFAULT_CGV)}</div>
+        <div style="margin-top:16px;text-align:center;font-size:8px;color:#aaa">Page 2/2 — Conditions Générales de Vente</div>
+    </div>
     </body></html>`);
     win.document.close();
     setTimeout(() => win.print(), 500);
+}
+
+// ============================================================
+// STATUS & PAYMENT BUTTONS
+// ============================================================
+function setInvoiceStatus(status) {
+    document.getElementById('fStatut').value = status;
+    document.querySelectorAll('#fStatutBtns .status-btn').forEach(b => {
+        const s = b.getAttribute('data-status');
+        if (s === status) {
+            b.style.transform = 'scale(1.08)';
+            b.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+            b.style.opacity = '1';
+            if (s === 'pending') { b.style.background = '#ffc107'; b.style.color = '#fff'; b.style.borderColor = '#ffc107'; }
+            else if (s === 'paid') { b.style.background = '#28a745'; b.style.color = '#fff'; b.style.borderColor = '#28a745'; }
+            else if (s === 'overdue') { b.style.background = '#dc3545'; b.style.color = '#fff'; b.style.borderColor = '#dc3545'; }
+        } else {
+            b.style.transform = 'scale(1)';
+            b.style.boxShadow = 'none';
+            b.style.opacity = '0.5';
+            if (s === 'pending') { b.style.background = '#fff8e1'; b.style.color = '#856404'; b.style.borderColor = '#ffc107'; }
+            else if (s === 'paid') { b.style.background = '#e8f5e9'; b.style.color = '#155724'; b.style.borderColor = '#28a745'; }
+            else if (s === 'overdue') { b.style.background = '#fce4ec'; b.style.color = '#721c24'; b.style.borderColor = '#dc3545'; }
+        }
+    });
+}
+
+function setPaymentMode(mode) {
+    document.getElementById('fPayment').value = mode;
+    document.querySelectorAll('#fPaymentBtns .payment-btn').forEach(b => {
+        const p = b.getAttribute('data-pay');
+        if (p === mode) {
+            b.style.transform = 'scale(1.08)';
+            b.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+            b.style.opacity = '1';
+            b.style.fontWeight = '800';
+        } else {
+            b.style.transform = 'scale(1)';
+            b.style.boxShadow = 'none';
+            b.style.opacity = '0.5';
+            b.style.fontWeight = '700';
+        }
+    });
+}
+
+function toggleInvoiceStatus(invId) {
+    const inv = data.invoices.find(x => x.id === invId);
+    if (!inv) return;
+    const cycle = { 'pending': 'paid', 'paid': 'overdue', 'overdue': 'pending' };
+    inv.status = cycle[inv.status] || 'pending';
+    saveData();
+    renderInvoices();
+    renderDashboard();
+    const labels = { 'pending': '⏳ En attente', 'paid': '✅ Payée', 'overdue': '❌ Impayée' };
+    toast('Statut → ' + labels[inv.status], 'success');
 }
 
 // ============================================================
@@ -5483,6 +5596,7 @@ function loadSettings() {
     document.getElementById('setPrefix').value = s.prefix || '';
     document.getElementById('setNextNum').value = s.nextNum || 1;
     document.getElementById('setMentions').value = s.mentions || '';
+    document.getElementById('setCGV').value = s.cgv || DEFAULT_CGV;
     document.getElementById('settingsLogoPreview').src = s.logo || DEFAULT_LOGO;
     toggleRegimeFields();
 }
@@ -5525,6 +5639,20 @@ function saveMentions() {
     data.settings.mentions = document.getElementById('setMentions').value;
     saveData();
     toast('Mentions enregistrées', 'success');
+}
+
+function saveCGV() {
+    data.settings.cgv = document.getElementById('setCGV').value;
+    saveData();
+    toast('CGV enregistrées — seront imprimées au verso des factures', 'success');
+}
+
+function resetCGV() {
+    if (!confirm('Réinitialiser les CGV avec le texte par défaut ?')) return;
+    document.getElementById('setCGV').value = DEFAULT_CGV;
+    data.settings.cgv = DEFAULT_CGV;
+    saveData();
+    toast('CGV réinitialisées', 'info');
 }
 
 // ============================================================
