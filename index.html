@@ -5423,6 +5423,7 @@ function showRecommendationModal() {
         modal = document.createElement('div');
         modal.id = 'recModal';
         modal.className = 'modal-overlay';
+        modal.style.zIndex = '2000';
         modal.innerHTML = '<div class="modal" style="max-width:560px"><div class="modal-header"><h2 id="recModalTitle">📋 Opérations complémentaires</h2><button class="modal-close" onclick="closeModal(\'recModal\')">×</button></div><div class="modal-body" id="recModalBody"></div></div>';
         document.body.appendChild(modal);
     }
@@ -5626,7 +5627,6 @@ function addDevisPart() {
 }
 
 function openDevisOpPicker() {
-    // Réutiliser le picker d'opérations existant mais avec callback devis
     window._devisPickerMode = true;
     selectedPickerOps = new Set();
     document.getElementById('opPickerSearch').value = '';
