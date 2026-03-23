@@ -40,10 +40,14 @@
             </div>
 
             <div class="card">
-                <div class="card-title">🧾 Numérotation des factures</div>
+                <div class="card-title">🧾 Numérotation des factures & devis</div>
                 <div class="form-row">
                     <div class="form-group"><label>Préfixe facture</label><input id="setPrefix" placeholder="ex: HVO-"></div>
-                    <div class="form-group"><label>Prochain numéro</label><input id="setNextNum" type="number" min="1"></div>
+                    <div class="form-group"><label>Prochain n° facture</label><input id="setNextNum" type="number" min="1"></div>
+                </div>
+                <div class="form-row" style="margin-top:8px">
+                    <div class="form-group"><label>Préfixe devis</label><input id="setDevisPrefix" placeholder="ex: DEV-"></div>
+                    <div class="form-group"><label>Prochain n° devis</label><input id="setNextDevisNum" type="number" min="1"></div>
                 </div>
                 <div style="margin-top:12px"><button class="btn btn-primary" onclick="saveNumbering()">💾 Enregistrer</button></div>
             </div>

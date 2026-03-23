@@ -1,0 +1,7 @@
+            <div class="card">
+                <div class="card-title">📋 Devis <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openDevisModal()">+ Nouveau devis</button></div>
+                <div class="search-bar" style="position:relative">
+                    <input type="text" id="devisSearch" placeholder="Rechercher par n° devis, client, plaque..." oninput="renderDevis()" autocomplete="off">
+                </div>
+                <div class="table-wrap"><table><thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Véhicule</th><th>Total</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="devisTable"></tbody></table></div>
+            </div>

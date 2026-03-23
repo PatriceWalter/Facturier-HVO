@@ -314,3 +314,53 @@
 </div>
 
 <!-- Toast -->
+
+<!-- ===== DEVIS MODAL ===== -->
+<div class="modal-overlay" id="devisModal">
+    <div class="modal" style="max-width:900px">
+        <div class="modal-header"><h2 id="devisModalTitle">Nouveau devis</h2><button class="modal-close" onclick="closeModal('devisModal')">×</button></div>
+        <div class="modal-body" style="max-height:75vh;overflow-y:auto">
+            <div class="form-row">
+                <div class="form-group"><label>N° Devis</label><input id="dNum" readonly style="background:var(--blue);color:#fff;font-weight:700"></div>
+                <div class="form-group"><label>Date</label><input id="dDate" type="date"></div>
+                <div class="form-group"><label>Validité</label><input id="dValidite" type="date"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>Client *</label><select id="dClient" onchange="loadDevisVehicles()"><option value="">-- Sélectionner --</option></select></div>
+                <div class="form-group"><label>Véhicule *</label><select id="dVehicle"><option value="">-- Sélectionner client --</option></select></div>
+                <div class="form-group"><label>Km</label><input id="dKmIn" type="number" placeholder="Kilométrage"></div>
+            </div>
+
+            <div style="margin-top:16px">
+                <h3 style="color:var(--blue);margin-bottom:10px">Lignes de devis</h3>
+                <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+                    <button class="btn btn-primary btn-sm" onclick="openDevisOpPicker()">📁 Ajouter depuis catalogue</button>
+                    <button class="btn btn-outline btn-sm" onclick="addDevisLine()">+ Ligne libre</button>
+                    <button class="btn btn-sm" style="background:#fff8e1;color:#856404;border:1px solid #ffc107" onclick="addDevisPart()">+ Pièce</button>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 60px 80px 70px 80px 30px;gap:8px;padding:4px 8px;font-size:0.75em;color:var(--text-light);font-weight:600">
+                    <div>DÉSIGNATION</div><div>QTÉ</div><div>PRIX TTC</div><div>REMISE %</div><div>TOTAL</div><div></div>
+                </div>
+                <div id="devisLinesZone"></div>
+            </div>
+
+            <div style="margin-top:16px;text-align:right;background:#f8f9fa;padding:16px;border-radius:8px" id="devisTotalsZone"></div>
+
+            <div class="form-row" style="margin-top:16px">
+                <div class="form-group"><label>Statut</label>
+                    <div id="dStatutBtns" style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button type="button" class="status-btn" data-status="pending" onclick="setDevisStatus('pending')" style="padding:10px 18px;border-radius:10px;border:2px solid #ffc107;background:#fff8e1;color:#856404;font-weight:700;font-size:0.95em;cursor:pointer;transition:all 0.2s">⏳ En attente</button>
+                        <button type="button" class="status-btn" data-status="accepted" onclick="setDevisStatus('accepted')" style="padding:10px 18px;border-radius:10px;border:2px solid #28a745;background:#e8f5e9;color:#155724;font-weight:700;font-size:0.95em;cursor:pointer;transition:all 0.2s">✅ Accepté</button>
+                        <button type="button" class="status-btn" data-status="refused" onclick="setDevisStatus('refused')" style="padding:10px 18px;border-radius:10px;border:2px solid #dc3545;background:#fce4ec;color:#721c24;font-weight:700;font-size:0.95em;cursor:pointer;transition:all 0.2s">❌ Refusé</button>
+                    </div>
+                    <input type="hidden" id="dStatut" value="pending">
+                </div>
+            </div>
+            <div class="form-group"><label>Observations</label><textarea id="dNotes" rows="2"></textarea></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('devisModal')">Annuler</button>
+            <button class="btn btn-primary" onclick="saveDevis()">💾 Enregistrer</button>
+        </div>
+    </div>
+</div>
