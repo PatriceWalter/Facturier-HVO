@@ -110,12 +110,31 @@
                         <div class="form-group"><label>Téléphone</label><input id="bcClientTel"></div>
                     </div>
                     <div class="vo-doc-section"><h4>💰 Conditions financières</h4>
-                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC (€)</label><input id="bcPrix" type="number" step="0.01" style="font-weight:700;font-size:1.1em"></div><div class="form-group"><label>Acompte versé (€)</label><input id="bcAcompte" type="number" step="0.01"></div></div>
-                        <div class="form-row"><div class="form-group"><label>Solde restant (€)</label><input id="bcSolde" type="number" step="0.01"></div><div class="form-group"><label>Mode de paiement</label><input id="bcPaiement"></div></div>
+                        <div class="form-row"><div class="form-group"><label>Prix de vente TTC (€)</label><input id="bcPrix" type="number" step="0.01" style="font-weight:700;font-size:1.1em" oninput="calcBcSolde()"></div><div class="form-group"><label>Acompte versé (€)</label><input id="bcAcompte" type="number" step="0.01" oninput="calcBcSolde()"></div><div class="form-group"><label>Solde restant dû (€)</label><input id="bcSolde" type="text" readonly style="font-weight:700;font-size:1.1em;color:#c41e1e;background:#fff5f5"></div></div>
+                        <div class="form-group"><label>Mode de paiement de l'acompte</label>
+                            <div id="bcPaiementAcompteBtns" style="display:flex;gap:8px;flex-wrap:wrap">
+                                <button type="button" class="bc-pay-btn" data-target="bcPaiementAcompte" data-val="Espèces" onclick="setBcPay(this)" style="padding:8px 16px;border-radius:8px;border:2px solid #ddd;background:#f9f9f9;cursor:pointer;font-weight:600;font-size:0.9em">💶 Espèces</button>
+                                <button type="button" class="bc-pay-btn" data-target="bcPaiementAcompte" data-val="Carte bancaire" onclick="setBcPay(this)" style="padding:8px 16px;border-radius:8px;border:2px solid #ddd;background:#f9f9f9;cursor:pointer;font-weight:600;font-size:0.9em">💳 Carte bancaire</button>
+                                <button type="button" class="bc-pay-btn" data-target="bcPaiementAcompte" data-val="Chèque" onclick="setBcPay(this)" style="padding:8px 16px;border-radius:8px;border:2px solid #ddd;background:#f9f9f9;cursor:pointer;font-weight:600;font-size:0.9em">📝 Chèque</button>
+                                <button type="button" class="bc-pay-btn" data-target="bcPaiementAcompte" data-val="Virement" onclick="setBcPay(this)" style="padding:8px 16px;border-radius:8px;border:2px solid #ddd;background:#f9f9f9;cursor:pointer;font-weight:600;font-size:0.9em">🏦 Virement</button>
+                            </div>
+                            <input type="hidden" id="bcPaiementAcompte" value="">
+                        </div>
+                        <div class="form-group"><label>Mode de paiement du solde</label>
+                            <div id="bcPaiementSoldeBtns" style="display:flex;gap:8px;flex-wrap:wrap">
+                                <button type="button" class="bc-pay-btn" data-target="bcPaiementSolde" data-val="Espèces" onclick="setBcPay(this)" style="padding:8px 16px;border-radius:8px;border:2px solid #ddd;background:#f9f9f9;cursor:pointer;font-weight:600;font-size:0.9em">💶 Espèces</button>
+                                <button type="button" class="bc-pay-btn" data-target="bcPaiementSolde" data-val="Carte bancaire" onclick="setBcPay(this)" style="padding:8px 16px;border-radius:8px;border:2px solid #ddd;background:#f9f9f9;cursor:pointer;font-weight:600;font-size:0.9em">💳 Carte bancaire</button>
+                                <button type="button" class="bc-pay-btn" data-target="bcPaiementSolde" data-val="Chèque" onclick="setBcPay(this)" style="padding:8px 16px;border-radius:8px;border:2px solid #ddd;background:#f9f9f9;cursor:pointer;font-weight:600;font-size:0.9em">📝 Chèque</button>
+                                <button type="button" class="bc-pay-btn" data-target="bcPaiementSolde" data-val="Virement" onclick="setBcPay(this)" style="padding:8px 16px;border-radius:8px;border:2px solid #ddd;background:#f9f9f9;cursor:pointer;font-weight:600;font-size:0.9em">🏦 Virement</button>
+                            </div>
+                            <input type="hidden" id="bcPaiementSolde" value="">
+                        </div>
                         <div class="form-row"><div class="form-group"><label>Date de livraison prévue</label><input id="bcDateLivraison" type="date"></div><div class="form-group"><label>Garantie</label><input id="bcGarantie"></div></div>
                         <div class="form-group"><label>Conditions particulières</label><textarea id="bcConditions" rows="2" placeholder="Reprise ancien véhicule, travaux prévus..."></textarea></div>
                     </div>
-                    <div class="vo-print-bar"><button class="btn btn-primary" onclick="printBonCmd()">🖨️ Imprimer le bon de commande</button></div>
+                    <div class="vo-print-bar" style="display:flex;gap:10px;flex-wrap:wrap">
+                        <button class="btn btn-primary" onclick="printBonCmd()">🖨️ Imprimer le bon de commande</button>
+                        <button class="btn btn-secondary" onclick="resetBonCmd()">🔄 Réinitialiser</button>
+                    </div>
                 </div>
             </div>
-

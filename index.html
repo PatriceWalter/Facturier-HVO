@@ -6305,37 +6305,156 @@ function printFactureVO(){
 }
 
 // 📝 BON DE COMMANDE
+
+function calcBcSolde() {
+    var prix = parseFloat(document.getElementById('bcPrix').value) || 0;
+    var acompte = parseFloat(document.getElementById('bcAcompte').value) || 0;
+    var solde = prix - acompte;
+    document.getElementById('bcSolde').value = solde.toFixed(2) + ' €';
+}
+
+function setBcPay(btn) {
+    var target = btn.getAttribute('data-target');
+    var val = btn.getAttribute('data-val');
+    document.getElementById(target).value = val;
+    // Highlight
+    var container = btn.parentElement;
+    container.querySelectorAll('.bc-pay-btn').forEach(function(b) {
+        if (b.getAttribute('data-target') === target) {
+            b.style.background = '#f9f9f9'; b.style.borderColor = '#ddd'; b.style.color = '#333'; b.style.transform = 'scale(1)';
+        }
+    });
+    btn.style.background = '#1a3a7a'; btn.style.borderColor = '#1a3a7a'; btn.style.color = '#fff'; btn.style.transform = 'scale(1.05)';
+}
+
+function resetBonCmd() {
+    if (!confirm('Réinitialiser tout le formulaire bon de commande ?')) return;
+    ['bcMarque','bcModele','bcVersion','bcPlaque','bcVin','bcKm','bcCouleur','bcEnergie','bcAnnee',
+     'bcClientNom','bcClientPrenom','bcClientAdresse','bcClientCP','bcClientVille','bcClientTel',
+     'bcPrix','bcAcompte','bcDateLivraison','bcGarantie'].forEach(function(id) {
+        var el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('bcSolde').value = '';
+    document.getElementById('bcConditions').value = '';
+    document.getElementById('bcPaiementAcompte').value = '';
+    document.getElementById('bcPaiementSolde').value = '';
+    var sel1 = document.getElementById('voSelBonCmd'); if (sel1) sel1.selectedIndex = 0;
+    var sel2 = document.getElementById('bcClientSel'); if (sel2) sel2.selectedIndex = 0;
+    // Reset button highlights
+    document.querySelectorAll('.bc-pay-btn').forEach(function(b) {
+        b.style.background = '#f9f9f9'; b.style.borderColor = '#ddd'; b.style.color = '#333'; b.style.transform = 'scale(1)';
+    });
+    toast('Formulaire réinitialisé', 'info');
+}
+
 function printBonCmd(){
     var marque=document.getElementById('bcMarque').value;
     if(!marque)return toast('Sélectionnez ou remplissez un véhicule','error');
-    var s=data.settings;var prix=parseFloat(document.getElementById('bcPrix').value)||0;
+    var s=data.settings;
+    var prix=parseFloat(document.getElementById('bcPrix').value)||0;
     var acompte=parseFloat(document.getElementById('bcAcompte').value)||0;
-    var solde=prix-acompte;document.getElementById('bcSolde').value=solde.toFixed(2);
-    var h=getPrintHeader('BON DE COMMANDE VÉHICULE');
-    h+='<div class="bloc"><h3>Acheteur</h3><table>';
-    h+=dotLine('Nom',document.getElementById('bcClientNom').value+' '+document.getElementById('bcClientPrenom').value);
-    h+=dotLine('Adresse',document.getElementById('bcClientAdresse').value+' '+document.getElementById('bcClientCP').value+' '+document.getElementById('bcClientVille').value);
-    h+=dotLine('Téléphone',document.getElementById('bcClientTel').value);
-    h+='</table></div>';
-    h+='<div class="bloc"><h3>Véhicule commandé</h3><table>';
-    h+=dotLine('Marque',document.getElementById('bcMarque').value)+dotLine('Modèle',document.getElementById('bcModele').value+' '+(document.getElementById('bcVersion').value||''));
-    h+=dotLine('Plaque',document.getElementById('bcPlaque').value)+dotLine('VIN',document.getElementById('bcVin').value);
-    h+=dotLine('Km',document.getElementById('bcKm').value?parseInt(document.getElementById('bcKm').value).toLocaleString('fr-FR')+' km':'');
-    h+=dotLine('Couleur',document.getElementById('bcCouleur').value)+dotLine('Énergie',document.getElementById('bcEnergie').value)+dotLine('Année',document.getElementById('bcAnnee').value);
-    h+='</table></div>';
-    h+='<div class="bloc"><h3>Conditions financières</h3><table>';
-    h+=dotLine('Prix de vente TTC',prix.toFixed(2)+' €');
-    h+=dotLine('Acompte versé',acompte.toFixed(2)+' €');
-    h+='<tr><td style="width:180px;font-weight:700;padding:5px;font-size:1.1em">Solde restant dû</td><td style="border-bottom:1px dotted #999;padding:5px;font-weight:700;font-size:1.1em;color:#c41e1e">'+solde.toFixed(2)+' €</td></tr>';
-    h+=dotLine('Mode de paiement',document.getElementById('bcPaiement').value);
-    h+=dotLine('Date de livraison prévue',document.getElementById('bcDateLivraison').value?new Date(document.getElementById('bcDateLivraison').value).toLocaleDateString('fr-FR'):'');
-    h+=dotLine('Garantie',document.getElementById('bcGarantie').value);
-    h+='</table></div>';
+    var solde=prix-acompte;
+    var paiementAcompte=document.getElementById('bcPaiementAcompte').value||'-';
+    var paiementSolde=document.getElementById('bcPaiementSolde').value||'-';
+    var logo=s.logo||(typeof DEFAULT_LOGO!=='undefined'?DEFAULT_LOGO:'');
+
+    var clientNom=document.getElementById('bcClientNom').value+' '+document.getElementById('bcClientPrenom').value;
+    var clientAddr=document.getElementById('bcClientAdresse').value+' '+document.getElementById('bcClientCP').value+' '+document.getElementById('bcClientVille').value;
+    var clientTel=document.getElementById('bcClientTel').value;
+    var vehicule=marque+' '+document.getElementById('bcModele').value+' '+(document.getElementById('bcVersion').value||'');
+    var plaque=document.getElementById('bcPlaque').value;
+    var vin=document.getElementById('bcVin').value;
+    var km=document.getElementById('bcKm').value?parseInt(document.getElementById('bcKm').value).toLocaleString('fr-FR')+' km':'';
+    var couleur=document.getElementById('bcCouleur').value;
+    var energie=document.getElementById('bcEnergie').value;
+    var annee=document.getElementById('bcAnnee').value;
+    var dateLiv=document.getElementById('bcDateLivraison').value?new Date(document.getElementById('bcDateLivraison').value).toLocaleDateString('fr-FR'):'';
+    var garantie=document.getElementById('bcGarantie').value;
     var cond=document.getElementById('bcConditions').value;
-    if(cond)h+='<div class="bloc"><h3>Conditions particulières</h3><p style="white-space:pre-wrap">'+cond+'</p></div>';
-    h+='<p style="font-size:0.8em;color:#555;margin-top:10px">Conformément à l\'article L.121-20-12 du Code de la consommation, l\'acheteur dispose d\'un délai de rétractation de 14 jours à compter de la livraison du véhicule (vente à distance uniquement). Ce bon de commande engage les deux parties dès sa signature.</p>';
-    h+='<div style="display:flex;justify-content:space-between;margin-top:25px"><div class="sig-zone">Le vendeur<br><small>Signature et cachet</small></div><div class="sig-zone">L\'acheteur<br><small>Signature précédée de "Bon pour commande"</small></div></div>';
-    openPrintWindow(h);
+
+    var w=window.open('','_blank');
+    w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bon de commande</title>'+
+    '<style>'+
+    '@page{size:A4;margin:10mm 12mm}'+
+    '*{margin:0;padding:0;box-sizing:border-box}'+
+    'body{font-family:Arial,sans-serif;font-size:10px;color:#222;padding:0}'+
+    '.header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:8px;border-bottom:3px solid #1a3a7a;margin-bottom:10px}'+
+    '.header img{max-height:50px}'+
+    '.co{font-size:12px;font-weight:700;color:#1a3a7a}.co-sub{font-size:8px;color:#555}'+
+    '.stamp{display:inline-block;padding:3px 14px;border:2px solid #1a3a7a;color:#1a3a7a;font-weight:700;font-size:12px;letter-spacing:2px;border-radius:4px}'+
+    '.row2{display:flex;gap:10px;margin-bottom:8px}.col{flex:1}'+
+    '.box{border:1.5px solid #1a3a7a;border-radius:6px;padding:8px;margin-bottom:8px}'+
+    '.box h3{font-size:10px;color:#1a3a7a;margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:3px}'+
+    'table{width:100%;border-collapse:collapse}'+
+    'td{padding:2px 4px;font-size:9px;vertical-align:top}'+
+    '.fl{font-weight:600;width:100px;color:#333}.fv{border-bottom:1px dotted #bbb}'+
+    '.money-box{background:#f0f7ff;border:2px solid #1a3a7a;border-radius:8px;padding:10px;margin:8px 0}'+
+    '.money-row{display:flex;justify-content:space-between;padding:3px 0;font-size:10px}'+
+    '.money-row.total{border-top:2px solid #1a3a7a;margin-top:4px;padding-top:6px;font-size:13px;font-weight:700;color:#c41e1e}'+
+    '.money-row .label{font-weight:600;color:#333}'+
+    '.pay-row{display:flex;gap:20px;margin-top:6px;font-size:9px}'+
+    '.pay-item{padding:4px 10px;background:#f8f9fa;border:1px solid #ddd;border-radius:4px}'+
+    '.pay-item.active{background:#1a3a7a;color:#fff;border-color:#1a3a7a;font-weight:700}'+
+    '.cond{font-size:8px;margin-top:6px;padding:6px;background:#f8f9fa;border-radius:4px}'+
+    '.legal{font-size:7px;color:#888;margin-top:8px;line-height:1.4}'+
+    '.sig-zone{display:flex;justify-content:space-between;gap:20px;margin-top:12px}'+
+    '.sig-box{flex:1;text-align:center;border:1px solid #ddd;border-radius:6px;padding:8px;min-height:80px}'+
+    '.sig-box h4{font-size:9px;color:#1a3a7a;margin-bottom:4px;border-bottom:1px solid #eee;padding-bottom:3px}'+
+    '.sig-box small{font-size:7px;color:#888}'+
+    '</style></head><body>'+
+    '<div class="header">'+
+        '<div style="display:flex;align-items:center;gap:8px">'+(logo?'<img src="'+logo+'">':'')+'<div><div class="co">'+escHtml(s.companyName||'HVO')+'</div><div class="co-sub">'+escHtml(s.address||'')+' '+escHtml(s.zip||'')+' '+escHtml(s.city||'')+'</div><div class="co-sub">Tél: '+escHtml(s.phone||'')+' — Email: '+escHtml(s.email||'')+'</div><div class="co-sub">SIRET: '+escHtml(s.siret||'')+(s.rcs?' — RCS: '+escHtml(s.rcs):'')+'</div></div></div>'+
+        '<div style="text-align:right"><span class="stamp">BON DE COMMANDE</span><br><span style="font-size:8px;color:#555">Date : '+new Date().toLocaleDateString('fr-FR')+'</span></div>'+
+    '</div>'+
+
+    '<div class="row2">'+
+        '<div class="col"><div class="box"><h3>👤 ACHETEUR</h3><table>'+
+            '<tr><td class="fl">Nom</td><td class="fv">'+escHtml(clientNom)+'</td></tr>'+
+            '<tr><td class="fl">Adresse</td><td class="fv">'+escHtml(clientAddr)+'</td></tr>'+
+            '<tr><td class="fl">Téléphone</td><td class="fv">'+escHtml(clientTel)+'</td></tr>'+
+        '</table></div></div>'+
+        '<div class="col"><div class="box"><h3>🚗 VÉHICULE</h3><table>'+
+            '<tr><td class="fl">Véhicule</td><td class="fv">'+escHtml(vehicule)+'</td></tr>'+
+            '<tr><td class="fl">Plaque</td><td class="fv">'+escHtml(plaque)+'</td><td class="fl">VIN</td><td class="fv">'+escHtml(vin)+'</td></tr>'+
+            '<tr><td class="fl">Km</td><td class="fv">'+escHtml(km)+'</td><td class="fl">Couleur</td><td class="fv">'+escHtml(couleur)+'</td></tr>'+
+            '<tr><td class="fl">Énergie</td><td class="fv">'+escHtml(energie)+'</td><td class="fl">Année</td><td class="fv">'+escHtml(annee)+'</td></tr>'+
+        '</table></div></div>'+
+    '</div>'+
+
+    '<div class="money-box">'+
+        '<div style="font-weight:700;color:#1a3a7a;font-size:10px;margin-bottom:6px">💰 CONDITIONS FINANCIÈRES</div>'+
+        '<div class="money-row"><span class="label">Prix de vente TTC</span><span style="font-weight:700">'+prix.toFixed(2)+' €</span></div>'+
+        '<div class="money-row"><span class="label">Acompte versé</span><span>'+acompte.toFixed(2)+' €</span></div>'+
+        '<div class="money-row total"><span>SOLDE RESTANT DÛ</span><span>'+solde.toFixed(2)+' €</span></div>'+
+        '<div class="pay-row">'+
+            '<span style="font-weight:600;font-size:8px">Paiement acompte :</span>'+
+            ['Espèces','Carte bancaire','Chèque','Virement'].map(function(m){return '<span class="pay-item'+(paiementAcompte===m?' active':'')+'">'+m+'</span>';}).join('')+
+        '</div>'+
+        '<div class="pay-row">'+
+            '<span style="font-weight:600;font-size:8px">Paiement solde :</span>'+
+            ['Espèces','Carte bancaire','Chèque','Virement'].map(function(m){return '<span class="pay-item'+(paiementSolde===m?' active':'')+'">'+m+'</span>';}).join('')+
+        '</div>'+
+        '<div style="display:flex;gap:20px;margin-top:6px;font-size:9px">'+
+            '<div><span class="label">Date de livraison : </span>'+escHtml(dateLiv||'..../../....')+'</div>'+
+            '<div><span class="label">Garantie : </span>'+escHtml(garantie||'.........')+'</div>'+
+        '</div>'+
+    '</div>'+
+
+    (cond?'<div class="cond"><strong>Conditions particulières :</strong> '+escHtml(cond)+'</div>':'')+
+
+    '<div class="legal">'+
+        'Conformément à l\'article L.121-20-12 du Code de la consommation, l\'acheteur dispose d\'un délai de rétractation de 14 jours à compter de la livraison du véhicule (vente à distance uniquement). '+
+        'Ce bon de commande engage les deux parties dès sa signature. L\'acompte versé sera déduit du prix total. En cas de désistement de l\'acheteur, l\'acompte reste acquis au vendeur à titre d\'indemnisation. '+
+        'Le véhicule reste la propriété du vendeur jusqu\'au paiement intégral du prix. La livraison du véhicule ne pourra intervenir qu\'après encaissement effectif de la totalité du prix.'+
+    '</div>'+
+
+    '<div class="sig-zone">'+
+        '<div class="sig-box"><h4>Le vendeur</h4><small>Signature et cachet</small><div style="margin-top:40px;font-size:7px;color:#aaa">Date : ....../....../......</div></div>'+
+        '<div class="sig-box"><h4>L\'acheteur — Bon pour commande</h4><small>Signature précédée de la mention<br>« Bon pour commande »</small><div style="margin-top:30px;font-size:7px;color:#aaa">Date : ....../....../......</div></div>'+
+    '</div>'+
+
+    '</body></html>');
+    w.document.close();setTimeout(function(){w.print();},500);
 }
 
 // ============================================================
